@@ -1,12 +1,15 @@
 'use client';
 
 import Image from "next/image";
+import { useSelector } from "react-redux";
 
 interface AvatarProps {
   src: string | null | undefined;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ src }) => {
+const Avatar: React.FC<AvatarProps> = () => {
+  const src = useSelector((state:any) => state.user?.user?.profile_image)
+
   return ( 
     <Image 
       className="rounded-full" 

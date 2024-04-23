@@ -8,30 +8,27 @@ import Link from "next/link";
 import { getCookie } from "cookies-next";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserProfile } from "@/store/slice/authSlice";
+import { RootState } from "@/types/user";
 
 interface UserMenuProps { }
 
 const UserMenu = () => {
-    const token = getCookie('token');
-    const [isHost, setIsHost] = useState(false);
-    const [isVerify, setIsVerify] = useState(false)
+  const token = getCookie("token");
+  const [isHost, setIsHost] = useState(false);
+  const [isVerify, setIsVerify] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const data = useSelector((state: RootState) => state.user);
 
-    const [isOpen, setIsOpen] = useState(false);
-    const dispatch = useDispatch()
+  useEffect(() => {
+    if (data.user) {
+      setIsVerify(data.user.is_verified);
+      setIsHost(data.user.is_host);
+    }
+  }, [data]);
 
-    useEffect(() => {
-        const fetchIsHost = async () => {
-            const data = await dispatch(getUserProfile(token))
-            setIsVerify(prev => data.payload?.is_verified)
-            setIsHost(prev => data.payload?.is_host)
-        }
-        fetchIsHost()
-    }, [])
-    
-
-    const toggleOpen = useCallback(() => {
-        setIsOpen(prevState => !prevState);
-    }, []);
+  const toggleOpen = useCallback(() => {
+    setIsOpen((prevState) => !prevState);
+  }, []);
 
     return (
       <div className="relative">

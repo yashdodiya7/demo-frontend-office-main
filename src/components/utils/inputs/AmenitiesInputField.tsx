@@ -21,18 +21,6 @@ const checkboxIcons: Record<string, string> = {
   ac: "https://www.flatmate.in/air_conditioner.png",
 };
 
-// const amenitiesData = [
-//   { id: "tv", value: "1" },
-//   { id: "power_backup", value: "2" },
-//   { id: "fridge", value: "3" },
-//   { id: "cook", value: "4" },
-//   { id: "kitchen", value: "5" },
-//   { id: "parking", value: "6" },
-//   { id: "wifi", value: "7" },
-//   { id: "washing_machine", value: "8" },
-//   { id: "ac", value: "9" },
-// ];
-
 const AmenitiesInputField: React.FC = ({
   id,
   name,

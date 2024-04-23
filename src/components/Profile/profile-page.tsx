@@ -1,4 +1,5 @@
 "use client"
+import { otpVerifySchema, phoneVerifySchema } from '@/schemas/UserSchema'
 import { getUserProfile, updateUserProfile } from '@/store/slice/authSlice'
 import { getCookie } from 'cookies-next'
 import { useFormik } from 'formik'
@@ -50,44 +51,99 @@ const ProfileComponent = () => {
         }
     };
     
-    
-    
     const handleSubmit = async (val: any) => {
-        const formData = new FormData();
-        formData.append('name', val.name);
-        formData.append('phone_no', val.phone_no);
-        formData.append('gender', val.gender);
-        formData.append('occupation', val.occupation);
-        formData.append('age', val.age);
-        // Append other form fields as needed
-        formData.append('profile_image', val.profile_image);
+      const formData = new FormData();
+      formData.append("name", val.name);
+      formData.append("phone_no", val.phone_no);
+      formData.append("gender", val.gender);
+      formData.append("occupation", val.occupation);
+      formData.append("age", val.age);
+      formData.append("bio", val.bio);
+      // Append other form fields as needed
+      formData.append("profile_image", val.profile_image);
 
+      try {
+        await dispatch(
+          updateUserProfile({ userToken: token, updatedata: formData })
+        );
+      } catch (error) {
+        throw error;
+      }
+    }
+
+    const [updateContact, setUpdateContact] = useState(false)
+
+    const handleContactUpdate = () => {
+        setUpdateContact(true);
+    }
+
+    const handlePhoneSubmit = async (val: any) => {
         try {
+            // console.log(val);
+            // setDisableResend(false);
+            // startTimer();
+            const response = await dispatch(phoneVerify(val))
+            console.log(response.payload);
             
-            await dispatch(updateUserProfile({ userToken: token, updatedata: formData }))
-            
+            if (response.payload.Status === "Success") {
+                // console.log(response.payload, "In if condition");
+                await dispatch(setPhoneNumber({ phone_no: val.phone_no }));
             }
-            catch (error) {
-                throw error
-            } finally {
-            }
-            // console.log(status);
         }
+        catch (error) {
+            throw error
+        }
+    }
+
+    const handleOtpSubmit = async ( val: any) => {
+        // val.phone_no = state.phone_no
+        val.otp_session_id = state.otp_session_id
+        try {
+            // console.log(val);
+            const response = await dispatch(otpVerify(val))
+            // console.log(response.payload);
+            
+            if (response.payload.Status === "Success") {
+                // console.log(response.payload, "In if condition");
+                // await dispatch(setPhoneNumber({ phone_no: val.phone_no }));
+                dispatch(setOtpSessionId());
+                router.push('/auth/register')
+            }
+        }
+        catch (error) {
+            throw error
+        }
+    }
+
+    const phoneFormik = useFormik({
+        initialValues: {
+            phone_no: '',
+        },
+        validationSchema: phoneVerifySchema,
+        onSubmit: handlePhoneSubmit,
+    })
+
+    const otpFormik = useFormik({
+        initialValues: {
+            otp: '',
+        },
+        validationSchema: otpVerifySchema,
+        onSubmit: handleOtpSubmit,
+    })
         
-        const formik = useFormik({
-            initialValues: {
-                name: `${userData.name}`,
-                phone_no: `${userData.phone_no}`,
-                bio: `${userData.bio}`,
-                profile_image: null,
-                // date_of_birth: `${userData.date_of_birth}`,
-                gender: `${userData.gender}`,
-                occupation: `${userData.occupation}`,
-                age: `${userData.age}`,
-            },
-            // validationSchema: loginValidation,
-            onSubmit: handleSubmit,
-        })
+    const formik = useFormik({
+        initialValues: {
+            name: `${userData.name}`,
+            phone_no: `${userData.phone_no}`,
+            bio: `${userData.bio}`,
+            profile_image: null,
+            gender: `${userData.gender}`,
+            occupation: `${userData.occupation}`,
+            age: `${userData.age}`,
+        },
+        // validationSchema: loginValidation,
+        onSubmit: handleSubmit,
+    })
 
 
     return (
@@ -164,30 +220,13 @@ const ProfileComponent = () => {
                                             id="phone_no"
                                             name="phone_no"
                                             value={formik.values.phone_no}
-                                            onChange={formik.handleChange}
                                             type="tel"
                                             placeholder='+914545453635'
                                             autoComplete="tel"
-                                            className="px-2     block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                            className="px-2 bg-stone-200 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"
                                         />
                                     </div>
                                 </div>
-
-                                {/* <div className="sm:col-span-2">
-                                    <label htmlFor="date-of-birth" className="block text-sm font-medium leading-6 text-gray-900">
-                                        Date of Birth
-                                    </label>
-                                    <div className="mt-2">
-                                        <input
-                                            id="date-of-birth"
-                                            name="date-of-birth"
-                                            value={formik.values.date_of_birth}
-                                            onChange={formik.handleChange}
-                                            type="date"
-                                            className="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                    </div>
-                                </div> */}
 
                                 <div className="sm:col-span-2">
                                     <label htmlFor="gender" className="block text-sm font-medium leading-6 text-gray-900">
@@ -268,7 +307,7 @@ const ProfileComponent = () => {
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center justify-center gap-x-6">
+                    <div className="mt-6 flex items-center justify-start gap-x-6">
                         {/* <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
                             Cancel
                         </button> */}
@@ -278,8 +317,85 @@ const ProfileComponent = () => {
                         >
                             Save
                         </button>
+                        <button
+                            type="button"
+                            onClick={() => setUpdateContact(prev => !updateContact)}
+                            className="rounded-md shadow-lg shadow-stone-400 bg-gray-700 px-24 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                        >
+                            {updateContact ? "Cancel":"Update Contact"}
+                        </button>
                     </div>
                 </form>
+                {/* {updateContact && 
+                    <div>
+                        <form method="POST" className="mt-8">
+                        <div className="space-y-5 flex items-center justify-start gap-4">
+                            <div>
+                                <label htmlFor="" className="text-base font-medium text-gray-900">
+                                    {' '}
+                                    Phone No{' '}
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                        name='phone_no'
+                                        value={phoneFormik.values.phone_no}
+                                        onChange={phoneFormik.handleChange}
+                                        className="flex h-10 rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                        type="number"
+                                        placeholder="6353355965"
+                                    ></input>
+                                    {phoneFormik.touched.phone_no && phoneFormik.errors.phone_no && (
+                                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                                            <span className='font-medium'>{phoneFormik.errors.phone_no}</span>
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                            <div>
+                                <button
+                                    type="submit"
+                                    className="inline-flex items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-gray-800"
+                                >
+                                    Send OTP
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <form method="POST" className="mt-8">
+                    <div className="space-y-5 flex items-center justify-start gap-4">
+                        <div>
+                            <label htmlFor="" className="text-base font-medium text-gray-900">
+                                {' '}
+                                Verify Otp{' '}
+                            </label>
+                            <div className="mt-2">
+                                <input
+                                    name='otp'
+                                    value={otpFormik.values.otp}
+                                    onChange={otpFormik.handleChange}
+                                    className="flex h-10 rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                    type="number"
+                                    placeholder="1234"
+                                ></input>
+                                {otpFormik.touched.otp && otpFormik.errors.otp && (
+                                    <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                                        <span className='font-medium'>{otpFormik.errors.otp}</span>
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <button
+                                type="submit"
+                                className="inline-flex items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-gray-800"
+                            >
+                                Verify
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                    </div>
+                } */}
             </div>
             )}
         </div>

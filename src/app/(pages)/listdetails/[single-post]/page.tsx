@@ -14,6 +14,15 @@ import AmenitiesField from "@/components/utils/inputs/AmenitiesField";
 import PreferncesField from "@/components/utils/inputs/PreferncesField";
 import MapComponent from "@/components/map/map-component";
 import Link from "next/link";
+import { loadStripe, StripeError } from "@stripe/stripe-js";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+const publicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY;
+
+type Stripe = import("@stripe/stripe-js").Stripe;
+
+const stripePromise: Promise<Stripe | null> = publicKey ? loadStripe(publicKey) : Promise.resolve(null);
+
 
 const SingleDetails = ({ params }: { params: any }) => {
   var settings = {
@@ -46,6 +55,42 @@ const SingleDetails = ({ params }: { params: any }) => {
     fetchData();
   }, [dispatch]);
 
+  const [error, setError] = useState<string | null>(null);
+
+  const totalPrice = 200
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/payment/pay`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          totalPrice: Number(totalPrice),
+        }),
+      });
+      const data = await response.json();
+
+      const stripe = await stripePromise;
+
+      if (!stripe) {
+        throw new Error("Stripe.js has not loaded yet");
+      }
+
+      const { error: stripeError } = await stripe.redirectToCheckout({
+        sessionId: data.sessionId,
+      });
+
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
+
   // console.log(data);
 
   return (
@@ -71,12 +116,17 @@ const SingleDetails = ({ params }: { params: any }) => {
                 {data.user_occupation}
               </p>
               <p className="text-sm text-gray-600">{data.gender}</p>
-              <Link
+              {/* <Link
                 href={`/listprofile/${params["single-post"]}`}
                 className="px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800"
-              >
-                View Profile
-              </Link>
+              > */}
+                <button
+                  className="px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800"
+                  onClick={handleCheckout}
+                >
+                  Pay Rs. {totalPrice.toFixed(2)}
+                </button>
+              {/* </Link> */}
             </div>
             <h1 className="mt-6 mx-auto font-bold text-lg text-center">Nearby Listings</h1>
             <div className="relative h-full w-full">

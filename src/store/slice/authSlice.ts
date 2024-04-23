@@ -205,7 +205,7 @@ export const updateUserProfile = createAsyncThunk(
 
 const initialState = {
     token: [],
-    user: [],
+    userDetails: {},
     phone_no: '',
     otp_session_id: '',
     error: null,
@@ -280,13 +280,12 @@ const authSlice = createSlice({
             })
             .addCase(userLogin.fulfilled, (state: any, action: any) => {
                 state.status = 'succeeded'
-                // console.log(action.payload.message)
+                state.user = {...action?.payload?.data}
                 state.token = action.payload.tokens?.access
                 setCookie('token', action.payload.tokens?.access)
             })
             .addCase(userLogin.rejected, (state: any, action: any) => {
                 state.status = 'failed'
-                console.log(action.error.errors);
                 state.error = action.error
             })
             .addCase(getUserProfile.pending, (state: any) => {

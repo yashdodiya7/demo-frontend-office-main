@@ -10,8 +10,6 @@ const PostCreationSchema = Yup.object().shape({
     smoking_policy: Yup.string().required('Smoking policy is required'),
     occupancy: Yup.string().required('Occupancy is required'),
     looking_for: Yup.string().required('Looking for is required'),
-    amenities: Yup.array().required('Amenities are required').min(1, 'At least one amenity is required'),
-    highlights: Yup.array().required('Highlights are required').min(1, 'At least one highlight is required'),
     description: Yup.string().required('Description is required'),
 });
 

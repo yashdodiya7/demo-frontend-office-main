@@ -17,10 +17,15 @@ const PhoneNumberField = () => {
     const router = useRouter()
     const dispatch = useDispatch()    
     const state = useSelector((state: any) => state.user)
+
+    const [disableResend, setDisableResend] = useState(true);
+    const [timer, setTimer] = useState(30);
     
     const handlePhoneSubmit = async (val: any) => {
         try {
             // console.log(val);
+            // setDisableResend(false);
+            // startTimer();
             const response = await dispatch(phoneVerify(val))
             console.log(response.payload);
             
@@ -31,7 +36,6 @@ const PhoneNumberField = () => {
         }
         catch (error) {
             throw error
-        } finally {
         }
     }
 
@@ -52,9 +56,7 @@ const PhoneNumberField = () => {
         }
         catch (error) {
             throw error
-        } finally {
         }
-
     }
 
     const phoneFormik = useFormik({
@@ -72,6 +74,27 @@ const PhoneNumberField = () => {
         validationSchema: otpVerifySchema,
         onSubmit: handleOtpSubmit,
     })
+
+    const startTimer = () => {
+        let timeLeft = timer;
+        const interval = setInterval(() => {
+            timeLeft--;
+            setTimer(timeLeft);
+            if (timeLeft === 0) {
+                clearInterval(interval);
+                setDisableResend(true);
+                setTimer(30);
+            }
+        }, 1000);
+    };
+
+    const handleResend = async () => {
+        // Implement resend logic here
+        // For demonstration, let's reset the timer
+        setDisableResend(true);
+        startTimer();
+        // You may dispatch a phoneVerify action here to resend OTP
+    };
 
   return (
     <section>
@@ -122,6 +145,17 @@ const PhoneNumberField = () => {
                                     Send Otp
                                 </button>
                             </div>
+                            {/* <div>
+                                <button
+                                    onClick={handleResend}
+                                    disabled={!disableResend}
+                                    className={`inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white ${
+                                        disableResend ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'
+                                    }`}
+                                >
+                                    Resend OTP {disableResend ? '' : `(${timer}s)`}
+                                </button>
+                            </div> */}
                         </div>
                     </form>
                     <form method="POST" onSubmit={otpFormik.handleSubmit} className="mt-8">

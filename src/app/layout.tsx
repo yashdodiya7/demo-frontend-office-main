@@ -5,7 +5,9 @@ import "./globals.css";
 import Navbar from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Provider } from "react-redux";
-import store from "@/store/store";
+import storeObj from "@/store/store";
+
+const { store } = storeObj;
 
 const inter = Inter({ subsets: ["latin"] });
 
