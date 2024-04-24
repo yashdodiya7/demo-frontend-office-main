@@ -116,17 +116,12 @@ const SingleDetails = ({ params }: { params: any }) => {
                 {data.user_occupation}
               </p>
               <p className="text-sm text-gray-600">{data.gender}</p>
-              {/* <Link
+              <Link
                 href={`/listprofile/${params["single-post"]}`}
                 className="px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800"
-              > */}
-                <button
-                  className="px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800"
-                  onClick={handleCheckout}
-                >
-                  Pay Rs. {totalPrice.toFixed(2)}
-                </button>
-              {/* </Link> */}
+              >
+                View Profile
+              </Link>
             </div>
             <h1 className="mt-6 mx-auto font-bold text-lg text-center">Nearby Listings</h1>
             <div className="relative h-full w-full">

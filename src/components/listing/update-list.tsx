@@ -97,7 +97,7 @@ const UpdateList = () => {
       pet_policy: "",
       smoking_policy: "",
       occupancy: "",
-      looking_for: "",
+      looking_for: "", 
       amenities: [],
       highlights: [],
       description: "",

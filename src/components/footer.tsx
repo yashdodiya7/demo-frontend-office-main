@@ -3,7 +3,7 @@ import React from 'react'
 
 export function Footer() {
     return (
-        <footer className="w-full">
+        <footer className="w-full mt-auto">
             <hr />
             <section className="relative overflow-hidden bg-white py-8">
                 <div className="container relative z-10 mx-auto px-4">
