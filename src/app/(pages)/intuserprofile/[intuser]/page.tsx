@@ -3,12 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import UserLayout from '../../UserLayout'
 import Image from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchSingleListingUserProfile } from '@/store/slice/listingSlice';
 import { getCookie } from 'cookies-next';
 import axios from 'axios';
-import { ToastContainer } from 'react-toastify';
-import { ToastError } from '@/components/utils/custom-error/toast';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -16,58 +12,34 @@ const ListProfile = ({ params }: { params: any }) => {
 
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true)
-    const [buttonLoading, setButtonLoading] = useState(false);
-    const userStateData = useSelector(state => state.user.user)
-    const dispatch = useDispatch();
     const token = getCookie("token");
 
     useEffect(() => {
-      // Define an asynchronous function inside the useEffect
-      const fetchData = async () => {
+      const fetchInterestedUserProfile = async () => {
         try {
-          // Fetch listings when the component mounts
-          const res = await dispatch(
-            fetchSingleListingUserProfile({
-              userToken: token,
-              id: params["profile"],
-            })
+          const response = await axios.get(
+            `${BASE_URL}/listing/interesteduserprofile/${params["intuser"]}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
-          setData({ ...res.payload });
+        //   console.log("<<<",params["intuser"])
+        //   console.log("<<<", response.data)
+          setData({ ...response.data });
           setLoading(false);
         } catch (error) {
           setLoading(false);
           console.error("Error fetching single listing:", error);
         }
       };
-      // Call the asynchronous function
-      fetchData();
-    }, [dispatch]);
-
-
-    const handleInterestedClick = async () => {
-      try {
-        setButtonLoading(true);
-        await axios.post(`${BASE_URL}/listing/listings/${params['profile']}/interested`, null, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setButtonLoading(true);
-        // If API call is successful, you can add further actions here if needed
-      } catch (error) {
-        console.log("<<<",error);
-        ToastError(error.response?.data?.error)
-        setButtonLoading(false);
-        console.error('Error marking as interested:', error);
-      } finally {
-        setButtonLoading(false);
-      }
-    };
+      fetchInterestedUserProfile();
+    }, []);
     
     
   return (
     <UserLayout>
-      <ToastContainer/>
       {loading ? ( // Show loader if loading is true
         <div className="flex items-center justify-center h-screen">
           <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
@@ -122,15 +94,6 @@ const ListProfile = ({ params }: { params: any }) => {
               <label className="block text-gray-700 font-bold mb-2">Bio:</label>
               <p className="text-gray-900">{data.bio}</p>
             </div>
-            <button
-              onClick={handleInterestedClick}
-              className={`px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800 ${
-                buttonLoading || data.interested || userStateData.is_host ? 'opacity-50 pointer-events-none' : ''
-              }`}
-              disabled={buttonLoading || data.interested || userStateData.is_host}
-            >
-              {buttonLoading ? 'Loading...' : 'Interested'}
-            </button>
           </div>
         </div>
       )}

@@ -120,7 +120,6 @@ export const fetchSingleListing = createAsyncThunk(
 export const fetchSingleListingUserProfile = createAsyncThunk(
     'fetchSingleListingUserProfile',
     async ( {userToken ,id} ) => {
-
         try {
             
             let headers = {}; // Initialize empty headers object
