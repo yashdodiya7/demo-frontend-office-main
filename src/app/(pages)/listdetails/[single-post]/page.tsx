@@ -126,7 +126,7 @@ const SingleDetails = ({ params }: { params: any }) => {
             <h1 className="mt-6 mx-auto font-bold text-lg text-center">Nearby Listings</h1>
             <div className="relative h-full w-full">
               <div className="mt-4 h-96 shadow-lg rounded-2xl overflow-hidden">
-                <MapComponent />
+                <MapComponent id={data.id} />
               </div>
             </div>
           </div>
@@ -137,15 +137,22 @@ const SingleDetails = ({ params }: { params: any }) => {
               {/* Product image */}
               {/* <div className="w-64 h-64 bg-gray-200 rounded-lg mb-8"></div> */}
               {/* Product details */}
-              <h1 className="text-xl font-semibold mb-4 text-gray-900">
-                Location
-              </h1>
-              <h1 className="text-xl text-gray-600 mb-4 flex justify-start gap-2 items-center">
-                <span className="inline-block">
-                  <MapPin />
-                </span>{" "}
-                {data.location}
-              </h1>
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-xl font-semibold ml-1 mb-4 text-gray-900">
+                    Location
+                  </h1>
+                  <h1 className="text-xl text-gray-600 mb-4 flex justify-start gap-2 items-center">
+                    <span className="inline-block">
+                      <MapPin />
+                    </span>{" "}
+                    {data.location}
+                  </h1>
+                </div>
+                <div className="text-4xl font-serif">
+                  {data.max_vacancy}
+                </div>
+              </div>
               <hr />
               <div>
                 <h1 className="text-xl font-semibold mb-4 mt-4 text-gray-900">

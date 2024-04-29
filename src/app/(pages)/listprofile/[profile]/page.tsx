@@ -17,7 +17,7 @@ const ListProfile = ({ params }: { params: any }) => {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true)
     const [buttonLoading, setButtonLoading] = useState(false);
-    const userStateData = useSelector(state => state.user.user)
+    const userStateData = useSelector(state => state.user.userProfile)
     const dispatch = useDispatch();
     const token = getCookie("token");
 
@@ -125,9 +125,9 @@ const ListProfile = ({ params }: { params: any }) => {
             <button
               onClick={handleInterestedClick}
               className={`px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800 ${
-                buttonLoading || data.interested || userStateData.is_host ? 'opacity-50 pointer-events-none' : ''
+                buttonLoading || data.interested || userStateData.is_host || userStateData.confirmed_deal ? 'opacity-50 pointer-events-none' : ''
               }`}
-              disabled={buttonLoading || data.interested || userStateData.is_host}
+              disabled={buttonLoading || data.interested || userStateData.is_host || userStateData.confirmed_deal}
             >
               {buttonLoading ? 'Loading...' : 'Interested'}
             </button>

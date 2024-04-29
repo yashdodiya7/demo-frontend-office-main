@@ -7,6 +7,8 @@ import { getCookie } from 'cookies-next';
 import { ToastError, ToastSuccess } from '@/components/utils/custom-error/toast';
 import { ToastContainer } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { setUserData } from '@/store/slice/authSlice';
+import { useDispatch } from 'react-redux';
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 const Verify = () => {
@@ -14,6 +16,7 @@ const Verify = () => {
     const userToken = getCookie('token');
     const [selectedFiles, setSelectedFiles] = useState(); // State to store selected files
     const router = useRouter()
+    const dispatch = useDispatch()
   
     const handleSubmit = async (values, { setSubmitting }) => {
       const formData = new FormData();
@@ -36,6 +39,7 @@ const Verify = () => {
         );
         if (response.data.is_verified){
           ToastSuccess("Verified")
+          dispatch(setUserData({is_verified: true}))
           router.push('/createlist')
         }
       } catch (error) {

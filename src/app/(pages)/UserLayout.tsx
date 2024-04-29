@@ -12,16 +12,17 @@ export const metadata: Metadata = {
 };
 
 export default function UserLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <>
-            <Navbar />
-            {children}
-            <Footer />
-        </>
-
-    );
+  return (
+    <>
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        {children}
+        <Footer />
+      </div>
+    </>
+  );
 }

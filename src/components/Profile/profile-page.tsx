@@ -1,28 +1,30 @@
 "use client"
 import { otpVerifySchema, phoneVerifySchema } from '@/schemas/UserSchema'
-import { getUserProfile, updateUserProfile } from '@/store/slice/authSlice'
+import { otpVerify, phoneVerify, setOtpSessionId, setPhoneNumber, setUserData, updateUserProfile } from '@/store/slice/authSlice'
 import { getCookie } from 'cookies-next'
 import { useFormik } from 'formik'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
+import { ToastError, ToastSuccess } from '../utils/custom-error/toast'
 
 
 const ProfileComponent = () => {
 
     // const userAge = getUserAge(userData?.date_of_birth)
     const dispatch = useDispatch()
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const token = getCookie('token')
     // const [previewImage, setPreviewImage] = useState();
-    const userData = useSelector((state: any) => state.user.userProfile)
+    const state = useSelector((state: any) => state.user)
+    const userData = state.userProfile
 
-    useEffect(() => {
-        dispatch(getUserProfile(token))
-        .then(() => setLoading(false))
-        .catch(() => setLoading(false));
-    }, [])
+    // useEffect(() => {
+    //     dispatch(getUserProfile(token))
+    //     .then(() => setLoading(false))
+    //     .catch(() => setLoading(false));
+    // }, [])
 
     useEffect(() => {
         // Update form values when userData changes
@@ -37,7 +39,7 @@ const ProfileComponent = () => {
                 age: userData.age || '',
             });
         }
-    }, [userData]);
+    }, []);
 
     // for update a user profile
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,9 +65,10 @@ const ProfileComponent = () => {
       formData.append("profile_image", val.profile_image);
 
       try {
-        await dispatch(
-          updateUserProfile({ userToken: token, updatedata: formData })
-        );
+        setLoading(true);
+        const response = await dispatch(updateUserProfile({ userToken: token, updatedata: formData }));
+        dispatch(setUserData(response.payload));
+        setLoading(false);
       } catch (error) {
         throw error;
       }
@@ -73,63 +76,55 @@ const ProfileComponent = () => {
 
     const [updateContact, setUpdateContact] = useState(false)
 
-    const handleContactUpdate = () => {
-        setUpdateContact(true);
-    }
+    // const handleContactUpdate = () => {
+    //     setUpdateContact(true);
+    // }
 
-    const handlePhoneSubmit = async (val: any) => {
-        try {
-            // console.log(val);
-            // setDisableResend(false);
-            // startTimer();
-            const response = await dispatch(phoneVerify(val))
-            console.log(response.payload);
+    // const handlePhoneSubmit = async (values) => {
+    //     try {
+    //       setLoading(true);
+    //       await dispatch(phoneVerify(values.phone_no));
+    //       setLoading(false);
+    //       dispatch(setPhoneNumber(values));
+    //     } catch (error) {
+    //       setLoading(false);
+    //     }
+    //   };
+
+    // const handleOtpSubmit = async ( val: any) => {
+    //     // val.phone_no = state.phone_no
+    //     val.otp_session_id = state.otp_session_id
+    //     try {
+    //         // console.log(val);
+    //         const response = await dispatch(otpVerify(val))
+    //         // console.log(response.payload);
             
-            if (response.payload.Status === "Success") {
-                // console.log(response.payload, "In if condition");
-                await dispatch(setPhoneNumber({ phone_no: val.phone_no }));
-            }
-        }
-        catch (error) {
-            throw error
-        }
-    }
+    //         if (response.payload.Status === "Success") {
+    //             // console.log(response.payload, "In if condition");
+    //             // await dispatch(setPhoneNumber({ phone_no: val.phone_no }));
+    //             await dispatch(setOtpSessionId());
+    //         }
+    //     }
+    //     catch (error) {
+    //         throw error
+    //     }
+    // }
 
-    const handleOtpSubmit = async ( val: any) => {
-        // val.phone_no = state.phone_no
-        val.otp_session_id = state.otp_session_id
-        try {
-            // console.log(val);
-            const response = await dispatch(otpVerify(val))
-            // console.log(response.payload);
-            
-            if (response.payload.Status === "Success") {
-                // console.log(response.payload, "In if condition");
-                // await dispatch(setPhoneNumber({ phone_no: val.phone_no }));
-                dispatch(setOtpSessionId());
-                router.push('/auth/register')
-            }
-        }
-        catch (error) {
-            throw error
-        }
-    }
+    // const phoneFormik = useFormik({
+    //     initialValues: {
+    //         phone_no: '',
+    //     },
+    //     validationSchema: phoneVerifySchema,
+    //     onSubmit: handlePhoneSubmit,
+    // })
 
-    const phoneFormik = useFormik({
-        initialValues: {
-            phone_no: '',
-        },
-        validationSchema: phoneVerifySchema,
-        onSubmit: handlePhoneSubmit,
-    })
-
-    const otpFormik = useFormik({
-        initialValues: {
-            otp: '',
-        },
-        validationSchema: otpVerifySchema,
-        onSubmit: handleOtpSubmit,
-    })
+    // const otpFormik = useFormik({
+    //     initialValues: {
+    //         otp: '',
+    //     },
+    //     validationSchema: otpVerifySchema,
+    //     onSubmit: handleOtpSubmit,
+    // })
         
     const formik = useFormik({
         initialValues: {
@@ -157,7 +152,7 @@ const ProfileComponent = () => {
             <div className="p-8 bg-stone-100 sm:w-[70%] mx-auto rounded-3xl shadow mt-24 relative">
                 <div className="felx felx-col items-center justify-center">
                     <div className="flex flex-col items-center justify-center">
-                        <Image src={userData.profile_image !== "null" ? userData.profile_image : "/images/placeholder.jpg"} width={1000} height={1000} alt='Profile' className="w-48 h-48 bg-indigo-100 mx-auto rounded-full shadow-2xl absolute inset-x-0 top-0 -mt-24 flex items-center justify-center text-indigo-500 object-cover" />
+                        <Image src={userData.profile_image ? userData.profile_image : "/images/placeholder.jpg"} width={1000} height={1000} alt='Profile' className="w-48 h-48 bg-indigo-100 mx-auto rounded-full shadow-2xl absolute inset-x-0 top-0 -mt-24 flex items-center justify-center text-indigo-500 object-cover" />
                     </div>
                 </div>
 
@@ -326,9 +321,9 @@ const ProfileComponent = () => {
                         </button>
                     </div>
                 </form>
-                {/* {updateContact && 
+                {updateContact && 
                     <div>
-                        <form method="POST" className="mt-8">
+                        <form method="POST" onSubmit={phoneFormik.handleSubmit} className="mt-8">
                         <div className="space-y-5 flex items-center justify-start gap-4">
                             <div>
                                 <label htmlFor="" className="text-base font-medium text-gray-900">
@@ -395,7 +390,7 @@ const ProfileComponent = () => {
                     </div>
                 </form>
                     </div>
-                } */}
+                }
             </div>
             )}
         </div>

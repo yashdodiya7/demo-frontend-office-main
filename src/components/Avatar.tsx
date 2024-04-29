@@ -8,7 +8,7 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = () => {
-  const src = useSelector((state:any) => state.user?.user?.profile_image)
+  const src = useSelector((state:any) => state.user?.userProfile?.profile_image)
 
   return ( 
     <Image 

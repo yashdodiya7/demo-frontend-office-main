@@ -218,10 +218,13 @@ const authSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        logout: (state: any, action: any) => {
+        logout: (state: any) => {
             state.token = null
             state.user = null
             deleteCookie('token')
+        },
+        setUserData: (state: any, action: any) => {
+            state.userProfile = {...state.userProfile, ...action?.payload}
         },
         setPhoneNumber: (state:any, action:any) => {            
             const { phone_no } = action.payload; // Extract phone number from payload
@@ -259,6 +262,8 @@ const authSlice = createSlice({
             .addCase(userRegister.fulfilled, (state: any, action: any) => {
                 state.status = 'succeeded'
                 state.token = action.payload.tokens?.access
+                state.user = {...action?.payload?.data}
+                state.userProfile = {...action?.payload?.data}
                 setCookie('token', action.payload.tokens?.access)
             })
             .addCase(userRegister.rejected, (state: any, action: any) => {
@@ -281,6 +286,7 @@ const authSlice = createSlice({
             .addCase(userLogin.fulfilled, (state: any, action: any) => {
                 state.status = 'succeeded'
                 state.user = {...action?.payload?.data}
+                state.userProfile = {...action?.payload?.data}
                 state.token = action.payload.tokens?.access
                 setCookie('token', action.payload.tokens?.access)
             })
@@ -336,5 +342,5 @@ const authSlice = createSlice({
     },
 })
 
-export const { logout, setPhoneNumber, setOtpSessionId } = authSlice.actions
+export const { logout, setPhoneNumber, setOtpSessionId, setUserData } = authSlice.actions
 export default authSlice.reducer

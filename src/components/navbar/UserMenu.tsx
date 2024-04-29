@@ -20,9 +20,9 @@ const UserMenu = () => {
   const data = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
-    if (data.user) {
-      setIsVerify(data.user.is_verified);
-      setIsHost(data.user.is_host);
+    if (data.userProfile) {
+      setIsVerify(data.userProfile.is_verified);
+      setIsHost(data.userProfile.is_host);
     }
   }, [data]);
 
@@ -59,13 +59,13 @@ const UserMenu = () => {
         </div>
         {isOpen && (
           <div className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm">
-            <div className="flex flex-col cursor-pointer">
+            <div>
               {!token && <MenuItem to="/auth/phone-no" label="Sign Up" />}
               {!token && <MenuItem to="/auth/login" label="Login" />}
               {token && <MenuItem to="/prefernce" label="User Prefernces" />}
-              {token && !data.user.is_host && <MenuItem to="/myinterests" label="My Interests" />}
-              {token && data.user.is_host && <MenuItem to="/interestedusers" label="Interested Users" />}
-              {token && !data.user.is_host && <MenuItem to="/mydeal" label="My Deal" />}
+              {token && !data.userProfile?.is_host && <MenuItem to="/myinterests" label="My Interests" />}
+              {token && data.userProfile?.is_host && <MenuItem to="/interestedusers" label="Interested Users" />}
+              {token && !data.userProfile?.is_host && <MenuItem to="/mydeal" label="My Deal" />}
               {token && <MenuItem to="/" label="Logout" />}
             </div>
           </div>

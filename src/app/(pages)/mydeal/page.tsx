@@ -30,7 +30,7 @@ const MyDeal = () => {
 
   return (
     <UserLayout>
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center max-h-screen p-10">
       {dealData ? (
         <div className="max-w-3xl p-8 bg-white shadow-xl rounded-lg flex flex-wrap gap-14">
           {/* User 1 Card */}

@@ -32,7 +32,7 @@ const MenuItem = ({ label, to }: MenuItemProps) => {
 
     return (
         <Link href={to}>
-            <div className="px-4 py-3 hover:bg-neutral-100 transition font-semibold">
+            <div className="px-4 py-3 hover:bg-neutral-100 transition font-semibold flex flex-col cursor-pointer">
                 {label}
             </div>
         </Link>

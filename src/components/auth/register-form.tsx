@@ -40,6 +40,7 @@ const RegisterForm: React.FC = () => {
     try {
       // console.log(val);
       val.phone_no = state.phone_no;
+      // val.phone_no = "6353355125"
       const response = await dispatch(userRegister(val));
       if (response.payload.message === "registration successfull") {
         // Redirect the user to the home page
