@@ -1,16 +1,63 @@
 "use client"
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import axios from "axios";
 import { getCookie } from "cookies-next";
 import UserLayout from "../UserLayout";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserProfile } from "@/store/slice/authSlice";
+import PremiumCard from "@/components/subscription/premium-card";
 
 const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 const publicKey: string = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || "";
 
 const Payment: React.FC = () => {
   const userToken: string | undefined = getCookie('token');
+  const [loading, setLoading] = useState<boolean>(false)
+  const [subscriptionData, setSubscriptionData] = useState(null);
+  const [remainingDays, setRemainingDays] = useState(null);
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getUserProfile(userToken))
+      .then(() => setLoading(false))
+      .catch(() => setLoading(false));
+  }, [dispatch]);
+
+  const userPaid = useSelector((state: any) => state.user.userProfile.is_paid);
+
+  useEffect(() => {
+    const fetchSubscriptionData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/payment/active-subscription/`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        )
+        const data = response.data;
+        // Assuming the response contains only one active subscription
+        const subscription = data;
+        setSubscriptionData(subscription);
+
+        // Calculate remaining days
+        const endDate = new Date(subscription.end_date);
+        const currentDate = new Date();
+        const differenceInTime = endDate.getTime() - currentDate.getTime();
+        const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+        setRemainingDays(differenceInDays);
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+      }
+    };
+
+    if (userPaid) {
+      fetchSubscriptionData();
+    }
+  }, [userPaid]);
+
 
   const handlePayment = async (planType: string) => {
     try {
@@ -46,8 +93,29 @@ const Payment: React.FC = () => {
     handlePayment('premium');
   };
 
+  if (userPaid){
+    return (
+      <UserLayout>
+      <div className="flex justify-center">
+        {subscriptionData ? (
+          <PremiumCard subscriptionData={subscriptionData} remainingDays={remainingDays}/>
+        ) : (
+          <div className="flex items-center justify-center h-screen">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
+          </div>
+        )}
+      </div>
+      </UserLayout>
+    );
+  }
+  
   return (
     <UserLayout>
+      {loading ? ( // Show loader if loading is true
+          <div className="flex items-center justify-center h-screen">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
+          </div>
+      ) : (
       <div className="flex justify-center items-center max-h-screen">
         <div className="grid lg:grid-cols-2 px-8 gap-10 text-stone-800 my-12">
           <div className="flex flex-col items-center bg-slate-100 p-8 rounded-lg shadow-lg max-w-sm overflow-hidden">
@@ -108,6 +176,7 @@ const Payment: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
     </UserLayout>
   );
 };

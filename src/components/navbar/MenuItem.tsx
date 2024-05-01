@@ -1,20 +1,31 @@
-'use client';
+"use client"
 
+import { logout } from "@/store/slice/authSlice";
+// import  storeObj  from "@/store/store";
 import { deleteCookie } from "cookies-next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 
 interface MenuItemProps {
     label: string;
     to: string;
 }
 
+// const {persistor} = storeObj;
+
 const MenuItem = ({ label, to }: MenuItemProps) => {
 
     const router = useRouter()
+    const dispatch = useDispatch()
 
     const handleLogout = () => {
         deleteCookie('token')
+        // persistor.pause();
+        // persistor.flush().then(() => {
+        // return persistor.purge();
+        // });
+        dispatch(logout())
         router.push('/')
     }
 

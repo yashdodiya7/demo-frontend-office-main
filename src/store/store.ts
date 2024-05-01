@@ -1,3 +1,5 @@
+"use client"
+
 import { configureStore } from "@reduxjs/toolkit";
 import authSlice from "./slice/authSlice";
 import listingSlice from "./slice/listingSlice";
@@ -22,6 +24,12 @@ const persistConfig = {
   whitelist: ["userProfile"],
 };
 
+// Combine all your reducers into a root reducer
+// const rootReducer = combineReducers({
+//   user: authSlice,
+//   list: listingSlice
+// });
+
 const persistedReducer = persistReducer(persistConfig, authSlice);
 
 const store = configureStore({
@@ -39,5 +47,4 @@ const store = configureStore({
 
 const persistor = persistStore(store);
   
-
 export default {store, persistor};

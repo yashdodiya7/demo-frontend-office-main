@@ -29,7 +29,11 @@ const MapComponent = ({ id }) => {
   };
 
   if (!data) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-[100%]">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
+      </div>
+    );
   }
 
   const { current_post, nearby_posts } = data;

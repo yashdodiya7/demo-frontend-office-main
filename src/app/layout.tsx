@@ -7,11 +7,9 @@ import { Footer } from "@/components/footer";
 import { Provider } from "react-redux";
 import storeObj from "@/store/store";
 
-const { store } = storeObj;
-
 const inter = Inter({ subsets: ["latin"] });
 
-  
+const {store} = storeObj  
 
 export default function RootLayout({
   children,

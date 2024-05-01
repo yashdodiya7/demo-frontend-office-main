@@ -11,6 +11,12 @@ import Logo from '../navbar/Logo';
 import AmenitiesInputField from '../utils/inputs/AmenitiesInputField';
 import { AiOutlineColumnHeight } from 'react-icons/ai';
 import HighlightsInputField from '../utils/inputs/HighlightsInputField';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { ToastSuccess } from '../utils/custom-error/toast';
+import { setUserData } from '@/store/slice/authSlice';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 const amenitiesData = [
   { id: "tv", value: "9" },
@@ -98,10 +104,10 @@ const UpdateList = () => {
       smoking_policy: "",
       occupancy: "",
       looking_for: "", 
+      max_vacancy: "",
       amenities: [],
       highlights: [],
       description: "",
-      mobile_visible: false,
       images: [],
     });
 
@@ -145,6 +151,7 @@ const UpdateList = () => {
         property_type: formDataState ? formDataState.property_type : "",
         lease_term: formDataState ? formDataState.lease_term : "",
         approx_rent: formDataState ? formDataState.approx_rent : "",
+        max_vacancy: formDataState ? formDataState.max_vacancy: "",
         pet_policy: formDataState ? formDataState.pet_policy : "",
         smoking_policy: formDataState ? formDataState.smoking_policy : "",
         images: [] as any,
@@ -152,6 +159,8 @@ const UpdateList = () => {
         looking_for: formDataState ? formDataState.looking_for : "",
         description: formDataState ? formDataState.description : "",
     };
+
+    // console.log("<<<", formDataState)
     
     
     const handleFileChange = (event) => {
@@ -170,16 +179,15 @@ const UpdateList = () => {
           if (
             key !== "amenities" &&
             key !== "highlights" &&
-            key !== "mobile_visible" &&
             key !== "images"
           ) {
             formData.append(key, value);
           }
         });
 
-        if (val.mobile_visible.length > 0) {
-          formData.append("mobile_visible", true);
-        }
+        // if (val.mobile_visible.length > 0) {
+        //   formData.append("mobile_visible", true);
+        // }
 
         selectedFiles.forEach((file) => {
           formData.append("images", file);
@@ -194,15 +202,14 @@ const UpdateList = () => {
         formData.append("latitude", coordinates.lat);
         formData.append("longitude", coordinates.lng);
 
-        formData.append("availability_date", "2024-04-30");
-        formData.append("max_vacancy", "2");
+        // formData.append("availability_date", "2024-04-30");
 
         // for (const [name, value] of formData.entries()) {
         //   console.log(`<<< ${name}: ${value}`);
         // }
             
         const res = await dispatch(updatePost({userToken: token , updatedata: formData}))
-        console.log("Response: ",res.data);
+        // console.log("<<<Response: ",res.data);
             
     }
         
@@ -263,6 +270,34 @@ const UpdateList = () => {
     useEffect(() => {
       updateNewHighlight();
     }, [highlightsChecked]);
+
+
+    const router = useRouter();
+
+    const handleDelete = async () => {
+      try {
+        const response = await axios.delete(`${BASE_URL}/listing/delete`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          },
+        });
+        
+        if (response.status === 204) {
+          ToastSuccess("Listing deleted successfully")
+          dispatch(setUserData({is_host: false}))
+          setLoading(true)
+          setTimeout(() => {
+            setLoading(false);
+            router.push('/'); // Redirect to the home page
+          }, 2000)
+        } else {
+          console.error('Failed to delete listing');
+        }
+      } catch (error) {
+        console.error('Error occurred:', error);
+      }
+  };
 
     return (
       <div>
@@ -381,6 +416,29 @@ const UpdateList = () => {
                             />
                             <ErrorMessage
                               name="lease_term"
+                              component="div"
+                              className="mt-2 text-sm text-red-600 dark:text-red-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label
+                            htmlFor="max_vacancy"
+                            className="block text-sm font-medium leading-6 text-gray-900"
+                          >
+                            Max Vacancy
+                          </label>
+                          <div className="mt-2">
+                            <Field
+                              id="max_vacancy"
+                              name="max_vacancy"
+                              type="number"
+                              placeholder="11"
+                              className="py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            />
+                            <ErrorMessage
+                              name="max_vacancy"
                               component="div"
                               className="mt-2 text-sm text-red-600 dark:text-red-500"
                             />
@@ -516,7 +574,7 @@ const UpdateList = () => {
                           </div>
                         </div>
 
-                        <div className="sm:col-span-4">
+                        {/* <div className="sm:col-span-4">
                           <div className="flex items-center">
                             <Field
                               type="checkbox"
@@ -532,7 +590,7 @@ const UpdateList = () => {
                               Mobile No Visible to Others ?
                             </label>
                           </div>
-                        </div>
+                        </div> */}
 
                         <div className="sm:col-span-6 flex gap-2 flex-col md:flex-col md:gap-2">
                           <div className="">
@@ -672,7 +730,7 @@ const UpdateList = () => {
                           <label className="text-sm text-black mb-2 block">
                             Upload Image file
                           </label>
-                          <Field
+                          <input
                             type="file"
                             name="images"
                             accept="image/*"
@@ -700,6 +758,7 @@ const UpdateList = () => {
                     </button>
                     <button
                       type="button"
+                      onClick={handleDelete}
                       className="capitalize ml-8 px-16 mb-8 rounded-md bg-red-600 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                     >
                       Delete

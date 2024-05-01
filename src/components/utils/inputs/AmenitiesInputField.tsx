@@ -43,7 +43,7 @@ const AmenitiesInputField: React.FC = ({
           onChange={onChange}
           className="hidden"
         />
-        <label htmlFor={id} className="cursor-pointer">
+        <label htmlFor={id} className="cursor-pointer flex flex-col items-center justify-center">
           <div
             className={`w-24 h-24 flex items-center justify-center border-2 rounded-full mb-1 ${
               checked ? "border-green-500" : "border-gray-300"
@@ -55,7 +55,7 @@ const AmenitiesInputField: React.FC = ({
               className="w-16 h-16 object-contain"
             />
           </div>
-          <span className="text-black text-sm capitalize p-4">
+          <span className="text-black text-sm capitalize mt-1">
             {formattedValue}
           </span>
         </label>

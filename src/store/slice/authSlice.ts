@@ -221,6 +221,9 @@ const authSlice = createSlice({
         logout: (state: any) => {
             state.token = null
             state.user = null
+            state.userProfile = null
+            state.phone_no = null
+            state.userPreferences = null
             deleteCookie('token')
         },
         setUserData: (state: any, action: any) => {
@@ -262,7 +265,6 @@ const authSlice = createSlice({
             .addCase(userRegister.fulfilled, (state: any, action: any) => {
                 state.status = 'succeeded'
                 state.token = action.payload.tokens?.access
-                state.user = {...action?.payload?.data}
                 state.userProfile = {...action?.payload?.data}
                 setCookie('token', action.payload.tokens?.access)
             })
@@ -285,7 +287,6 @@ const authSlice = createSlice({
             })
             .addCase(userLogin.fulfilled, (state: any, action: any) => {
                 state.status = 'succeeded'
-                state.user = {...action?.payload?.data}
                 state.userProfile = {...action?.payload?.data}
                 state.token = action.payload.tokens?.access
                 setCookie('token', action.payload.tokens?.access)

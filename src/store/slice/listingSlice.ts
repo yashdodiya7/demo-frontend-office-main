@@ -48,7 +48,7 @@ export const updatePost = createAsyncThunk(
             ToastSuccess(data.message)
             return data
         } catch (error: any) {
-            ToastError(error?.response?.data?.error)
+            ToastError(error?.response?.data?.message)
             throw error?.response?.data
         }
     }

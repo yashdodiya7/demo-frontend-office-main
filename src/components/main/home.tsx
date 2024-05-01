@@ -7,22 +7,22 @@ import { fetchListing, setSearchData } from "@/store/slice/listingSlice";
 import { getCookie } from "cookies-next";
 import Link from "next/link";
 import ErrorCard from "../utils/custom-error/error-card";
-import SearchComponent from "../search/search-name";
 import axios from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
 function HomePage() {
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.list);
+  const stateUser = useSelector((state: any) => state.user);
   // const stateUser = useSelector((state: any) => state.user)
-  const token = getCookie("token");
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const token: string | undefined = getCookie("token");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     // Function to fetch listings with user's location
-    const fetchListingsWithLocation = async (latitude, longitude) => {
+    const fetchListingsWithLocation = async (latitude: number, longitude: number) => {
       try {
         // Dispatch action to fetch listings with user's location
         
@@ -55,7 +55,7 @@ function HomePage() {
 
     // Call function to get user's location
     getUserLocation();
-  }, [dispatch]);
+  }, [dispatch, stateUser, token]);
 
 
 
@@ -84,7 +84,7 @@ function HomePage() {
   const handleSearch = async () => {
     // Perform search only if searchQuery is not empty
 
-    const fetchListingsWithLocation = async (lat, lan) => {
+    const fetchListingsWithLocation = async (lat: number, lan: number) => {
 
       if (searchQuery.trim() !== '') {
         setLoading(true); // Set loading state to true while fetching data

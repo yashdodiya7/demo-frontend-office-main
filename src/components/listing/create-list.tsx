@@ -1,8 +1,10 @@
 "use client"
 import PostCreationSchema from '@/schemas/ListingSchema';
+import { setUserData } from '@/store/slice/authSlice';
 import { createPost } from '@/store/slice/listingSlice';
 import { getCookie } from 'cookies-next';
 import { ErrorMessage, Field, FieldArray, Formik} from 'formik';
+import { useRouter } from 'next/navigation';
 import React, { FormEventHandler, useState } from 'react'
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { useDispatch, useSelector } from 'react-redux';
@@ -52,6 +54,7 @@ const CreateList = () => {
 
     const dispatch = useDispatch()
     const state = useSelector((state: any) => state.list)
+    const router = useRouter()
     
     const [checked, setChecked] = useState({
         "tv":false,
@@ -84,6 +87,7 @@ const CreateList = () => {
         smoking_policy: "",
         images: [] as any,
         occupancy: "",
+        max_vacancy: "",
         looking_for: "",
         amenities: [],
         highlights: [],
@@ -122,15 +126,18 @@ const CreateList = () => {
         formData.append('longitude', coordinates.lng)
 
         formData.append('availability_date', '2024-04-30')
-        formData.append('max_vacancy', "2")
 
         // for (const [name, value] of formData.entries()){
         //     console.log(`${name}: ${value}`);
         // }
         
         const res = await dispatch(createPost({userToken: token , updatedata: formData}))
-        // console.log("Response: ",res.data);
-        
+        if(res?.payload?.message === "Post Created"){
+            dispatch(setUserData({is_host: true}))
+            setTimeout(() => {
+                router.push("/")
+            }, 2000)
+        }
     }
 
     const handleSelect = async value => {
@@ -224,6 +231,22 @@ const CreateList = () => {
                                             className="py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                         />
                                         <ErrorMessage name="lease_term" component="div" className="mt-2 text-sm text-red-600 dark:text-red-500" />
+                                    </div>
+                                </div>
+
+                                <div className="sm:col-span-2">
+                                    <label htmlFor="max_vacancy" className="block text-sm font-medium leading-6 text-gray-900">
+                                        Max Vacancy
+                                    </label>
+                                    <div className="mt-2">
+                                        <Field
+                                            id="max_vacancy"
+                                            name="max_vacancy"
+                                            type="number"
+                                            placeholder='2'
+                                            className="py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        />
+                                        <ErrorMessage name="max_vacancy" component="div" className="mt-2 text-sm text-red-600 dark:text-red-500" />
                                     </div>
                                 </div>
 
@@ -380,15 +403,15 @@ const CreateList = () => {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label className="text-sm text-black mb-2 block">Upload Image file</label>
-                                        <Field
+                                    <label htmlFor="file-input" className="sr-only">Choose file</label>
+                                        <input
                                             type="file"
                                             name='images'
                                             accept="image/*"
                                             onChange={handleFileChange}
                                             multiple
-                                            className="w-full text-black text-sm bg-white border file:cursor-pointer cursor-pointer file:border-0 file:py-2.5 file:px-4 file:bg-gray-100 file:hover:bg-gray-200 file:text-black rounded" />
-                                    <p className="text-xs text-gray-400 mt-2">PNG, JPG SVG, WEBP, and GIF are Allowed.</p>
+                                            className="block w-full border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none file:bg-gray-50 file:border-0 file:me-4 file:py-3 file:px-4" 
+                                        />
                                 </div>
                             </div>
                         </div>

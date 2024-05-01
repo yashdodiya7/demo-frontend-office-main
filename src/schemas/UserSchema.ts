@@ -48,16 +48,20 @@ const otpVerifySchema = yup.object().shape({
 })
 
 const updateUser = yup.object().shape({
-	name: yup.string(),
-	email: yup.string().email('Invalid email address format'),
-	contact_no: yup.number()
-		.typeError("That doesn't look like a mobile number")
-		.positive("A mobile number can't start with a minus")
-		.integer("A mobile number can't include a decimal point")
-		.test(
-			'Mobile number must be exactly 10 digits',
-			(val: any) => val.toString().length === 10
-		),
+	name: yup.string()
+        .required('Name is required'),
+    email: yup.string()
+        .email('Invalid email')
+        .required('Email is required'),
+    gender: yup.string()
+        .required('Gender is required'),
+    occupation: yup.string()
+        .required('Occupation is required'),
+    age: yup.number()
+        .typeError('Age must be a number')
+        .required('Age is required')
+        .positive('Age must be a positive number')
+        .integer('Age must be an integer'),
 })
 
 export { registerSchema, loginValidation, updateUser, phoneVerifySchema, otpVerifySchema }

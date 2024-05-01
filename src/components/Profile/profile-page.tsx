@@ -1,5 +1,5 @@
 "use client"
-import { otpVerifySchema, phoneVerifySchema } from '@/schemas/UserSchema'
+import { otpVerifySchema, phoneVerifySchema, updateUser } from '@/schemas/UserSchema'
 import { otpVerify, phoneVerify, setOtpSessionId, setPhoneNumber, setUserData, updateUserProfile } from '@/store/slice/authSlice'
 import { getCookie } from 'cookies-next'
 import { useFormik } from 'formik'
@@ -10,12 +10,12 @@ import { ToastContainer } from 'react-toastify'
 import { ToastError, ToastSuccess } from '../utils/custom-error/toast'
 
 
-const ProfileComponent = () => {
+const ProfileComponent: React.FC = () => {
 
     // const userAge = getUserAge(userData?.date_of_birth)
     const dispatch = useDispatch()
-    const [loading, setLoading] = useState(false);
-    const token = getCookie('token')
+    const [loading, setLoading] = useState<boolean>(false);
+    const token: string | undefined = getCookie('token')
     // const [previewImage, setPreviewImage] = useState();
     const state = useSelector((state: any) => state.user)
     const userData = state.userProfile
@@ -30,21 +30,22 @@ const ProfileComponent = () => {
         // Update form values when userData changes
         if (userData) {
             formik.setValues({
-                name: userData.name || '',
-                phone_no: userData.phone_no || '',
-                profile_image: userData.profile_image || null,
-                bio: userData.bio || '',
-                gender: userData.gender || '',
-                occupation: userData.occupation || '',
-                age: userData.age || '',
+                name: userData?.name || '',
+                phone_no: userData?.phone_no || '',
+                email: userData?.email || '',
+                profile_image: userData?.profile_image || null,
+                bio: userData?.bio || '',
+                gender: userData?.gender || '',
+                occupation: userData?.occupation || '',
+                age: userData?.age || '',
             });
         }
     }, []);
 
     // for update a user profile
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const fieldName = e.target.name;
-        const fieldValue = e.target.type === 'file' ? e.target.files[0] : e.target.value;
+        const fieldName: string = e.target.name;
+        const fieldValue: undefined | string | File = e.target.type === 'file' ? e.target.files?.[0] : e.target.value;
     
         formik.setFieldValue(fieldName, fieldValue); // Set formik field value
     
@@ -57,6 +58,7 @@ const ProfileComponent = () => {
       const formData = new FormData();
       formData.append("name", val.name);
       formData.append("phone_no", val.phone_no);
+      formData.append("email", val.email);
       formData.append("gender", val.gender);
       formData.append("occupation", val.occupation);
       formData.append("age", val.age);
@@ -128,15 +130,16 @@ const ProfileComponent = () => {
         
     const formik = useFormik({
         initialValues: {
-            name: `${userData.name}`,
-            phone_no: `${userData.phone_no}`,
-            bio: `${userData.bio}`,
+            name: `${userData?.name}`,
+            phone_no: `${userData?.phone_no}`,
+            email: `${userData?.email}`,
+            bio: `${userData?.bio}`,
             profile_image: null,
-            gender: `${userData.gender}`,
-            occupation: `${userData.occupation}`,
-            age: `${userData.age}`,
+            gender: `${userData?.gender}`,
+            occupation: `${userData?.occupation}`,
+            age: `${userData?.age}`,
         },
-        // validationSchema: loginValidation,
+        validationSchema: updateUser,
         onSubmit: handleSubmit,
     })
 
@@ -163,7 +166,6 @@ const ProfileComponent = () => {
                             <input type="file" name='profile_image' className='cursor-pointer' id="profile-image-upload" accept="image/*" hidden onChange={handleChange}/>
                         </div>
                         <h1 className="text-4xl mt-8 font-medium text-gray-700">{userData?.name}, <span className="font-light text-gray-500">{userData.age}</span></h1>
-                        <p className="font-light text-gray-600 mt-1">{userData.location} Surat</p>
                         <p className="mt-1 text-gray-500">{userData.occupation}</p>
                         {/* <p className="mt-2 text-gray-500">University of Computer Science</p> */}
                     </div>
@@ -187,7 +189,7 @@ const ProfileComponent = () => {
 
                             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                                 <div className="sm:col-span-2">
-                                    <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                                    <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">
                                         Full Name
                                     </label>
                                     <div className="mt-2">
@@ -198,10 +200,15 @@ const ProfileComponent = () => {
                                             value={formik.values.name}
                                             onChange={formik.handleChange}
                                             placeholder='John Doe'
-                                            autoComplete="email"
+                                            autoComplete="name"
                                             className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
+                                    {formik.touched.name && formik.errors.name && (
+                                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                                            <span className='font-medium'>{formik.errors.name}</span>
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* More input fields for address */}
@@ -224,6 +231,29 @@ const ProfileComponent = () => {
                                 </div>
 
                                 <div className="sm:col-span-2">
+                                    <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                                        Email
+                                    </label>
+                                    <div className="mt-2">
+                                        <input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            value={formik.values.email}
+                                            onChange={formik.handleChange}
+                                            placeholder='John Doe'
+                                            autoComplete="email"
+                                            className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        />
+                                        {formik.touched.email && formik.errors.email && (
+                                            <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                                                <span className='font-medium'>{formik.errors.email}</span>
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="sm:col-span-2">
                                     <label htmlFor="gender" className="block text-sm font-medium leading-6 text-gray-900">
                                         Gender
                                     </label>
@@ -240,11 +270,11 @@ const ProfileComponent = () => {
                                             <option value="female">Female</option>
                                         </select>
                                     </div>
-                                    {/* {formik.touched.gender && formik.errors.gender && (
+                                    {formik.touched.gender && formik.errors.gender && (
                                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
                                             <span className='font-medium'>{formik.errors.gender}</span>
                                         </p>
-                                    )} */}
+                                    )}
                             </div>
 
                                 <div className="sm:col-span-2">
@@ -263,6 +293,11 @@ const ProfileComponent = () => {
                                             className="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
+                                    {formik.touched.occupation && formik.errors.occupation && (
+                                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                                            <span className='font-medium'>{formik.errors.occupation}</span>
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="sm:col-span-2">
@@ -281,6 +316,11 @@ const ProfileComponent = () => {
                                             className="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                         />
                                     </div>
+                                    {formik.touched.age && formik.errors.age && (
+                                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                                            <span className='font-medium'>{formik.errors.age}</span>
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="sm:col-span-full">
@@ -303,9 +343,6 @@ const ProfileComponent = () => {
                     </div>
 
                     <div className="mt-6 flex items-center justify-start gap-x-6">
-                        {/* <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
-                            Cancel
-                        </button> */}
                         <button
                             type="submit"
                             className="rounded-md shadow-lg shadow-stone-400 bg-stone-700 px-28 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
@@ -321,7 +358,7 @@ const ProfileComponent = () => {
                         </button>
                     </div>
                 </form>
-                {updateContact && 
+                {/* {updateContact && 
                     <div>
                         <form method="POST" onSubmit={phoneFormik.handleSubmit} className="mt-8">
                         <div className="space-y-5 flex items-center justify-start gap-4">
@@ -390,7 +427,7 @@ const ProfileComponent = () => {
                     </div>
                 </form>
                     </div>
-                }
+                } */}
             </div>
             )}
         </div>
