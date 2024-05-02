@@ -122,7 +122,7 @@ const MyInterests = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {interestedUsers.map((user) => (
-                        <tr key={user.id} className={`${userState.confirmed_deal ? 'bg-gray-100' : undefined}`}>
+                        <tr key={user?.id} className={`${userState?.confirmed_deal ? 'bg-gray-100' : undefined}`}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                             <div className="flex items-center">
                               <div className="flex-shrink-0 h-10 w-10">
@@ -130,37 +130,37 @@ const MyInterests = () => {
                                   width={1000}
                                   height={1000}
                                   className="h-10 w-10 rounded-full"
-                                  src={user.user.profile_image} // Replace 'profile_image' with the actual field name
-                                  alt={user.user.name}
+                                  src={user?.user?.profile_image} // Replace 'profile_image' with the actual field name
+                                  alt={user?.user?.name}
                                 />
                               </div>
-                              <div className="ml-4">{user.user.name}</div>
+                              <div className="ml-4">{user?.user?.name}</div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            {user.user.age}
+                            {user?.user?.age}
                           </td>
 
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            {user.created_at.split("T")[0]}{" "}
-                            {user.created_at.split("T")[1].split(":")[0]}:
-                            {user.created_at.split("T")[1].split(":")[0]}
+                            {user?.created_at?.split("T")[0]}{" "}
+                            {user?.created_at?.split("T")[1].split(":")[0]}:
+                            {user?.created_at?.split("T")[1].split(":")[0]}
                           </td>
 
                           <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                            {user.make_deal && !userState.confirmed_deal && (
+                            {user?.make_deal && !userState?.confirmed_deal && (
                               <button
                                 type="button"
-                                onClick={() => handleConfirmDeal(user.listing)} // Pass the listingId to the function
+                                onClick={() => handleConfirmDeal(user?.listing)} // Pass the listingId to the function
                                 disabled={
                                   isButtonDisabled ||
                                   isRequestPending ||
-                                  userState.confirmed_deal
+                                  userState?.confirmed_deal
                                 } // Disable the button based on state, if request is pending, or if already confirmed
                                 className={`mr-2 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 ${
                                   isButtonDisabled ||
                                   isRequestPending ||
-                                  userState.confirmed_deal
+                                  userState?.confirmed_deal
                                     ? "opacity-50 pointer-events-none"
                                     : ""
                                 }`}
@@ -192,7 +192,7 @@ const MyInterests = () => {
                               </button>
                             )}
                             <Link
-                              href={`/intuserprofile/${user.user.id}`}
+                              href={`/listdetails/${user?.listing}`}
                               className="mr-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
                               View Profile

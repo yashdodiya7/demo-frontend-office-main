@@ -65,7 +65,7 @@ const UserMenu = () => {
               {token && <MenuItem to="/prefernce" label="User Prefernces" />}
               {token && !data.userProfile?.is_host && <MenuItem to="/myinterests" label="My Interests" />}
               {token && data.userProfile?.is_host && <MenuItem to="/interestedusers" label="Interested Users" />}
-              {token && !data.userProfile?.is_host && <MenuItem to="/mydeal" label="My Deal" />}
+              {token && data.userProfile?.confirmed_deal && !data.userProfile?.is_host && <MenuItem to="/mydeal" label="My Deal" />}
               {token && <MenuItem to="/subscription" label="Subscription" />}
               {token && <MenuItem to="/" label="Logout" />}
             </div>

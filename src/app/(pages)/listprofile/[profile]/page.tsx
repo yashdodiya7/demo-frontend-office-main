@@ -8,7 +8,7 @@ import { fetchSingleListingUserProfile } from '@/store/slice/listingSlice';
 import { getCookie } from 'cookies-next';
 import axios from 'axios';
 import { ToastContainer } from 'react-toastify';
-import { ToastError } from '@/components/utils/custom-error/toast';
+import { ToastError, ToastSuccess } from '@/components/utils/custom-error/toast';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -17,9 +17,11 @@ const ListProfile = ({ params }: { params: any }) => {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true)
     const [buttonLoading, setButtonLoading] = useState(false);
-    const userStateData = useSelector(state => state.user.userProfile)
+    const [buttonClick, setButtonClick] = useState(false);
+    const userStateData = useSelector((state: any) => state.user.userProfile)
     const dispatch = useDispatch();
     const token = getCookie("token");
+
 
     useEffect(() => {
       // Define an asynchronous function inside the useEffect
@@ -41,17 +43,21 @@ const ListProfile = ({ params }: { params: any }) => {
       };
       // Call the asynchronous function
       fetchData();
-    }, [dispatch]);
+    }, [dispatch, buttonClick]);
 
 
     const handleInterestedClick = async () => {
       try {
         setButtonLoading(true);
-        await axios.post(`${BASE_URL}/listing/listings/${params['profile']}/interested`, null, {
+        const res = await axios.post(`${BASE_URL}/listing/listings/${params['profile']}/interested`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log("<<<",res.data)
+        if(res.status == 201){
+          ToastSuccess("Successfully Interested")
+        }
         setButtonLoading(true);
         // If API call is successful, you can add further actions here if needed
       } catch (error) {
@@ -61,6 +67,7 @@ const ListProfile = ({ params }: { params: any }) => {
         console.error('Error marking as interested:', error);
       } finally {
         setButtonLoading(false);
+        setButtonClick(prevState => !prevState);
       }
     };
     

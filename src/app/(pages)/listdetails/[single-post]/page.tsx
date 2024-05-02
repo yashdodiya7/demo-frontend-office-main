@@ -14,17 +14,12 @@ import AmenitiesField from "@/components/utils/inputs/AmenitiesField";
 import PreferncesField from "@/components/utils/inputs/PreferncesField";
 import MapComponent from "@/components/map/map-component";
 import Link from "next/link";
-import { loadStripe, StripeError } from "@stripe/stripe-js";
 import LoginPopup from "@/components/utils/popup/login-popup";
 import { useRouter } from "next/navigation";
 import SubscriptionPopUp from "@/components/utils/popup/subscription-popup";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 const publicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY;
-
-type Stripe = import("@stripe/stripe-js").Stripe;
-
-const stripePromise: Promise<Stripe | null> = publicKey ? loadStripe(publicKey) : Promise.resolve(null);
 
 
 const SingleDetails = ({ params }: { params: any }) => {
@@ -37,8 +32,9 @@ const SingleDetails = ({ params }: { params: any }) => {
   };
 
   const [data, setData] = useState({});
-  const [showLoginPopup, setShowLoginPopup] = useState(false);
-  const [showSubscriptionPopup, setShowSubscriptionPopup] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
+  const [showSubscriptionPopup, setShowSubscriptionPopup] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const dispatch = useDispatch();
   const router = useRouter()
@@ -47,17 +43,20 @@ const SingleDetails = ({ params }: { params: any }) => {
 
   const userPaid = useSelector((state:any) => state?.user?.userProfile?.is_paid)
 
+  // Fetching Data of the listing
   useEffect(() => {
     // Define an asynchronous function inside the useEffect
     const fetchData = async () => {
       try {
         // Fetch listings when the component mounts
+        setLoading(true);
         const res = await dispatch(
           fetchSingleListing({ userToken: token, id: params["single-post"] })
         );
+        setLoading(false);
         setData({ ...res.payload });
       } catch (error) {
-        console.error("Error fetching single listing:", error);
+        console.error("<<<Error fetching single listing:", error);
       }
     };
     // Call the asynchronous function
@@ -77,6 +76,11 @@ const SingleDetails = ({ params }: { params: any }) => {
 
   return (
     <UserLayout>
+      {loading ? ( // Show loader if loading is true
+          <div className="flex items-center justify-center h-screen">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
+          </div>
+        ) : (
       <div className="flex min-h-screen">
         <div className="container mx-auto px-28 py-8 flex justify-center">
           {/* Left side - Profile card */}
@@ -315,6 +319,7 @@ const SingleDetails = ({ params }: { params: any }) => {
           </div>
         </div>
       </div>
+        )}
     </UserLayout>
   );
 };
