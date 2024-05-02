@@ -18,7 +18,7 @@ const MyForm = () => {
         <div className="bg-white max-w-lg w-full rounded-lg shadow-lg shadow-stone-200">
           <div className="p-8">
               
-                  <h2 className="text-2xl font-semibold mb-4 text-center">Yash Dodiya</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-center">Yash Dodiya</h2>
               <div className="mb-8">
                   <h2 className="text-xl font-semibold mb-2">Wallet Balance</h2>
                   <div className="bg-stone-200 rounded-lg shadow p-4">

@@ -6,9 +6,6 @@ import { useEffect } from 'react';
 
 const Search = () => {
     const token: string = getCookie('token') || "";
-    useEffect(() =>{
-
-    }, [token]);
     
     return (
         <div className="w-full md:w-auto py-2 transition cursor-pointer">

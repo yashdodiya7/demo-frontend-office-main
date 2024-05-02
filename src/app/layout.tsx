@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <head>
-      <script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBLeAvWMxpPVw2yRJgz1xN-EkNeGFhxt1E&libraries=places&callback=initMap' async></script>
+        <script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBLeAvWMxpPVw2yRJgz1xN-EkNeGFhxt1E&libraries=places&callback=initMap' async></script>
       </head>
       <body className={inter.className} suppressHydrationWarning={true}>
         <Provider store={store}>

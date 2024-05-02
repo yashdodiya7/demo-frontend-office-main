@@ -17,14 +17,14 @@ const UserMenu = () => {
   const [isHost, setIsHost] = useState(false);
   const [isVerify, setIsVerify] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const data = useSelector((state: RootState) => state.user);
+  const data = useSelector((state: RootState) => state.user.userProfile);
 
-  useEffect(() => {
-    if (data.userProfile) {
-      setIsVerify(data.userProfile.is_verified);
-      setIsHost(data.userProfile.is_host);
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data.userProfile) {
+  //     setIsVerify(data.userProfile.is_verified);
+  //     setIsHost(data.userProfile.is_host);
+  //   }
+  // }, [data]);
 
   const toggleOpen = useCallback(() => {
     setIsOpen((prevState) => !prevState);
@@ -33,8 +33,8 @@ const UserMenu = () => {
     return (
       <div className="relative">
         <div className="flex flex-row items-center gap-3">
-          {token ? (
-            isHost ? (
+          {token && !data.confirmed_deal ? (
+            data.is_host ? (
               <div className="md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
                 <Link href="/updatelisting">Edit a Post</Link>
               </div>
@@ -58,14 +58,14 @@ const UserMenu = () => {
           </div>
         </div>
         {isOpen && (
-          <div className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm">
+          <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[80%] bg-white overflow-hidden right-0 top-12 text-sm">
             <div>
               {!token && <MenuItem to="/auth/phone-no" label="Sign Up" />}
               {!token && <MenuItem to="/auth/login" label="Login" />}
               {token && <MenuItem to="/prefernce" label="User Prefernces" />}
-              {token && !data.userProfile?.is_host && <MenuItem to="/myinterests" label="My Interests" />}
-              {token && data.userProfile?.is_host && <MenuItem to="/interestedusers" label="Interested Users" />}
-              {token && data.userProfile?.confirmed_deal && !data.userProfile?.is_host && <MenuItem to="/mydeal" label="My Deal" />}
+              {token && !data?.is_host && <MenuItem to="/myinterests" label="My Interests" />}
+              {token && data?.is_host && <MenuItem to="/interestedusers" label="Interested Users" />}
+              {token && data?.confirmed_deal && !data?.is_host && <MenuItem to="/mydeal" label="My Deal" />}
               {token && <MenuItem to="/subscription" label="Subscription" />}
               {token && <MenuItem to="/" label="Logout" />}
             </div>
