@@ -11,6 +11,7 @@ import axios from "axios";
 
 const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
+
 function HomePage() {
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.list);

@@ -16,7 +16,7 @@ const Navbar: React.FC<NavbarProps> = () => {
 
     useEffect(() => {
 
-    }, [userState.confirm_deal, userState.is_verified, userState.is_host, userState.is_paid])
+    }, [userState?.confirm_deal, userState?.is_verified, userState?.is_host, userState?.is_paid])
 
     return (
         <div className="w-full bg-white shadow-sm sticky top-0 z-50">

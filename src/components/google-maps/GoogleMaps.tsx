@@ -1,9 +1,9 @@
 // GoogleMaps.js
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
-const GoogleMaps = ({ children }) => {
+const GoogleMaps = ({ children } : {children: ReactNode}) => {
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   useEffect(() => {

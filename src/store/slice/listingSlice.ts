@@ -1,6 +1,7 @@
 const { createSlice, createAsyncThunk } = require('@reduxjs/toolkit')
 const { default: axios } = require('axios')
 import { ToastError, ToastSuccess } from '@/components/utils/custom-error/toast'
+import { ListingState } from '@/types/user'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -56,7 +57,7 @@ export const updatePost = createAsyncThunk(
 
 export const fetchListing = createAsyncThunk(
     'fetchListing',
-    async ( {userToken, locationCoords} ) => {
+    async ( {userToken, locationCoords}: {userToken: string, locationCoords: Object} ) => {
         // console.log(userToken, "userToken")
         // console.log(updatedata, "updatedata")
         try {
@@ -88,7 +89,7 @@ export const fetchListing = createAsyncThunk(
 
 export const fetchSingleListing = createAsyncThunk(
     'fetchSingleListing',
-    async ( {userToken ,id} ) => {
+    async ( {userToken ,id}: {userToken: string, id: number} ) => {
 
         try {
             
@@ -119,7 +120,7 @@ export const fetchSingleListing = createAsyncThunk(
 
 export const fetchSingleListingUserProfile = createAsyncThunk(
     'fetchSingleListingUserProfile',
-    async ( {userToken ,id} ) => {
+    async ( {userToken ,id}:{userToken: string, id: number}) => {
         try {
             
             let headers = {}; // Initialize empty headers object
@@ -148,7 +149,7 @@ export const fetchSingleListingUserProfile = createAsyncThunk(
 
 export const fetchUpdateListingData = createAsyncThunk(
     'fetchUpdateListingData',
-    async ( userToken ) => {
+    async ( userToken: string ) => {
 
         try {
             let headers = {}; // Initialize empty headers object
@@ -176,7 +177,8 @@ export const fetchUpdateListingData = createAsyncThunk(
 )
 
 
-const initialState = {
+const initialState: ListingState = {
+    status: "",
     listingData: [],
     listingUserProfile:[],
 }
@@ -185,65 +187,65 @@ const listSlice = createSlice({
     name: 'listing',
     initialState,
     reducers: {
-        setSearchData(state, action) {
+        setSearchData(state: ListingState, action: any) {
             state.listingData = action.payload; // Set listing data from payload
         },
     },
     extraReducers: (builder: any) => {
         builder
-            .addCase(createPost.pending, (state: any) => {
+            .addCase(createPost.pending, (state: ListingState) => {
                 state.status = 'loading'
             })
-            .addCase(createPost.fulfilled, (state: any, action: any) => {
+            .addCase(createPost.fulfilled, (state: ListingState, action: any) => {
                 state.status = 'success'
             })
-            .addCase(createPost.rejected, (state: any) => {
+            .addCase(createPost.rejected, (state: ListingState) => {
                 state.status = 'failed'
             })
-            .addCase(fetchListing.pending, (state: any, action: any) => {
+            .addCase(fetchListing.pending, (state: ListingState, action: any) => {
                 state.status = 'loading'
             })
-            .addCase(fetchListing.fulfilled, (state: any, action: any) => {
+            .addCase(fetchListing.fulfilled, (state: ListingState, action: any) => {
                 state.status = 'success'
                 state.listingData = [...action.payload]
             })
-            .addCase(fetchListing.rejected, (state: any) => {
+            .addCase(fetchListing.rejected, (state: ListingState) => {
                 state.status = 'failed'
             })
-            .addCase(fetchSingleListing.pending, (state: any) => {
+            .addCase(fetchSingleListing.pending, (state: ListingState) => {
                 state.status = 'loading'
             })
-            .addCase(fetchSingleListing.fulfilled, (state: any) => {
+            .addCase(fetchSingleListing.fulfilled, (state: ListingState) => {
                 state.status = 'success'
             })
-            .addCase(fetchSingleListing.rejected, (state: any) => {
+            .addCase(fetchSingleListing.rejected, (state: ListingState) => {
                 state.status = 'failed'
             })
-            .addCase(fetchSingleListingUserProfile.pending, (state: any) => {
+            .addCase(fetchSingleListingUserProfile.pending, (state: ListingState) => {
                 state.status = 'loading'
             })
-            .addCase(fetchSingleListingUserProfile.fulfilled, (state: any) => {
+            .addCase(fetchSingleListingUserProfile.fulfilled, (state: ListingState) => {
                 state.status = 'success'
             })
-            .addCase(fetchSingleListingUserProfile.rejected, (state: any) => {
+            .addCase(fetchSingleListingUserProfile.rejected, (state: ListingState) => {
                 state.status = 'failed'
             })
-            .addCase(fetchUpdateListingData.pending, (state: any) => {
+            .addCase(fetchUpdateListingData.pending, (state: ListingState) => {
                 state.status = 'loading'
             })
-            .addCase(fetchUpdateListingData.fulfilled, (state: any) => {
+            .addCase(fetchUpdateListingData.fulfilled, (state: ListingState) => {
                 state.status = 'success'
             })
-            .addCase(fetchUpdateListingData.rejected, (state: any) => {
+            .addCase(fetchUpdateListingData.rejected, (state: ListingState) => {
                 state.status = 'failed'
             })
-            .addCase(updatePost.pending, (state: any) => {
+            .addCase(updatePost.pending, (state: ListingState) => {
                 state.status = 'loading'
             })
-            .addCase(updatePost.fulfilled, (state: any) => {
+            .addCase(updatePost.fulfilled, (state: ListingState) => {
                 state.status = 'success'
             })
-            .addCase(updatePost.rejected, (state: any) => {
+            .addCase(updatePost.rejected, (state: ListingState) => {
                 state.status = 'failed'
             })
     },

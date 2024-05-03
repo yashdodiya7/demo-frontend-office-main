@@ -1,6 +1,19 @@
 import React from 'react'
 
-const PremiumCard = ({subscriptionData, remainingDays}) => {
+interface SubscriptionData {
+  amount: number;
+  user_name: string;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+}
+
+interface subscriptionCardProps {
+  subscriptionData: SubscriptionData;
+  remainingDays: number | null;
+}
+
+const PremiumCard: React.FC<subscriptionCardProps> = ({subscriptionData, remainingDays}) => {
   return (
     <div
         className="flex flex-col items-center my-10 bg-gradient-to-br from-blue-100 via-orange-100 to-purple-100 p-8 rounded-lg shadow-lg relative border-8 border-orange-200 max-w-sm">
@@ -25,27 +38,37 @@ const PremiumCard = ({subscriptionData, remainingDays}) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-1">
-        <p className="flex items-center text-sm">
-          <b>Access to all user profiles and details</b>
-        </p>
-        <p className="flex items-center text-sm">
-          <b>Full website access for 2 month</b>
-        </p>
-        {subscriptionData && (
-          <div>
-            <p>User: {subscriptionData.user_name}</p>
-            <p>
-              Start Date:{" "}
-              {new Date(subscriptionData.start_date).toLocaleDateString()}
+      <div className="flex flex-col gap-2 rounded-lg shadow-md p-4">
+        <p className="text-lg font-bold">Subscription Benefits:</p>
+        <div className="flex flex-col gap-1">
+            <p className="text-sm">
+              <span className="text-green-600">&#10003;</span> Access to all user profiles and details
             </p>
-            <p>
-              End Date:{" "}
-              {new Date(subscriptionData.end_date).toLocaleDateString()}
+            <p className="text-sm">
+              <span className="text-green-600">&#10003;</span> Full website access for 1 month
             </p>
-            {remainingDays !== null && <p>Remaining Days: {remainingDays}</p>}
           </div>
-        )}
+          {subscriptionData && (
+            <div className="border-t pt-2 mt-2">
+              <p className="text-lg font-bold mb-2">Subscription Details:</p>
+              <p className="text-sm">
+                <span className="font-bold">User:</span> {subscriptionData.user_name}
+              </p>
+              <p className="text-sm mt-2">
+                <span className="font-bold">Start Date:</span>{" "}
+                {new Date(subscriptionData.start_date).toLocaleDateString()}
+              </p>
+              <p className="text-sm mt-2">
+                <span className="font-bold">End Date:</span>{" "}
+                {new Date(subscriptionData.end_date).toLocaleDateString()}
+              </p>
+              {remainingDays !== null && (
+                <p className="text-sm mt-2">
+                  <span className="font-bold">Remaining Days:</span> {remainingDays}
+                </p>
+              )}
+            </div>
+          )}
       </div>
     </div>
   );

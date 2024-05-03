@@ -20,7 +20,7 @@ interface RegisterFormValues {
   name: string;
   gender: string;
   phone_no: string;
-  age: number | null;
+  age: string | null | number | undefined;
 }
 
 interface FormikErrors {

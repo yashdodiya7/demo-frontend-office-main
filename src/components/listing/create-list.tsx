@@ -56,7 +56,7 @@ const CreateList = () => {
     const state = useSelector((state: any) => state.list)
     const router = useRouter()
     
-    const [checked, setChecked] = useState({
+    const [checked, setChecked] = useState<{ [key: string]: boolean }>({
         "tv":false,
         "power_backup":false,
         "fridge":false,
@@ -68,13 +68,13 @@ const CreateList = () => {
         "ac":false,
     });
 
-    const [maxImages, setMaxImages] = useState(10);
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [previewImages, setPreviewImages] = useState([]);
-    const [address, setAddress] = useState("");
-    const [coordinates, setCoordinates] = useState({
-        lat: null,
-        lng: null
+    const [maxImages, setMaxImages] = useState<number>(10);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [previewImages, setPreviewImages] = useState<string[]>([]);
+    const [address, setAddress] = useState<string>('');
+    const [coordinates, setCoordinates] = useState<{ lat: number | null; lng: number | null }>({
+      lat: null,
+      lng: null,
     });
     // const [isSelected, setIsSelected] = useState()
     
@@ -94,8 +94,8 @@ const CreateList = () => {
         description: "",
     };
     
-    const handleFileChange = (event) => {
-        const files = Array.from(event.currentTarget.files);
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(event.currentTarget.files || []);
         setSelectedFiles(files);
     };
 
@@ -111,7 +111,7 @@ const CreateList = () => {
             }
         });
 
-        if (val.mobile_visible.length > 0){
+        if (val.mobile_visible?.length > 0){
             formData.append('mobile_visible', true);
         }
 
@@ -140,7 +140,7 @@ const CreateList = () => {
         }
     }
 
-    const handleSelect = async value => {
+    const handleSelect = async (value: any) => {
         const results = await geocodeByAddress(value);
         const latLng = await getLatLng(results[0]);
         console.log(latLng);

@@ -103,13 +103,12 @@ const ProfileChoice = () => {
                     <div className="grid grid-cols-6 gap-4">
                       {Object.keys(preferences).map((preference) => (
                         <FormikInputField
-                          type="checkbox"
                           key={preference}
                           id={preference}
                           name={preference}
                           value={preference}
-                          checked={preferences[preference]}
-                          onChange={() => handleChange(preference)}
+                          checked={preferences[preference as keyof userPreferences]}
+                          onChange={() => handleChange(preference as keyof userPreferences)}
                         />
                       ))}
                     </div>

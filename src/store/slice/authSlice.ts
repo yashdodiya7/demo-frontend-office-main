@@ -1,6 +1,7 @@
 const { createSlice, createAsyncThunk } = require('@reduxjs/toolkit')
 const { default: axios } = require('axios')
 import {ToastError, ToastSuccess} from '@/components/utils/custom-error/toast'
+import { UserState } from '@/types/user'
 import { RootState } from '@reduxjs/toolkit/query'
 import { deleteCookie, setCookie } from 'cookies-next'
 
@@ -203,7 +204,7 @@ export const updateUserProfile = createAsyncThunk(
     }
 )
 
-const initialState = {
+const initialState: UserState = {
     token: [],
     userDetails: {},
     phone_no: '',

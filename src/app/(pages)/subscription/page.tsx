@@ -8,15 +8,24 @@ import UserLayout from "../UserLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserProfile } from "@/store/slice/authSlice";
 import PremiumCard from "@/components/subscription/premium-card";
+import BasicCard from "@/components/subscription/basic-card";
 
 const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 const publicKey: string = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || "";
 
+interface SubscriptionData {
+  amount: number;
+  user_name: string;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+}
+
 const Payment: React.FC = () => {
   const userToken: string | undefined = getCookie('token');
   const [loading, setLoading] = useState<boolean>(false)
-  const [subscriptionData, setSubscriptionData] = useState(null);
-  const [remainingDays, setRemainingDays] = useState(null);
+  const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
+  const [remainingDays, setRemainingDays] = useState<number | null>(null);
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -96,15 +105,17 @@ const Payment: React.FC = () => {
   if (userPaid){
     return (
       <UserLayout>
-      <div className="flex justify-center">
-        {subscriptionData ? (
-          <PremiumCard subscriptionData={subscriptionData} remainingDays={remainingDays}/>
-        ) : (
-          <div className="flex items-center justify-center h-screen">
+        <div className="flex justify-center">
+          {subscriptionData?.amount === 349 ? (
+            <PremiumCard subscriptionData={subscriptionData} remainingDays={remainingDays} />
+          ) : subscriptionData?.amount === 200 ? (
+            <BasicCard subscriptionData={subscriptionData} remainingDays={remainingDays} />
+          ) : (
+            <div className="flex items-center justify-center h-screen">
               <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
       </UserLayout>
     );
   }
