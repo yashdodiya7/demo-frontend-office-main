@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-const PostCreationSchema = Yup.object().shape({
+export const PostCreationSchema = Yup.object().shape({
     property_type: Yup.string().required('Property type is required'),
     lease_term: Yup.string()
     .required('Lease term is required')
@@ -14,7 +14,7 @@ const PostCreationSchema = Yup.object().shape({
     max_vacancy: Yup.number().max(6, 'You can add a maximum of 6 vacancies').required('Max Vacancy is required'),
 });
 
-const PostUpdationSchema = Yup.object().shape({
+export const PostUpdationSchema = Yup.object().shape({
     property_type: Yup.string().required('Property type is required'),
     lease_term: Yup.string()
     .required('Lease term is required')
@@ -28,4 +28,4 @@ const PostUpdationSchema = Yup.object().shape({
     max_vacancy: Yup.number().max(6, 'You can add a maximum of 6 vacancies').required('Max Vacancy is required'),
 });
 
-export {PostCreationSchema, PostUpdationSchema};
+// export  {PostCreationSchema, PostUpdationSchema};

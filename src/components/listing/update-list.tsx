@@ -1,5 +1,6 @@
 "use client"
-import PostCreationSchema from '@/schemas/ListingSchema';
+
+
 import { fetchUpdateListingData, updatePost } from '@/store/slice/listingSlice';
 import { getCookie } from 'cookies-next';
 import { ErrorMessage, Field, FieldArray, Formik} from 'formik';
@@ -15,6 +16,8 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { ToastSuccess } from '../utils/custom-error/toast';
 import { setUserData } from '@/store/slice/authSlice';
+import Image from 'next/image';
+import { PostCreationSchema } from '@/schemas/ListingSchema';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -55,9 +58,7 @@ const UpdateList = () => {
     const dispatch = useDispatch()
     const state = useSelector((state: any) => state.list)
     const token = getCookie('token')
-    const [loading, setLoading] = useState(true);
-    const [maxImages, setMaxImages] = useState(10);
-    const [previewImages, setPreviewImages] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [address, setAddress] = useState("");
     const [coordinates, setCoordinates] = useState({
@@ -65,16 +66,18 @@ const UpdateList = () => {
         lng: null
     });
 
+    const router = useRouter();
+
     const [amenitiesChecked, setAmenitiesChecked] = useState({
-        "tv":false,
-        "power_backup":false,
-        "fridge":false,
-        "cook":false,
-        "kitchen":false,
-        "parking":false,
-        "wifi":false,
-        "washing_machine":false,
-        "ac":false,
+      tv: false,
+      power_backup: false,
+      fridge: false,
+      cook: false,
+      kitchen: false,
+      parking: false,
+      wifi: false,
+      washing_machine: false,
+      ac: false,
     });
 
     const [highlightsChecked, setHighlightsChecked] = useState({
@@ -114,38 +117,49 @@ const UpdateList = () => {
     useEffect(() => {
       const fetchUpdateData = async () => {
         try {
+          setLoading(true)
           const data = await dispatch(fetchUpdateListingData(token));
-          const latLng = {lat: data.payload.latitude, lng: data.payload.longitude};
+          const latLng = {
+            lat: data.payload.latitude,
+            lng: data.payload.longitude,
+          };
           setCoordinates(latLng);
-          setAddress(data.payload.location)
-          
+          setAddress(data.payload.location);
+
           // Update amenitiesChecked based on data from the backend
           const updatedAmenitiesChecked = { ...amenitiesChecked };
-          data.payload.amenities.forEach(amenity => {
-              if (updatedAmenitiesChecked.hasOwnProperty(amenity)) {
-                  updatedAmenitiesChecked[amenity] = true;
-                }
+          data.payload.amenities.forEach((amenity) => {
+            if (updatedAmenitiesChecked.hasOwnProperty(amenity)) {
+              updatedAmenitiesChecked[amenity] = true;
+            }
           });
           setAmenitiesChecked(updatedAmenitiesChecked);
 
           // Update highlightsChecked based on data from the backend
           const updatedHighlightsChecked = { ...highlightsChecked };
-          data.payload.highlights.forEach(highlight => {
-              if (updatedHighlightsChecked.hasOwnProperty(highlight)) {
-                  updatedHighlightsChecked[highlight] = true;
-                }
+          data.payload.highlights.forEach((highlight) => {
+            if (updatedHighlightsChecked.hasOwnProperty(highlight)) {
+              updatedHighlightsChecked[highlight] = true;
+            }
           });
           setHighlightsChecked(updatedHighlightsChecked);
 
+          setSelectedFiles(data.payload.image_urls);
+
           setFormDataState(data.payload);
+
+          setLoading(false)
         } catch (error) {
+          setLoading(false)
           console.error("Error fetching data:", error);
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
       };
       fetchUpdateData();
-    }, []);
+    }, [dispatch]);
+
+
     
     const initialValues = {
         property_type: formDataState ? formDataState.property_type : "",
@@ -158,14 +172,6 @@ const UpdateList = () => {
         occupancy: formDataState ? formDataState.occupancy : "",
         looking_for: formDataState ? formDataState.looking_for : "",
         description: formDataState ? formDataState.description : "",
-    };
-
-    // console.log("<<<", formDataState)
-    
-    
-    const handleFileChange = (event) => {
-        const files = Array.from(event.currentTarget.files);
-        setSelectedFiles(files);
     };
     
     
@@ -194,10 +200,7 @@ const UpdateList = () => {
         });
 
         formData.append("amenities", JSON.stringify(newAmenity.map(Number)));
-        formData.append(
-          "highlights",
-          JSON.stringify(newHighlight.map(Number))
-        );
+        formData.append("highlights", JSON.stringify(newHighlight.map(Number)));
         formData.append("location", address);
         formData.append("latitude", coordinates.lat);
         formData.append("longitude", coordinates.lng);
@@ -207,10 +210,10 @@ const UpdateList = () => {
         // for (const [name, value] of formData.entries()) {
         //   console.log(`<<< ${name}: ${value}`);
         // }
-            
+        setLoading(true)
         const res = await dispatch(updatePost({userToken: token , updatedata: formData}))
+        setLoading(false)
         // console.log("<<<Response: ",res.data);
-            
     }
         
     const handleSelect = async (value: any) => {
@@ -236,16 +239,18 @@ const UpdateList = () => {
 
     // Function to update newAmenity based on amenitiesChecked
     const updateNewAmenity = () => {
-        const updatedNewAmenity = [];
-        Object.entries(amenitiesChecked).forEach(([key, value]) => {
-            if (value) {
-            const amenityObj = amenitiesData.find(amenity => amenity.id === key);
-            if (amenityObj) {
-                updatedNewAmenity.push(amenityObj.value);
-            }
-            }
-        });
-        setNewAmenity(updatedNewAmenity);
+      const updatedNewAmenity = [];
+      Object.entries(amenitiesChecked).forEach(([key, value]) => {
+        if (value) {
+          const amenityObj = amenitiesData.find(
+            (amenity) => amenity.id === key
+          );
+          if (amenityObj) {
+            updatedNewAmenity.push(amenityObj.value);
+          }
+        }
+      });
+      setNewAmenity(updatedNewAmenity);
     };
 
     useEffect(() => {
@@ -271,9 +276,6 @@ const UpdateList = () => {
       updateNewHighlight();
     }, [highlightsChecked]);
 
-
-    const router = useRouter();
-
     const handleDelete = async () => {
       try {
         const response = await axios.delete(`${BASE_URL}/listing/delete`, {
@@ -298,6 +300,60 @@ const UpdateList = () => {
         console.error('Error occurred:', error);
       }
   };
+
+  const handleFileChange = (event) => {
+    const files = Array.from(event.currentTarget.files);
+    const mergedFiles = [...selectedFiles, ...files];
+    setSelectedFiles(mergedFiles);
+    // setSelectedFiles(files);
+  };
+
+  const handleRemoveImage = (indexToRemove) => {
+    setSelectedFiles((prevFiles) =>
+      prevFiles.filter((file, index) => index !== indexToRemove)
+    );
+  };
+
+  const renderImagePreviews = () => {
+    return selectedFiles.map((file, index) => {
+      if (typeof file === "string") {
+        // Render existing image URL with remove button
+        return (
+          <div key={index} className="relative inline-block mb-4 mr-4">
+            <img
+              src={file}
+              alt={`Preview ${index}`}
+              className="w-32 h-32 object-cover rounded-lg shadow-md"
+            />
+            <button
+              onClick={() => handleRemoveImage(index)}
+              className="absolute top-1 right-1 bg-red-500 text-white rounded-full px-2 py-1 text-xs hover:bg-red-600"
+            >
+              X
+            </button>
+          </div>
+        );
+      } else {
+        // Render newly selected file with remove button
+        return (
+          <div key={index} className="relative inline-block mb-4 mr-4">
+            <img
+              src={URL.createObjectURL(file)}
+              alt={`Preview ${index}`}
+              className="w-32 h-32 object-cover rounded-lg shadow-md"
+            />
+            <button
+              onClick={() => handleRemoveImage(index)}
+              className="absolute top-1 right-1 bg-red-500 text-white rounded-full px-2 py-1 text-xs hover:bg-red-600"
+            >
+              X
+            </button>
+          </div>
+        );
+      }
+    });
+  };
+
 
     return (
       <div>
@@ -386,7 +442,7 @@ const UpdateList = () => {
                               name="property_type"
                               className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             >
-                              <option value="">Select Property Type</option>
+                              <option value="">--------------</option>
                               <option value="apartment">Apartment</option>
                               <option value="house">House</option>
                               <option value="room">Room</option>
@@ -482,7 +538,7 @@ const UpdateList = () => {
                               name="pet_policy"
                               className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             >
-                              <option value="">Pet Policy</option>
+                              <option value="">--------------</option>
                               <option value="allowed">Allowed</option>
                               <option value="not_allowed">Not Allowed</option>
                             </Field>
@@ -508,7 +564,7 @@ const UpdateList = () => {
                               name="smoking_policy"
                               className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             >
-                              <option value="">Smoking Policy</option>
+                              <option value="">--------------</option>
                               <option value="allowed">Allowed</option>
                               <option value="not_allowed">Not Allowed</option>
                             </Field>
@@ -534,7 +590,7 @@ const UpdateList = () => {
                               name="occupancy"
                               className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             >
-                              <option value="">Select occupancy</option>
+                              <option value="">--------------</option>
                               <option value="single">Single</option>
                               <option value="shared">Shared</option>
                               <option value="any">Any</option>
@@ -561,7 +617,7 @@ const UpdateList = () => {
                               name="looking_for"
                               className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             >
-                              <option value="">Looking For</option>
+                              <option value="">--------------</option>
                               <option value="male">Male</option>
                               <option value="female">Female</option>
                               <option value="any">Any</option>
@@ -593,7 +649,7 @@ const UpdateList = () => {
                         </div> */}
 
                         <div className="sm:col-span-6 flex gap-2 flex-col md:flex-col md:gap-2">
-                          <div className="">
+                          <div>
                             <h3 className="text-md font-semibold mb-6">
                               Amenities
                             </h3>
@@ -614,64 +670,11 @@ const UpdateList = () => {
                                     />
                                   )
                                 )}
-                                {/* <ErrorMessage
-                                name="amenities"
-                                component="div"
-                                className="mt-4 text-sm text-red-600 dark:text-red-500"
-                              /> */}
                               </div>
                             </div>
-                            {/* <FieldArray name="amenities">
-                                            {({ push, remove }) => (
-                                            <>
-                                                <h4 className='mb-2 font-semibold text-black'>Amenities</h4>
-                                                {amenitiesData.map(amenity => (
-                                                    <div className="flex items-center mt-2">
-                                                        <Field type="checkbox" id={amenity.id} name="amenities" value={amenity.value}
-                                                        checked={formDataState.amenities.includes(amenity.id)}
-                                                        className="w-6 h-4 mr-3"
-                                                        />
-                                                        <label htmlFor={amenity.id} className="text-black text-sm capitalize">{amenity.id.replace("_", " ")}</label>
-                                                    </div>
-                                                ))}
-                                            </>
-                                             )}
-                                        </FieldArray> */}
                           </div>
-                          {/* <div className="">
-                          <FieldArray name="highlights">
-                            {({ push, remove }) => (
-                              <>
-                                <h4 className="mb-2 font-semibold text-black">
-                                  Highlights
-                                </h4>
-                                {highlightsData.map((highlight) => (
-                                  <div className="flex items-center mt-2">
-                                    <Field
-                                      type="checkbox"
-                                      id={highlight.id}
-                                      name="highlights"
-                                      value={highlight.value}
-                                      className="w-6 h-4 mr-3"
-                                    />
-                                    <label
-                                      htmlFor={highlight.id}
-                                      className="text-black text-sm capitalize"
-                                    >
-                                      {highlight.id.replace("_", " ")}
-                                    </label>
-                                  </div>
-                                ))}
-                              </>
-                            )}
-                          </FieldArray>
-                          <ErrorMessage
-                            name="highlights"
-                            component="div"
-                            className="mt-4 text-sm text-red-600 dark:text-red-500"
-                          />
-                        </div> */}
-                        <div className="mt-4">
+
+                          <div className="mt-4">
                             <h3 className="text-md font-semibold mb-6">
                               Highlights
                             </h3>
@@ -692,15 +695,9 @@ const UpdateList = () => {
                                     />
                                   )
                                 )}
-                                {/* <ErrorMessage
-                                name="amenities"
-                                component="div"
-                                className="mt-4 text-sm text-red-600 dark:text-red-500"
-                              /> */}
                               </div>
                             </div>
                           </div>
-
                         </div>
 
                         <div className="sm:col-span-full">
@@ -726,6 +723,7 @@ const UpdateList = () => {
                             />
                           </div>
                         </div>
+
                         <div className="sm:col-span-2">
                           <label className="text-sm text-black mb-2 block">
                             Upload Image file
@@ -743,19 +741,28 @@ const UpdateList = () => {
                           </p>
                         </div>
                       </div>
+
+                      <div className="mt-2 flex">{renderImagePreviews()}</div>
+
+                      <p className="mt-1 font-semibold text-sm text-red-600 dark:text-red-500">
+                        {selectedFiles.length < 2 &&
+                          "Minimum 2 Images to be uploaded"}
+                        {selectedFiles.length > 5 && "Maximum 5 Images allowed"}
+                      </p>
                     </div>
                   </div>
 
                   <div className="mt-6 flex items-center">
-                    {/* <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
-                            Cancel
-                        </button> */}
                     <button
                       type="submit"
+                      disabled={
+                        selectedFiles.length < 2 || selectedFiles.length > 5
+                      }
                       className="capitalize px-16 mb-8 rounded-md bg-stone-600 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600"
                     >
                       Update
                     </button>
+
                     <button
                       type="button"
                       onClick={handleDelete}

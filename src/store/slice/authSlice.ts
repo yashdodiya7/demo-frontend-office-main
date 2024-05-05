@@ -38,8 +38,7 @@ export const otpVerify = createAsyncThunk(
             ToastSuccess("OTP Verified")
             return otpVerify.data
         } catch (error: any) {
-            // console.log(error.response);
-            ToastError(error.response.data)
+            ToastError(error.response?.data?.error)
             throw error.response
         }
     }

@@ -1,4 +1,4 @@
-import ProfileComponent from '@/components/Profile/profile-page'
+import ProfileComponent from '@/components/profile/profile-page'
 import React from 'react'
 import UserLayout from '../UserLayout'
 

@@ -14,8 +14,6 @@ interface UserMenuProps { }
 
 const UserMenu = () => {
   const token = getCookie("token");
-  const [isHost, setIsHost] = useState<boolean>(false);
-  const [isVerify, setIsVerify] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const data = useSelector((state: RootState) => state.user.userProfile);
 
@@ -41,7 +39,7 @@ const UserMenu = () => {
               </div>
             ) : (
               <div className="md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
-                <Link href={isVerify ? "/createlist" : "/verify"}>Make a Post</Link>
+                <Link href={data?.is_verified ? "/createlist" : "/verify"}>Make a Post</Link>
               </div>
             )
           ) : (
