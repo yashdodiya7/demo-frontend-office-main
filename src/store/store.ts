@@ -21,7 +21,7 @@ import storage from "redux-persist/lib/storage";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["userProfile"],
+  whitelist: ["userProfile", "phone_no", "otp_session_id"],
 };
 
 // Combine all your reducers into a root reducer

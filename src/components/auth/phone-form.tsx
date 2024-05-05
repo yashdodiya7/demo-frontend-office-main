@@ -23,15 +23,16 @@ const PhoneNumberField = () => {
     
     const handlePhoneSubmit = async (val: any) => {
         try {
-            // console.log(val);
             // setDisableResend(false);
+            val.phone_number = "+91" + val.phone_number
+            console.log("<<<" ,val.phone_number)
             // startTimer();
             const response = await dispatch(phoneVerify(val))
             console.log(response.payload);
             
-            if (response.payload.Status === "Success") {
+            if (response.payload.session_token) {
                 // console.log(response.payload, "In if condition");
-                await dispatch(setPhoneNumber({ phone_no: val.phone_no }));
+                await dispatch(setPhoneNumber({ phone_no: val.phone_number }));
             }
         }
         catch (error) {
@@ -41,13 +42,17 @@ const PhoneNumberField = () => {
 
     const handleOtpSubmit = async ( val: any) => {
         // val.phone_no = state.phone_no
-        val.otp_session_id = state.otp_session_id
+        val.session_token = state.otp_session_id
+        val.phone_number = state.phone_no
+
+        console.log("<<<", state.phone_no)
+        console.log("<<<", val.phone_number)
         try {
             // console.log(val);
             const response = await dispatch(otpVerify(val))
             // console.log(response.payload);
             
-            if (response.payload.Status === "Success") {
+            if (response.payload.security_code) {
                 // console.log(response.payload, "In if condition");
                 // await dispatch(setPhoneNumber({ phone_no: val.phone_no }));
                 dispatch(setOtpSessionId());
@@ -61,7 +66,7 @@ const PhoneNumberField = () => {
 
     const phoneFormik = useFormik({
         initialValues: {
-            phone_no: '',
+            phone_number: '',
         },
         validationSchema: phoneVerifySchema,
         onSubmit: handlePhoneSubmit,
@@ -69,7 +74,7 @@ const PhoneNumberField = () => {
 
     const otpFormik = useFormik({
         initialValues: {
-            otp: '',
+            security_code: '',
         },
         validationSchema: otpVerifySchema,
         onSubmit: handleOtpSubmit,
@@ -117,22 +122,23 @@ const PhoneNumberField = () => {
                     <form method="POST" onSubmit={phoneFormik.handleSubmit} className="mt-8">
                         <div className="space-y-5">
                             <div>
-                                <label htmlFor="" className="text-base font-medium text-gray-900">
+                                <label htmlFor="phone_number" className="text-base font-medium text-gray-900">
                                     {' '}
                                     Phone No{' '}
                                 </label>
                                 <div className="mt-2">
                                     <input
-                                        name='phone_no'
-                                        value={phoneFormik.values.phone_no}
+                                        id="phone_number"
+                                        name='phone_number'
+                                        value={phoneFormik.values.phone_number}
                                         onChange={phoneFormik.handleChange}
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="number"
                                         placeholder="6353355965"
                                     ></input>
-                                    {phoneFormik.touched.phone_no && phoneFormik.errors.phone_no && (
+                                    {phoneFormik.touched.phone_number && phoneFormik.errors.phone_number && (
                                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
-                                            <span className='font-medium'>{phoneFormik.errors.phone_no}</span>
+                                            <span className='font-medium'>{phoneFormik.errors.phone_number}</span>
                                         </p>
                                     )}
                                 </div>
@@ -161,22 +167,23 @@ const PhoneNumberField = () => {
                     <form method="POST" onSubmit={otpFormik.handleSubmit} className="mt-8">
                         <div className="space-y-5">
                             <div>
-                                <label htmlFor="" className="text-base font-medium text-gray-900">
+                                <label htmlFor="security_code" className="text-base font-medium text-gray-900">
                                     {' '}
                                     Verify OTP{' '}
                                 </label>
                                 <div className="mt-2">
                                     <input
-                                        name='otp'
-                                        value={otpFormik.values.otp}
+                                        id='security_code'
+                                        name='security_code'
+                                        value={otpFormik.values.security_code}
                                         onChange={otpFormik.handleChange}
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="number"
                                         placeholder="1234"
                                     ></input>
-                                    {otpFormik.touched.otp && otpFormik.errors.otp && (
+                                    {otpFormik.touched.security_code && otpFormik.errors.security_code && (
                                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
-                                            <span className='font-medium'>{otpFormik.errors.otp}</span>
+                                            <span className='font-medium'>{otpFormik.errors.security_code}</span>
                                         </p>
                                     )}
                                 </div>

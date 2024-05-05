@@ -39,7 +39,7 @@ const RegisterForm: React.FC = () => {
   const handleSubmit = async (val: RegisterFormValues) => {
     try {
       // console.log(val);
-      val.phone_no = state.phone_no;
+      val.phone_no = state.phone_no.slice(3);
       // val.phone_no = "6353355125"
       const response = await dispatch(userRegister(val));
       if (response.payload.message === "registration successfull") {

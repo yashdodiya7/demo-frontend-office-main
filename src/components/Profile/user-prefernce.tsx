@@ -70,13 +70,13 @@ const UserChoice = () => {
 
   const handleSubmit = async () => {
     // Extract user_name and preferences from form values
-    // const payload = {
-    //   ...preferences, // Spread the preferences object into the payload
-    // };
+    const payload = {
+      ...preferences, // Spread the preferences object into the payload
+    };
 
     try {
       const response = await dispatch(
-        updateUserPreference({ userToken: token, val: preferences })
+        updateUserPreference({ userToken: token, val: payload })
       );
       // if (response.payload) {
       // Redirect the user to the home page

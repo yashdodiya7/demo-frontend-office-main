@@ -35,15 +35,15 @@ const loginValidation = yup.object().shape({
 // const PHONE_REGEX = "^\+?91\d{10}$"
 
 const phoneVerifySchema = yup.object().shape({
-	phone_no: yup.string()
+	phone_number: yup.string()
     .required('Phone number is required')
     .matches(/^\d{10}$/, 'Phone number should be in 6353355512 format'),
 })
 
 const otpVerifySchema = yup.object().shape({
-	otp: yup.string()
+	security_code: yup.string()
     .required('OTP is required')
-    .length(4, 'OTP must be 4 digits long')
+    .length(6, 'OTP must be 6 digits long')
     .matches(/^\d+$/, 'OTP must contain only digits'),
 })
 

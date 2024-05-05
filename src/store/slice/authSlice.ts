@@ -12,13 +12,12 @@ const OTP_VERIFY = process.env.NEXT_PUBLIC_OTP_VERIFY
 
 export const phoneVerify = createAsyncThunk(
     'phoneVerify',
-    async (val: any) => {
+    async (val: Object) => {
         try {
-            // console.log(val);
-            // const otpSent = await axios.post(`${BASE_URL}/user/phone-verify`, val)
+            const otpSent = await axios.post(`${BASE_URL}/verify/phone/register`, val)
             // const otpSent = await axios.get(`${PHONE_VERIFY}/+91${val.phone_no}/AUTOGEN3/`)
-            const otpSent = await axios.post(`${BASE_URL}/user/phone-verify`, val)
-            console.log(otpSent.data);
+            // const otpSent = await axios.post(`${BASE_URL}/user/phone-verify`, val)
+            console.log("<<<",otpSent.data);
             ToastSuccess("OTP Sent successfully")
             return otpSent.data
         } catch (error: any) {
@@ -33,14 +32,14 @@ export const otpVerify = createAsyncThunk(
     'otpVerify',
     async (val: any) => {
         try {
-            const otpVerify = await axios.get(`${OTP_VERIFY}/${val.otp_session_id}/${val.otp}`)
+            const otpVerify = await axios.post(`${BASE_URL}/verify/phone/verify_and_register`, val)
             // console.log(otpVerify.data);
             // ToastSuccess(createUser.data.message)
             ToastSuccess("OTP Verified")
             return otpVerify.data
         } catch (error: any) {
             // console.log(error.response);
-            ToastError(error.response.data?.Details)
+            ToastError(error.response.data)
             throw error.response
         }
     }
@@ -245,8 +244,8 @@ const authSlice = createSlice({
             })
             .addCase(phoneVerify.fulfilled, (state: any, action: any) => {
                 state.status = 'succeeded'
-                console.log(action.payload.Details);
-                state.otp_session_id = action.payload.Details
+                console.log("<<<",action.payload.session_token);
+                state.otp_session_id = action.payload.session_token
             })
             .addCase(phoneVerify.rejected, (state: any) => {
                 state.status = 'failed'
