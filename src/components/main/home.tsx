@@ -188,8 +188,8 @@ function HomePage() {
         </div>
       ) : (
         <div className="mx-auto my-10 max-w-7xl px-2">
-          <div className="flex justify-between items-baseline">
-            <div className="relative mt-4 w-[30%]">
+          <div className="flex justify-between items-baseline flex-col sm:flex-row">
+            <div className="relative mt-4 w-full sm:w-[30%]">
               <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                 <svg
                   className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -225,7 +225,7 @@ function HomePage() {
               </button>
             </div>
 
-            <div>
+            <div className="mt-4 sm:mt-0">
               <select
                 value={selectedGender}
                 onChange={(e) => {
@@ -240,7 +240,7 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="mt-8 grid grid-cols-2 gap-y-8 sm:grid-cols-2 sm:gap-12 lg:grid-cols-2">
+          <div className="mt-8 grid gap-y-8 sm:grid-cols-2 sm:gap-12 lg:grid-cols-2">
             {state.listingData.map((listing: any, index: number) => (
               <Link key={index} href={`/listdetails/${listing.id}`}>
                 <DetailCard listing={listing} />

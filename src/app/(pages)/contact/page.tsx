@@ -1,46 +1,55 @@
 "use client";
 
-import React from "react";
-import { Menu, X, MapPin } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import UserLayout from "../UserLayout";
 import { useFormik } from "formik";
 import { ContactFormSchema } from "@/schemas/UserSchema";
 import axios from "axios";
-import { ToastError, ToastSuccess } from "@/components/utils/custom-error/toast";
+import {
+  ToastError,
+  ToastSuccess,
+} from "@/components/utils/custom-error/toast";
 import { ToastContainer } from "react-toastify";
 import Image from "next/image";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export default function ContactPageOne() {
+  const [loading, setLoading] = useState<boolean>(true);
 
-    const handleSubmit = async (val: any) => {
-      try {
-        val.phone_no = "+91" + val.phone_no;
-        const response = await axios.post(`${BASE_URL}/user/submit-contact-form/`, val);
-        ToastSuccess(response.data.message)
-        
-      } catch (error: any) {
-        console.error('API Error:', error);
-        ToastError('An error occurred. Please try again later.')
-        throw error;
-      } finally {
-        formik.resetForm();
-      }
-      // console.log(status);
-    };
+  useEffect(() =>{
+    setLoading(false)
+  },[])
 
-    const formik = useFormik({
-      initialValues: {
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone_no: "",
-        message: "",
-      },
-      validationSchema: ContactFormSchema,
-      onSubmit: handleSubmit,
-    });
+  const handleSubmit = async (val: any) => {
+    try {
+      val.phone_no = "+91" + val.phone_no;
+      const response = await axios.post(
+        `${BASE_URL}/user/submit-contact-form/`,
+        val
+      );
+      ToastSuccess(response.data.message);
+    } catch (error: any) {
+      console.error("API Error:", error);
+      ToastError("An error occurred. Please try again later.");
+      throw error;
+    } finally {
+      formik.resetForm();
+    }
+    // console.log(status);
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_no: "",
+      message: "",
+    },
+    validationSchema: ContactFormSchema,
+    onSubmit: handleSubmit,
+  });
 
   return (
     <UserLayout>

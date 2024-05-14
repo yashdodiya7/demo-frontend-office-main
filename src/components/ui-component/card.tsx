@@ -23,15 +23,14 @@ function DetailCard({listing}:{listing: any}) {
   const [showTags, setShowTags] = React.useState(false);
   
   return (
-    <div className="flex max-w-2xl flex-col items-center rounded-md border md:flex-row">
-      <div className="md:w-[200px] md:h-[200px]">
+    <div className="flex flex-col max-w-2xl items-center rounded-md border md:flex-row">
+      <div className="md:w-[200px] md:h-[200px] w-full mb-4 md:mb-0">
         <Image src={listing?.user_profile_image} width={1000} height={1000}
           alt="Image"
           className="h-full w-full rounded-l-md object-cover"
         />
       </div>
         <div className="p-4 w-full">
-
           <div className='flex items-center justify-between mb-2'>
             <h1 className="text-lg font-semibold flex flex-col items-baseline gap-1">
               {listing?.user_name}
@@ -40,7 +39,7 @@ function DetailCard({listing}:{listing: any}) {
               </p>
             </h1>
             <p className="mt-1 text-sm text-gray-600 flex items-center justify-start gap-1">
-              <MapPin />{listing?.location}
+              <MapPin />{listing?.location.length > 30 ? `${listing.location.slice(0, 30)} ...` : listing?.location}
             </p>
           </div>
 

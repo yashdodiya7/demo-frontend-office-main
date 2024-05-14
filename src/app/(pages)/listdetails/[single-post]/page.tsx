@@ -106,11 +106,11 @@ const SingleDetails = ({ params }: { params: any }) => {
             <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
           </div>
         ) : (
-      <div className="flex min-h-screen">
-        <div className="container mx-auto px-28 py-8 flex justify-center">
+      <div className="flex flex-col min-h-screen">
+        <div className="container mx-auto px-4 md:px-28 py-8 flex flex-col md:flex-row justify-center">
           {/* Left side - Profile card */}
-          <div className="w-96 pr-8">
-            <div className="bg-white shadow flex flex-col justify-center items-center rounded-lg p-4">
+          <div className="w-full md:w-80 pr-0 md:pr-8 mb-8 md:mb-0">
+            <div className="bg-white shadow flex flex-col justify-center items-center rounded-lg p-4 mb-4">
               {/* Profile image */}
               <div className="mx-auto">
                 <Image
@@ -126,7 +126,7 @@ const SingleDetails = ({ params }: { params: any }) => {
               <p className="text-sm text-gray-600 mb-2">
                 {data?.user_occupation}
               </p>
-              <p className="text-sm text-gray-600">{data?.user_gender}</p>
+              {/* <p className="text-sm text-gray-600">{data?.user_gender}</p> */}
                 <button
                     onClick={handleLinkClick}
                     className="px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800"
@@ -155,7 +155,7 @@ const SingleDetails = ({ params }: { params: any }) => {
             )}
             </div>
             <h1 className="mt-6 mx-auto font-bold text-lg text-center">Nearby Listings</h1>
-            <div className="relative h-full w-full">
+            <div className="relative w-full">
               <div className="mt-4 h-96 shadow-lg rounded-2xl overflow-hidden">
                 <MapComponent id={data?.id} />
               </div>
@@ -163,12 +163,12 @@ const SingleDetails = ({ params }: { params: any }) => {
           </div>
 
           {/* Right side - Product details */}
-          <div className="w-2/3">
+          <div className="w-full sm:w-2/3">
             <div className="bg-white shadow rounded-lg p-8">
               {/* Product image */}
               {/* <div className="w-64 h-64 bg-gray-200 rounded-lg mb-8"></div> */}
               {/* Product details */}
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col items-start justify-start md:flex-row md:justify-between">
                 <div>
                   <h1 className="text-xl font-semibold ml-1 mb-4 text-gray-900">
                     Location
@@ -190,7 +190,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                 <h1 className="text-xl font-semibold mb-4 mt-4 text-gray-900">
                   Basic Info
                 </h1>
-                <div className="flex items-center justify-between mt-4 mb-4">
+                <div className="flex items-center justify-between flex-wrap gap-4 mt-4 mb-4">
                   <div className="flex flex-col gap-1">
                     <p className="text-gray-500 text-sm">Gender</p>
                     <p className="text-xl text-gray-800 font-semibold capitalize">
@@ -222,7 +222,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                 <h1 className="text-xl font-semibold mb-4 mt-4 text-gray-900">
                   Property Info
                 </h1>
-                <div className="flex items-center justify-between mt-4 mb-4">
+                <div className="flex items-center justify-between flex-wrap gap-6 mt-4 mb-4">
                   <div className="flex flex-col gap-1">
                     <p className="text-gray-500 text-sm">Lease Term</p>
                     <p className="text-xl text-gray-800 font-semibold capitalize">
@@ -293,7 +293,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                 <h2 className="text-xl font-semibold mb-4 mt-4 text-gray-900">
                   Prefernce
                 </h2>
-                <div className="flex flex-wrap items-center justify-center mt-2">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center mt-2">
                   {data?.match_details?.user_preferences?.map((name: string, index: number) => (
                     <PreferncesField name={name} key={index}/>
                   ))}
@@ -304,9 +304,9 @@ const SingleDetails = ({ params }: { params: any }) => {
                 <h2 className="text-xl font-semibold mb-4 mt-4 text-gray-900">
                   Highlights
                 </h2>
-                <div className="flex flex-wrap items-center justify-start mt-2">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center mt-2">
                   {data?.highlights?.map((highlight: string, index: number) => (
-                    <div key={index} className="flex gap-1 justify-center items-center px-3 py-1 text-sm font-medium text-gray-600 bg-slate-200 rounded-full mr-2 mb-1">
+                    <div key={index} className="flex gap-1 justify-start items-center py-1 sm:px-3 sm:py-1 text-sm font-medium text-gray-600 bg-slate-200 rounded-lg sm:rounded-full mr-2 mb-1">
                       <Check className="w-4 h-4" />
                       <span className="capitalize">
                         {highlight.replace(/_/g, " ")}
@@ -320,7 +320,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                 <h2 className="text-xl font-semibold mb-4 mt-4 text-gray-900">
                   Amenities
                 </h2>
-                <div className="flex flex-wrap items-center justify-center mt-2">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center mt-2">
                   {data?.amenities?.map((name: string, index: number) => (
                     <AmenitiesField name={name} key={index}/>
                   ))}
