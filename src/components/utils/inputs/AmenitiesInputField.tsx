@@ -21,7 +21,15 @@ const checkboxIcons: Record<string, string> = {
   ac: "https://www.flatmate.in/air_conditioner.png",
 };
 
-const AmenitiesInputField: React.FC = ({
+interface AmenitiesInputFieldProps {
+  id: string;
+  name: string;
+  value: string;
+  checked: boolean;
+  onChange: () => void;
+}
+
+const AmenitiesInputField: React.FC<AmenitiesInputFieldProps> = ({
   id,
   name,
   value,

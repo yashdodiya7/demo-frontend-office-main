@@ -9,7 +9,7 @@ export const ToastError = (error: string) => {
     <>
         {toast.error(error, {
             position: "top-center",
-            autoClose: 3000,
+            autoClose: 1000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,

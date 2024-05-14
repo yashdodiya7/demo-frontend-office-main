@@ -18,8 +18,26 @@ import HighlightsInputField from "../utils/inputs/HighlightsInputField";
 import { PostCreationSchema } from "@/schemas/ListingSchema";
 import TextNumberInputField from "../utils/inputs/TextNumberInputField";
 import SelectInputField from "../utils/inputs/SelectInputField";
+import Image from "next/image";
+import { ToastError } from "../utils/custom-error/toast";
 
-const amenitiesData = [
+interface Amenity {
+  id: string;
+  value: string;
+}
+
+interface Highlight {
+  id: string;
+  value: string;
+}
+
+
+interface Coordinates {
+  lat: number | null;
+  lng: number | null;
+}
+
+const amenitiesData: Amenity[] = [
   { id: "tv", value: "9" },
   { id: "power_backup", value: "8" },
   { id: "fridge", value: "7" },
@@ -31,7 +49,7 @@ const amenitiesData = [
   { id: "ac", value: "1" },
 ];
 
-const highlightsData = [
+const highlightsData: Highlight[] = [
   {
     id: "gated_society",
     value: "11",
@@ -51,24 +69,38 @@ const highlightsData = [
   { id: "gym_nearby", value: "1" },
 ];
 
+
+interface FormDataValue {
+  property_type: string;
+  lease_term: string;
+  approx_rent: string;
+  pet_policy: string;
+  smoking_policy: string;
+  images: File[];
+  occupancy: string;
+  max_vacancy: string;
+  looking_for: string;
+  amenities: number[];
+  highlights: number[];
+  description: string;
+}
+
 const CreateList = () => {
   const dispatch = useDispatch();
-  const state = useSelector((state: any) => state.list);
   const router = useRouter();
   const [loading, setLoading] = useState(false)
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [address, setAddress] = useState<string>("");
-  const [coordinates, setCoordinates] = useState<{
-    lat: number | null;
-    lng: number | null;
-  }>({
+  const [coordinates, setCoordinates] = useState<Coordinates>({
     lat: null,
     lng: null,
   });
   // const [isSelected, setIsSelected] = useState()
 
-  const [amenitiesChecked, setAmenitiesChecked] = useState({
+  const [amenitiesChecked, setAmenitiesChecked] = useState<{
+    [key: string]: boolean;
+  }>({
     tv: false,
     power_backup: false,
     fridge: false,
@@ -79,9 +111,11 @@ const CreateList = () => {
     washing_machine: false,
     ac: false,
   });
-  const [newAmenity, setNewAmenity] = useState([]);
+  const [newAmenity, setNewAmenity] = useState<string[]>([]);
 
-  const [highlightsChecked, setHighlightsChecked] = useState({
+  const [highlightsChecked, setHighlightsChecked] = useState<{
+    [key: string]: boolean;
+  }>({
     gated_society: false,
     park_nearby: false,
     market_nearby: false,
@@ -94,9 +128,9 @@ const CreateList = () => {
     public_transport_nearby: false,
     gym_nearby: false,
   });
-  const [newHighlight, setNewHighlight] = useState([]);
+  const [newHighlight, setNewHighlight] = useState<string[]>([]);
 
-  const initialValues = {
+  const initialValues:FormDataValue = {
     property_type: "apartment",
     lease_term: "",
     approx_rent: "",
@@ -111,6 +145,24 @@ const CreateList = () => {
     description: "",
   };
 
+  const getUserLocation = () => {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            resolve({ latitude, longitude });
+          },
+          (error) => {
+            reject(error);
+          }
+        );
+      } else {
+        reject("Geolocation is not supported by this browser.");
+      }
+    });
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.currentTarget.files || []);
     setSelectedFiles(files);
@@ -118,25 +170,35 @@ const CreateList = () => {
 
   const token = getCookie("token");
 
-  const handleSubmit = async (val: any) => {
+  const handleSubmit = async (val: FormDataValue) => {
     try {
+      // Retrieve user's current location
+      // let userLocation: any;
+      // try {
+      //   userLocation = await getUserLocation();
+      // } catch (error) {
+      //   ToastError("Please allow location access");
+      //   return; // Stop further execution
+      // }
+
       const formData = new FormData();
+
+      // formData.append("userLatitude", userLocation.latitude.toString());
+      // formData.append("userLongitude", userLocation.longitude.toString());
 
       Object.entries(val).forEach(([key, value]) => {
         if (
           key !== "amenities" &&
           key !== "highlights" &&
-          key !== "mobile_visible" &&
+          // key !== "mobile_visible" &&
           key !== "images"
         ) {
           formData.append(key, value);
         }
       });
-
-      if (val.mobile_visible?.length > 0) {
-        formData.append("mobile_visible", true);
-      }
-
+      // if (val.mobile_visible?.length > 0) {
+      formData.append("mobile_visible", "true");
+      // }
       selectedFiles.forEach((file) => {
         formData.append("images", file);
       });
@@ -145,14 +207,12 @@ const CreateList = () => {
       formData.append("amenities", JSON.stringify(newAmenity.map(Number)));
       formData.append("highlights", JSON.stringify(newHighlight.map(Number)));
       formData.append("location", address);
-      formData.append("latitude", coordinates.lat);
-      formData.append("longitude", coordinates.lng);
+      if (coordinates.lat && coordinates.lng) {
+        formData.append("latitude", coordinates.lat.toString());
+        formData.append("longitude", coordinates.lng.toString());
+      }
 
       formData.append("availability_date", "2024-04-30");
-
-      // for (const [name, value] of formData.entries()){
-      //     console.log(`${name}: ${value}`);
-      // }
       setLoading(true);
       const res = await dispatch(
         createPost({ userToken: token, updatedata: formData })
@@ -188,7 +248,7 @@ const CreateList = () => {
   };
 
   const updateNewAmenity = () => {
-    const updatedNewAmenity = [];
+    const updatedNewAmenity: string[] = [];
     Object.entries(amenitiesChecked).forEach(([key, value]) => {
       if (value) {
         const amenityObj = amenitiesData.find((amenity) => amenity.id === key);
@@ -205,7 +265,7 @@ const CreateList = () => {
   }, [amenitiesChecked]);
 
   const updateNewHighlight = () => {
-    const updatedNewHighlight = [];
+    const updatedNewHighlight: string[] = [];
     Object.entries(highlightsChecked).forEach(([key, value]) => {
       if (value) {
         const highlightObj = highlightsData.find(
@@ -239,7 +299,9 @@ const CreateList = () => {
       // Render newly selected file with remove button
       return (
         <div key={index} className="relative inline-block mb-4 mr-4">
-          <img
+          <Image
+            width={500}
+            height={500}
             src={URL.createObjectURL(file)}
             alt={`Preview ${index}`}
             className="w-32 h-32 object-cover rounded-lg shadow-md"
@@ -251,277 +313,277 @@ const CreateList = () => {
 
   return (
     <div>
-        <ToastContainer />
-        {loading ? ( // Show loader if loading is true
-          <div className="flex items-center justify-center h-screen">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-          </div>
-        ) : (
-      <Formik
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        validationSchema={PostCreationSchema}
-      >
-        {({ handleSubmit }) => (
-          <div className="mx-28 my-8 mb-24">
-            <form action="#" method="POST" onSubmit={handleSubmit}>
-              <div className="space-y-12">
-                <div className="border-b border-gray-900/10 pb-12">
-                  <h2 className="text-base font-semibold leading-7 text-gray-900">
-                    Add a POST
-                  </h2>
-                  {/* <p className="mt-1 text-sm leading-6 text-gray-600">Add Choices based on your Preferences</p> */}
+      <ToastContainer />
+      {loading ? ( // Show loader if loading is true
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
+        </div>
+      ) : (
+        <Formik
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          validationSchema={PostCreationSchema}
+        >
+          {({ handleSubmit }) => (
+            <div className="mx-28 my-8 mb-24">
+              <form action="#" method="POST" onSubmit={handleSubmit}>
+                <div className="space-y-12">
+                  <div className="border-b border-gray-900/10 pb-12">
+                    <h2 className="text-base font-semibold leading-7 text-gray-900">
+                      Add a POST
+                    </h2>
+                    {/* <p className="mt-1 text-sm leading-6 text-gray-600">Add Choices based on your Preferences</p> */}
 
-                  <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="location"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Location
-                      </label>
-                      <div className="mt-2">
-                        <PlacesAutocomplete
-                          value={address}
-                          onChange={setAddress}
-                          onSelect={handleSelect}
+                    <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="location"
+                          className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                          {({
-                            getInputProps,
-                            suggestions,
-                            getSuggestionItemProps,
-                            loading,
-                          }) => (
-                            <div>
-                              <input
-                                {...getInputProps({
-                                  placeholder: "Type address",
-                                  className:
-                                    "py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
-                                })}
-                              />
-                              {loading ? <div>...loading</div> : null}
-                              {suggestions.map((suggestion, index) => (
-                                <div
-                                  key={index}
-                                  {...getSuggestionItemProps(suggestion, {
+                          Location
+                        </label>
+                        <div className="mt-2">
+                          <PlacesAutocomplete
+                            value={address}
+                            onChange={setAddress}
+                            onSelect={handleSelect}
+                          >
+                            {({
+                              getInputProps,
+                              suggestions,
+                              getSuggestionItemProps,
+                              loading,
+                            }) => (
+                              <div>
+                                <input
+                                  {...getInputProps({
+                                    placeholder: "Type address",
                                     className:
-                                      "cursor-pointer p-2 hover:bg-gray-100",
+                                      "py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
                                   })}
-                                >
-                                  <span className="block text-sm text-gray-800">
-                                    {suggestion.description}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </PlacesAutocomplete>
+                                />
+                                {loading ? <div>...loading</div> : null}
+                                {suggestions.map((suggestion, index) => (
+                                  <div
+                                    {...getSuggestionItemProps(suggestion, {
+                                      className:
+                                        "cursor-pointer p-2 hover:bg-gray-100",
+                                      key: index,
+                                    })}
+                                  >
+                                    <span className="block text-sm text-gray-800">
+                                      {suggestion.description}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </PlacesAutocomplete>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="property_type"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Property Type
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          as="select"
-                          id="property_type"
-                          name="property_type"
-                          className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="property_type"
+                          className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                          <option value="apartment">Apartment</option>
-                          <option value="house">House</option>
-                          <option value="room">Room</option>
-                        </Field>
-                        <ErrorMessage
-                          name="property_type"
-                          component="div"
-                          className="mt-2 text-sm text-red-600 dark:text-red-500"
-                        />
+                          Property Type
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            as="select"
+                            id="property_type"
+                            name="property_type"
+                            className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          >
+                            <option value="apartment">Apartment</option>
+                            <option value="house">House</option>
+                            <option value="room">Room</option>
+                          </Field>
+                          <ErrorMessage
+                            name="property_type"
+                            component="div"
+                            className="mt-2 text-sm text-red-600 dark:text-red-500"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    {/* <SelectInputField initialValue="apartment" name="Property Type" value="property_type" options={["apartment", "house", "room"]}/> */}
+                      {/* <SelectInputField initialValue="apartment" name="Property Type" value="property_type" options={["apartment", "house", "room"]}/> */}
 
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="lease_term"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Lease Term
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          id="lease_term"
-                          name="lease_term"
-                          type="number"
-                          placeholder="11"
-                          className="py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        />
-                        <ErrorMessage
-                          name="lease_term"
-                          component="div"
-                          className="mt-2 text-sm text-red-600 dark:text-red-500"
-                        />
-                      </div>
-                    </div>
-
-                    {/* <TextNumberInputField name="Lease Term" type="number" value="lease_term" placeholder="11"/> */}
-
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="max_vacancy"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Max Vacancy
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          id="max_vacancy"
-                          name="max_vacancy"
-                          type="number"
-                          placeholder="2"
-                          className="py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        />
-                        <ErrorMessage
-                          name="max_vacancy"
-                          component="div"
-                          className="mt-2 text-sm text-red-600 dark:text-red-500"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="approx_rent"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Approx Rent
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          id="approx_rent"
-                          name="approx_rent"
-                          type="text"
-                          placeholder="5000"
-                          className="block w-full px-2 rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        />
-                        <ErrorMessage
-                          name="approx_rent"
-                          component="div"
-                          className="mt-2 text-sm text-red-600 dark:text-red-500"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="pet_policy"
-                        className="block text-sm font-medium leading-6 text-gray-900 capitalize"
-                      >
-                        Pet Policy
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          as="select"
-                          id="pet_policy"
-                          name="pet_policy"
-                          className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="lease_term"
+                          className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                          <option value="allowed">Allowed</option>
-                          <option value="not_allowed">Not Allowed</option>
-                        </Field>
-                        <ErrorMessage
-                          name="pet_policy"
-                          component="div"
-                          className="mt-2 text-sm text-red-600 dark:text-red-500"
-                        />
+                          Lease Term
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            id="lease_term"
+                            name="lease_term"
+                            type="number"
+                            placeholder="11"
+                            className="py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          />
+                          <ErrorMessage
+                            name="lease_term"
+                            component="div"
+                            className="mt-2 text-sm text-red-600 dark:text-red-500"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="smoking_policy"
-                        className="block text-sm font-medium leading-6 text-gray-900 capitalize"
-                      >
-                        Smoking Policy
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          as="select"
-                          id="smoking_policy"
-                          name="smoking_policy"
-                          className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      {/* <TextNumberInputField name="Lease Term" type="number" value="lease_term" placeholder="11"/> */}
+
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="max_vacancy"
+                          className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                          <option value="allowed">Allowed</option>
-                          <option value="not_allowed">Not Allowed</option>
-                        </Field>
-                        <ErrorMessage
-                          name="smoking_policy"
-                          component="div"
-                          className="mt-2 text-sm text-red-600 dark:text-red-500"
-                        />
+                          Max Vacancy
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            id="max_vacancy"
+                            name="max_vacancy"
+                            type="number"
+                            placeholder="2"
+                            className="py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          />
+                          <ErrorMessage
+                            name="max_vacancy"
+                            component="div"
+                            className="mt-2 text-sm text-red-600 dark:text-red-500"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="occupancy"
-                        className="block text-sm font-medium leading-6 text-gray-900 capitalize"
-                      >
-                        Occupancy
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          as="select"
-                          id="occupancy"
-                          name="occupancy"
-                          className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="approx_rent"
+                          className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                          <option value="single">Single</option>
-                          <option value="shared">Shared</option>
-                          <option value="any">Any</option>
-                        </Field>
-                        <ErrorMessage
-                          name="occupancy"
-                          component="div"
-                          className="mt-2 text-sm text-red-600 dark:text-red-500"
-                        />
+                          Approx Rent
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            id="approx_rent"
+                            name="approx_rent"
+                            type="text"
+                            placeholder="5000"
+                            className="block w-full px-2 rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          />
+                          <ErrorMessage
+                            name="approx_rent"
+                            component="div"
+                            className="mt-2 text-sm text-red-600 dark:text-red-500"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="sm:col-span-2">
-                      <label
-                        htmlFor="looking_for"
-                        className="block text-sm font-medium leading-6 text-gray-900 capitalize"
-                      >
-                        Looking For
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          as="select"
-                          id="looking_for"
-                          name="looking_for"
-                          className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="pet_policy"
+                          className="block text-sm font-medium leading-6 text-gray-900 capitalize"
                         >
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                          <option value="any">Any</option>
-                        </Field>
-                        <ErrorMessage
-                          name="looking_for"
-                          component="div"
-                          className="mt-2 text-sm text-red-600 dark:text-red-500"
-                        />
+                          Pet Policy
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            as="select"
+                            id="pet_policy"
+                            name="pet_policy"
+                            className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          >
+                            <option value="allowed">Allowed</option>
+                            <option value="not_allowed">Not Allowed</option>
+                          </Field>
+                          <ErrorMessage
+                            name="pet_policy"
+                            component="div"
+                            className="mt-2 text-sm text-red-600 dark:text-red-500"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="sm:col-span-4">
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="smoking_policy"
+                          className="block text-sm font-medium leading-6 text-gray-900 capitalize"
+                        >
+                          Smoking Policy
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            as="select"
+                            id="smoking_policy"
+                            name="smoking_policy"
+                            className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          >
+                            <option value="allowed">Allowed</option>
+                            <option value="not_allowed">Not Allowed</option>
+                          </Field>
+                          <ErrorMessage
+                            name="smoking_policy"
+                            component="div"
+                            className="mt-2 text-sm text-red-600 dark:text-red-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="occupancy"
+                          className="block text-sm font-medium leading-6 text-gray-900 capitalize"
+                        >
+                          Occupancy
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            as="select"
+                            id="occupancy"
+                            name="occupancy"
+                            className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          >
+                            <option value="single">Single</option>
+                            <option value="shared">Shared</option>
+                            <option value="any">Any</option>
+                          </Field>
+                          <ErrorMessage
+                            name="occupancy"
+                            component="div"
+                            className="mt-2 text-sm text-red-600 dark:text-red-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="looking_for"
+                          className="block text-sm font-medium leading-6 text-gray-900 capitalize"
+                        >
+                          Looking For
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            as="select"
+                            id="looking_for"
+                            name="looking_for"
+                            className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          >
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="any">Any</option>
+                          </Field>
+                          <ErrorMessage
+                            name="looking_for"
+                            component="div"
+                            className="mt-2 text-sm text-red-600 dark:text-red-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* <div className="sm:col-span-4">
                       <div className="flex items-center">
                         <Field
                           type="checkbox"
@@ -537,122 +599,121 @@ const CreateList = () => {
                           Mobile No Visible to Others ?
                         </label>
                       </div>
-                    </div>
+                    </div> */}
 
-                    <div className="sm:col-span-6 flex gap-2 flex-col md:flex-col md:gap-2">
-                      <div>
-                        <h3 className="text-md font-semibold mb-6">
-                          Amenities
-                        </h3>
-                        <div className="flex flex-wrap items-baseline justify-center">
-                          <div className="grid grid-cols-6 gap-4">
-                            {Object.keys(amenitiesChecked).map(
-                              (amenity: string) => (
-                                <AmenitiesInputField
-                                  key={amenity}
-                                  id={amenity}
-                                  name={amenity}
-                                  value={amenity}
-                                  checked={amenitiesChecked[amenity]}
-                                  onChange={() =>
-                                    handleAmenitiesChange(amenity)
-                                  }
-                                />
-                              )
-                            )}
+                      <div className="sm:col-span-6 flex gap-2 flex-col md:flex-col md:gap-2">
+                        <div>
+                          <h3 className="text-md font-semibold mb-6">
+                            Amenities
+                          </h3>
+                          <div className="flex flex-wrap items-baseline justify-center">
+                            <div className="grid grid-cols-6 gap-4">
+                              {Object.keys(amenitiesChecked).map(
+                                (amenity: string) => (
+                                  <AmenitiesInputField
+                                    key={amenity}
+                                    id={amenity}
+                                    name={amenity}
+                                    value={amenity}
+                                    checked={amenitiesChecked[amenity]}
+                                    onChange={() =>
+                                      handleAmenitiesChange(amenity)
+                                    }
+                                  />
+                                )
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-4">
+                          <h3 className="text-md font-semibold mb-6">
+                            Highlights
+                          </h3>
+                          <div className="flex flex-wrap items-center justify-center">
+                            <div className="grid grid-cols-6 gap-4">
+                              {Object.keys(highlightsChecked).map(
+                                (highlight: string) => (
+                                  <HighlightsInputField
+                                    key={highlight}
+                                    id={highlight}
+                                    name={highlight}
+                                    value={highlight}
+                                    checked={highlightsChecked[highlight]}
+                                    onChange={() =>
+                                      handleHighlightsChange(highlight)
+                                    }
+                                  />
+                                )
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="mt-4">
-                        <h3 className="text-md font-semibold mb-6">
-                          Highlights
-                        </h3>
-                        <div className="flex flex-wrap items-center justify-center">
-                          <div className="grid grid-cols-6 gap-4">
-                            {Object.keys(highlightsChecked).map(
-                              (highlight: string) => (
-                                <HighlightsInputField
-                                  type="checkbox"
-                                  key={highlight}
-                                  id={highlight}
-                                  name={highlight}
-                                  value={highlight}
-                                  checked={highlightsChecked[highlight]}
-                                  onChange={() =>
-                                    handleHighlightsChange(highlight)
-                                  }
-                                />
-                              )
-                            )}
-                          </div>
+                      <div className="sm:col-span-full">
+                        <label
+                          htmlFor="bio"
+                          className="block text-sm font-medium leading-6 text-gray-900"
+                        >
+                          Bio
+                        </label>
+                        <div className="mt-2">
+                          <Field
+                            as="textarea"
+                            id="bio"
+                            name="description"
+                            placeholder="Add Description"
+                            className="block p-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          />
+                          {/* Optional: Display validation errors */}
+                          <ErrorMessage
+                            name="description"
+                            component="div"
+                            className="mt-3 text-sm text-red-600 dark:text-red-500"
+                          />
                         </div>
                       </div>
-                    </div>
 
-                    <div className="sm:col-span-full">
-                      <label
-                        htmlFor="bio"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Bio
-                      </label>
-                      <div className="mt-2">
-                        <Field
-                          as="textarea"
-                          id="bio"
-                          name="description"
-                          placeholder="Add Description"
-                          className="block p-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        />
-                        {/* Optional: Display validation errors */}
-                        <ErrorMessage
-                          name="description"
-                          component="div"
-                          className="mt-3 text-sm text-red-600 dark:text-red-500"
+                      <div className="sm:col-span-2">
+                        <label htmlFor="file-input" className="sr-only">
+                          Choose file
+                        </label>
+                        <input
+                          type="file"
+                          name="images"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          multiple
+                          className="block w-full border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none file:bg-gray-50 file:border-0 file:me-4 file:py-3 file:px-4"
                         />
                       </div>
                     </div>
-
-                    <div className="sm:col-span-2">
-                      <label htmlFor="file-input" className="sr-only">
-                        Choose file
-                      </label>
-                      <input
-                        type="file"
-                        name="images"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        multiple
-                        className="block w-full border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none file:bg-gray-50 file:border-0 file:me-4 file:py-3 file:px-4"
-                      />
-                    </div>
+                    <div className="mt-2 flex">{renderImagePreviews()}</div>
+                    <p className="mt-1 font-semibold text-sm text-orange-600">
+                      {selectedFiles.length < 2 &&
+                        "Minimum 2 Images to be uploaded"}
+                      {selectedFiles.length > 5 && "Maximum 5 Images allowed"}
+                    </p>
                   </div>
-                  <div className="mt-2 flex">{renderImagePreviews()}</div>
-                  <p className="mt-1 font-semibold text-sm text-red-600 dark:text-red-500">
-                    {selectedFiles.length < 2 &&
-                      "Minimum 2 Images to be uploaded"}
-                    {selectedFiles.length > 5 && "Maximum 5 Images allowed"}
-                  </p>
                 </div>
-              </div>
 
-              <div className="mt-6 flex items-center justify-center">
-                <button
-                  type="submit"
-                  disabled={
-                    selectedFiles.length < 2 || selectedFiles.length > 5
-                  }
-                  className="px-16 mb-8 rounded-md bg-stone-600 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-700"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-      </Formik>
-        )}
+                <div className="mt-6 flex items-center justify-center">
+                  <button
+                    type="submit"
+                    disabled={
+                      selectedFiles.length < 2 || selectedFiles.length > 5
+                    }
+                    className="px-16 mb-8 rounded-md bg-stone-600 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-700"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </Formik>
+      )}
     </div>
   );
 };

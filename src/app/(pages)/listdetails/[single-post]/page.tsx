@@ -18,9 +18,34 @@ import LoginPopup from "@/components/utils/popup/login-popup";
 import { useRouter } from "next/navigation";
 import SubscriptionPopUp from "@/components/utils/popup/subscription-popup";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
-const publicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY;
-
+interface ListingData {
+  id: number;
+  amenities: string[];
+  highlights: string[];
+  user_name: string;
+  user_occupation: string;
+  user_gender: string;
+  user_profile_image: string;
+  match_details: {
+    user_preferences: string[];
+  };
+  is_available: boolean;
+  max_vacancy: number;
+  description: string;
+  property_type: string;
+  latitude: number;
+  longitude: number;
+  lease_term: number;
+  pet_policy: string;
+  smoking_policy: string;
+  location: string;
+  occupancy: string;
+  looking_for: string;
+  approx_rent: number;
+  mobile_visible: boolean;
+  image_urls: string[];
+  user: number;
+}
 
 const SingleDetails = ({ params }: { params: any }) => {
   var settings = {
@@ -31,7 +56,7 @@ const SingleDetails = ({ params }: { params: any }) => {
     slidesToScroll: 1,
   };
 
-  const [data, setData] = useState({});
+  const [data, setData] = useState<ListingData | null>(null);
   const [showLoginPopup, setShowLoginPopup] = useState<boolean>(false);
   const [showSubscriptionPopup, setShowSubscriptionPopup] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,9 +64,9 @@ const SingleDetails = ({ params }: { params: any }) => {
   const dispatch = useDispatch();
   const router = useRouter()
 
-  const token = getCookie("token");
+  const token: string | undefined = getCookie("token");
 
-  const userPaid = useSelector((state:any) => state?.user?.userProfile?.is_paid)
+  const userPaid: boolean | undefined = useSelector((state: any) => state?.user?.userProfile?.is_paid)
 
   // Fetching Data of the listing
   useEffect(() => {
@@ -50,18 +75,18 @@ const SingleDetails = ({ params }: { params: any }) => {
       try {
         // Fetch listings when the component mounts
         setLoading(true);
-        const res = await dispatch(
+        const res: any = await dispatch(
           fetchSingleListing({ userToken: token, id: params["single-post"] })
         );
         setLoading(false);
-        setData({ ...res.payload });
+        setData(res.payload);
       } catch (error) {
         console.error("<<<Error fetching single listing:", error);
       }
     };
     // Call the asynchronous function
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, params, token]);
 
   const handleLinkClick = () => {
     if (!token) {
@@ -91,7 +116,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                 <Image
                   alt="profile image"
                   className="object-cover w-20 h-20 bg-gray-200 rounded-full mb-4"
-                  src={data?.user_profile_image}
+                  src={data?.user_profile_image || ""}
                   width={1000}
                   height={1000}
                 />
@@ -101,12 +126,12 @@ const SingleDetails = ({ params }: { params: any }) => {
               <p className="text-sm text-gray-600 mb-2">
                 {data?.user_occupation}
               </p>
-              <p className="text-sm text-gray-600">{data?.gender}</p>
+              <p className="text-sm text-gray-600">{data?.user_gender}</p>
                 <button
                     onClick={handleLinkClick}
                     className="px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800"
                 >
-                    View Profile
+                    View Details
                 </button>
             {showLoginPopup && (
                 <LoginPopup
@@ -155,8 +180,9 @@ const SingleDetails = ({ params }: { params: any }) => {
                     {data?.location}
                   </h1>
                 </div>
-                <div className="text-4xl font-serif">
-                  {data?.max_vacancy}
+                <div className="flex flex-wrap justify-center items-baseline gap-2">
+                  <p className="text-xl mr-1 text-gray-600">Vacancy</p>
+                  <p className="text-3xl font-serif ">{data?.max_vacancy}</p>
                 </div>
               </div>
               <hr />
@@ -229,9 +255,9 @@ const SingleDetails = ({ params }: { params: any }) => {
               </h1>
               <div>
                 <div className="bg-stone-200 rounded-lg px-8 py-6">
-                  {data?.image_urls?.length > 1 ? (
+                  {data?.image_urls && data?.image_urls?.length > 1 ? (
                     <Slider {...settings}>
-                      {data.image_urls?.map(
+                      {data?.image_urls?.map(
                         (imageUrl: string, index: number) => (
                           <div key={index} className="h-60">
                             <Image
@@ -247,7 +273,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                     </Slider>
                   ) : (
                     <div className="h-60">
-                      {data?.image_urls?.length > 0 ? (
+                      {data?.image_urls && data?.image_urls?.length > 0 ? (
                         <Image
                           src={data.image_urls[0]} // Use index 0 to access the first image URL
                           alt={`image`}
@@ -268,8 +294,8 @@ const SingleDetails = ({ params }: { params: any }) => {
                   Prefernce
                 </h2>
                 <div className="flex flex-wrap items-center justify-center mt-2">
-                  {data?.match_details?.user_preferences?.map((name: string) => (
-                    <PreferncesField name={name} />
+                  {data?.match_details?.user_preferences?.map((name: string, index: number) => (
+                    <PreferncesField name={name} key={index}/>
                   ))}
                 </div>
               </div>
@@ -279,8 +305,8 @@ const SingleDetails = ({ params }: { params: any }) => {
                   Highlights
                 </h2>
                 <div className="flex flex-wrap items-center justify-start mt-2">
-                  {data?.highlights?.map((highlight: string) => (
-                    <div className="flex gap-1 justify-center items-center px-3 py-1 text-sm font-medium text-gray-600 bg-slate-200 rounded-full mr-2 mb-1">
+                  {data?.highlights?.map((highlight: string, index: number) => (
+                    <div key={index} className="flex gap-1 justify-center items-center px-3 py-1 text-sm font-medium text-gray-600 bg-slate-200 rounded-full mr-2 mb-1">
                       <Check className="w-4 h-4" />
                       <span className="capitalize">
                         {highlight.replace(/_/g, " ")}
@@ -295,8 +321,8 @@ const SingleDetails = ({ params }: { params: any }) => {
                   Amenities
                 </h2>
                 <div className="flex flex-wrap items-center justify-center mt-2">
-                  {data?.amenities?.map((name: string) => (
-                    <AmenitiesField name={name} />
+                  {data?.amenities?.map((name: string, index: number) => (
+                    <AmenitiesField name={name} key={index}/>
                   ))}
                 </div>
               </div>
@@ -307,7 +333,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                 </h2>
                 {userPaid ? (
                   <div className="p-4 border border-gray-300 rounded-lg">
-                    <p className="text-gray-700 capitalize">{data.description}</p>
+                    <p className="text-gray-700 capitalize">{data?.description}</p>
                   </div>
                 ) : (
                   <div className="p-4 border border-gray-300 rounded-lg blur">

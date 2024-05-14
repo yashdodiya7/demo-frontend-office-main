@@ -196,7 +196,7 @@ export const updateUserProfile = createAsyncThunk(
             ToastSuccess("Profile Updated Successfully")
             return data
         } catch (error: any) {
-            // ToastError(error.response.data.message)
+            ToastError(error.response.data.error)
             throw error?.response?.data
         }
     }

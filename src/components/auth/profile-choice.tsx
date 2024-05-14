@@ -39,8 +39,16 @@ const ProfileChoice = () => {
     non_smoker: false,
     wanderer: false,
   });
+
+  const [selectedCount, setSelectedCount] = useState<number>(0);
   const router = useRouter();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Calculate the count of selected preferences
+    const count = Object.values(preferences).filter((value) => value).length;
+    setSelectedCount(count);
+  }, [preferences]);
 
   const handleSubmit = async () => {
     const payload = {
@@ -94,9 +102,13 @@ const ProfileChoice = () => {
                 <p className="mt-1 text-sm leading-6 text-gray-600">
                   It will show others what kind of flatmate you prefer.
                 </p>
-
                 <h4 className="mb-14 mt-8 text-center font-semibold text-black">
                   Select Preferences
+                {selectedCount < 4 && (
+                  <p className="text-red-500 text-center mt-4">
+                    Please select at least four preferences.
+                  </p>
+                )}
                 </h4>
                 <div className="mt-4">
                   <div className="flex items-baseline justify-center">
@@ -123,7 +135,9 @@ const ProfileChoice = () => {
                     </button> */}
               <button
                 type="submit"
-                className="rounded-md bg-stone-600 px-16 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600"
+                disabled={selectedCount < 4}
+                className={`rounded-md px-16 py-2 text-sm font-semibold text-white shadow-sm 
+                  ${selectedCount < 4 ? 'bg-gray-400 cursor-not-allowed' : 'bg-stone-600 hover:bg-stone-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600'}`}
               >
                 Save
               </button>

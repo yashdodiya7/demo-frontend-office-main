@@ -10,7 +10,7 @@ interface FormikInputFieldProps {
   onChange: () => void;
 }
 
-const HighlightsInputField: React.FC = ({
+const HighlightsInputField: React.FC<FormikInputFieldProps> = ({
   id,
   name,
   value,

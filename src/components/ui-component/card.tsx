@@ -6,7 +6,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-function CustomSlide(props) {
+function CustomSlide(props: any) {
   const { index, ...otherProps } = props;
   return (
     <div {...otherProps}>
@@ -18,48 +18,14 @@ function CustomSlide(props) {
   );
 }
 
-function SampleNextArrow(props) {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{ ...style, display: "none"}}
-      onClick={onClick}
-    />
-  );
-}
-
-function SamplePrevArrow(props) {
-  const { className, onClick } = props;
-  return (
-    <div
-      className={className}
-      onClick={onClick}
-    />
-  );
-}
-
 
 function DetailCard({listing}:{listing: any}) {
   const [showTags, setShowTags] = React.useState(false);
-
-  const settings = {
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    speed: 2000,
-    autoplaySpeed: 2000,
-    cssEase: "linear",
-    nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />
-  };
   
   return (
     <div className="flex max-w-2xl flex-col items-center rounded-md border md:flex-row">
       <div className="md:w-[200px] md:h-[200px]">
-        <Image src={listing.user_profile_image} width={1000} height={1000}
+        <Image src={listing?.user_profile_image} width={1000} height={1000}
           alt="Image"
           className="h-full w-full rounded-l-md object-cover"
         />
@@ -67,57 +33,32 @@ function DetailCard({listing}:{listing: any}) {
         <div className="p-4 w-full">
 
           <div className='flex items-center justify-between mb-2'>
-            <h1 className="inline-flex items-center text-lg font-semibold flex flex-col items-baseline gap-1">
-              {listing.user_name}
+            <h1 className="text-lg font-semibold flex flex-col items-baseline gap-1">
+              {listing?.user_name}
               <p className='text-sm font-normal'>
-                <span className='font-semibold'>Occupation:</span> {listing.user_occupation}
+                <span className='font-semibold'>Occupation:</span> {listing?.user_occupation}
               </p>
             </h1>
             <p className="mt-1 text-sm text-gray-600 flex items-center justify-start gap-1">
-              <MapPin />{listing.location}
+              <MapPin />{listing?.location}
             </p>
           </div>
 
           <div className='flex items-center justify-between mt-6'>
               <div className='flex flex-col gap-1'>
                   <p className='text-gray-500 text-sm'>Approx Rent</p>
-                  <p className='text-base text-gray-800 font-semibold'>&#8377; {listing.approx_rent}</p>
+                  <p className='text-base text-gray-800 font-semibold'>&#8377; {listing?.approx_rent}</p>
               </div>
               <div className='flex flex-col gap-1'>
                   <p className='text-gray-500 text-sm'>Occupancy</p>
-                  <p className='text-base text-gray-800 font-semibold capitalize'>{listing.occupancy}</p>
+                  <p className='text-base text-gray-800 font-semibold capitalize'>{listing?.occupancy}</p>
               </div>
               <div className='flex flex-col gap-1'>
                   <p className='text-gray-500 text-sm'>Looking For</p>
-                  <p className='text-base text-gray-800 font-semibold capitalize'>{listing.looking_for}</p>
+                  <p className='text-base text-gray-800 font-semibold capitalize'>{listing?.looking_for}</p>
               </div>
           </div>
           <hr className='mt-4'/>
-          
-          {/* <div className="mt-4">
-            {listing.amenities.map((name: any) =>
-                (
-                    <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[10px] font-semibold text-gray-900">
-                    #{name}
-                    </span>
-                )
-            )}
-          </div> */}
-          {/* <div className="mt-3 flex items-center justify-end w-full space-x-2">
-            <div className='flex items-center justify-center gap-2'>
-              <Image 
-                width={1000}
-                height={1000}
-                className="inline-block h-12 w-12 rounded-full"
-                src={listing.user_profile_image}
-                alt="Dan_Abromov"
-              />
-              <span className="flex flex-col">
-                <span className="text-[10px] font-medium text-gray-900">{listing.user_name}</span>
-                <span className="text-[8px] font-medium text-gray-500">@dan_abromov</span>
-              </span>
-            </div>
-          </div> */}
 
           <div className="flex items-center flex-wrap justify-between w-full space-x-2 mt-2">
             <p
@@ -125,13 +66,13 @@ function DetailCard({listing}:{listing: any}) {
               onMouseEnter={() => setShowTags(true)}
               onMouseLeave={() => setShowTags(false)}
             >
-              {listing.match_details && <span className={`ml-1`}>{listing.match_details?.match_percentage}% Match</span>}
+              {listing?.match_details && <span className={`ml-1`}>{listing?.match_details?.match_percentage}% Match</span>}
             
               {/* Conditionally render tags on hover */}
-              {showTags && listing.match_details && (
+              {showTags && listing?.match_details && (
                 <div className="absolute w-52 z-50 bottom-full left-0 p-2 bg-white border border-gray-200 rounded shadow-md">
                   <p className='py-4 text-sm text-stone-700 font-semibold'>Common Interests</p>
-                  {listing.match_details && listing.match_details?.matched_fields.map((name: any, index: number) => (
+                  {listing?.match_details && listing?.match_details?.matched_fields.map((name: any, index: number) => (
                     <span
                       key={index}
                       className="inline-block px-3 py-1 text-xs font-medium text-gray-900 bg-green-200 rounded-full mr-2 mb-1"
@@ -142,7 +83,7 @@ function DetailCard({listing}:{listing: any}) {
                 </div>
               )}
             </p>
-            {listing.distance && <p className='text-sm text-gray-600 relative'><span className='font-bold'>{+listing.distance?.toFixed(1)}</span> km from your location</p>}
+            {listing?.distance && <p className='text-sm text-gray-600 relative'><span className='font-bold'>{+listing?.distance?.toFixed(1)}</span> km from your location</p>}
           </div>
         </div>
     </div>

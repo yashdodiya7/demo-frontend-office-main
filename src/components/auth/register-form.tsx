@@ -20,7 +20,7 @@ interface RegisterFormValues {
   name: string;
   gender: string;
   phone_no: string;
-  age: string | null | number | undefined;
+  age: string | number | readonly string[] | undefined;
 }
 
 interface FormikErrors {
@@ -39,7 +39,7 @@ const RegisterForm: React.FC = () => {
   const handleSubmit = async (val: RegisterFormValues) => {
     try {
       // console.log(val);
-      val.phone_no = state.phone_no.slice(3);
+      val.phone_no = state.phone_no
       // val.phone_no = "6353355125"
       const response = await dispatch(userRegister(val));
       if (response.payload.message === "registration successfull") {
@@ -63,7 +63,7 @@ const RegisterForm: React.FC = () => {
       phone_no: "",
       password: "",
       password2: "",
-      age: null,
+      age: "",
     },
     validationSchema: registerSchema,
     onSubmit: handleSubmit,

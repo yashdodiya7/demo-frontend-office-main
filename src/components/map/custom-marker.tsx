@@ -1,7 +1,14 @@
 import React from 'react';
 import { OverlayView } from '@react-google-maps/api';
 
-const CustomMarker = ({ position, user_name, profile_image, onClick }) => (
+interface CustomMarkerProps {
+  position: any;
+  user_name: string;
+  profile_image: string;
+  onClick?: () => void;
+}
+
+const CustomMarker: React.FC<CustomMarkerProps> = ({ position, user_name, profile_image, onClick }) => (
   <OverlayView
     position={position}
     mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}

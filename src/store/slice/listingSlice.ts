@@ -57,7 +57,7 @@ export const updatePost = createAsyncThunk(
 
 export const fetchListing = createAsyncThunk(
     'fetchListing',
-    async ( {userToken, locationCoords}: {userToken: string, locationCoords: Object} ) => {
+    async ( {userToken, locationCoords, page}: {userToken: string, locationCoords: Object, page: number} ) => {
         // console.log(userToken, "userToken")
         // console.log(updatedata, "updatedata")
         try {
@@ -70,7 +70,7 @@ export const fetchListing = createAsyncThunk(
             }
 
             const createPost = await axios.post(
-                `${BASE_URL}/listing/getlistings`,
+                `${BASE_URL}/listing/getlistings?page=${page}`,
                 locationCoords,
                 {
                     headers: headers,
@@ -188,7 +188,7 @@ const listSlice = createSlice({
     initialState,
     reducers: {
         setSearchData(state: ListingState, action: any) {
-            state.listingData = action.payload; // Set listing data from payload
+            state.listingData = [...action?.payload?.listings]; // Set listing data from payload
         },
     },
     extraReducers: (builder: any) => {
@@ -207,7 +207,7 @@ const listSlice = createSlice({
             })
             .addCase(fetchListing.fulfilled, (state: ListingState, action: any) => {
                 state.status = 'success'
-                state.listingData = [...action.payload]
+                state.listingData = [...action.payload.listings]
             })
             .addCase(fetchListing.rejected, (state: ListingState) => {
                 state.status = 'failed'

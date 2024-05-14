@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SubscriptionPopUp = ({ onClose, onLogin }) => {
+const SubscriptionPopUp = ({ onClose, onLogin }: {onClose: () => void, onLogin: () => void}) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
         <div className="bg-white rounded-lg p-8">

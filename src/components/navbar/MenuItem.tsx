@@ -21,10 +21,6 @@ const MenuItem = ({ label, to }: MenuItemProps) => {
 
     const handleLogout = () => {
         deleteCookie('token')
-        // persistor.pause();
-        // persistor.flush().then(() => {
-        // return persistor.purge();
-        // });
         dispatch(logout())
         router.push('/')
     }

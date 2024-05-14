@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { ToastContainer } from 'react-toastify'
 import Link from 'next/link'
 import Logo from '../navbar/Logo'
+import { ToastError } from '../utils/custom-error/toast'
 
 
 const PhoneNumberField = () => {
@@ -17,8 +18,6 @@ const PhoneNumberField = () => {
     const router = useRouter()
     const dispatch = useDispatch()    
     const state = useSelector((state: any) => state.user)
-
-    const [disableResend, setDisableResend] = useState(true);
     const [timer, setTimer] = useState(30);
     
     const handlePhoneSubmit = async (val: any) => {
@@ -87,7 +86,7 @@ const PhoneNumberField = () => {
             setTimer(timeLeft);
             if (timeLeft === 0) {
                 clearInterval(interval);
-                setDisableResend(true);
+                // setDisableResend(true);
                 setTimer(30);
             }
         }, 1000);
@@ -96,7 +95,7 @@ const PhoneNumberField = () => {
     const handleResend = async () => {
         // Implement resend logic here
         // For demonstration, let's reset the timer
-        setDisableResend(true);
+        // setDisableResend(true);
         startTimer();
         // You may dispatch a phoneVerify action here to resend OTP
     };
@@ -112,9 +111,6 @@ const PhoneNumberField = () => {
                     <h2 className="text-start text-2xl font-bold leading-tight text-black">
                         Enter Your Contact No for Verification
                     </h2>
-                    <h3 className="text-red-600 text-md mt-3 font-semibold">
-                        For verification otp you will recieve a call where OTP will be given to you
-                    </h3>
                     <p className="mt-4 text-base text-gray-600">
                         Already have an account?{' '}
                         <Link href='/auth/login' className="font-semibold text-black transition-all duration-200 hover:underline">Sign In</Link>
@@ -179,7 +175,7 @@ const PhoneNumberField = () => {
                                         onChange={otpFormik.handleChange}
                                         className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                                         type="number"
-                                        placeholder="1234"
+                                        placeholder="123456"
                                     ></input>
                                     {otpFormik.touched.security_code && otpFormik.errors.security_code && (
                                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>

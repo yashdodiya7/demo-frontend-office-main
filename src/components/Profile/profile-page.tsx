@@ -1,6 +1,6 @@
 "use client"
 import { otpVerifySchema, phoneVerifySchema, updateUser } from '@/schemas/UserSchema'
-import { otpVerify, phoneVerify, setOtpSessionId, setPhoneNumber, setUserData, updateUserProfile } from '@/store/slice/authSlice'
+import { getUserProfile, otpVerify, phoneVerify, setOtpSessionId, setPhoneNumber, setUserData, updateUserProfile } from '@/store/slice/authSlice'
 import { getCookie } from 'cookies-next'
 import { useFormik } from 'formik'
 import Image from 'next/image'
@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
 import { ToastError, ToastSuccess } from '../utils/custom-error/toast'
+import { URL } from 'url'
 
 
 const ProfileComponent: React.FC = () => {
@@ -19,12 +20,13 @@ const ProfileComponent: React.FC = () => {
     // const [previewImage, setPreviewImage] = useState();
     const state = useSelector((state: any) => state.user)
     const userData = state.userProfile
+    const [imagePreview, setPreviewImage] = useState<any>();
 
-    // useEffect(() => {
-    //     dispatch(getUserProfile(token))
-    //     .then(() => setLoading(false))
-    //     .catch(() => setLoading(false));
-    // }, [])
+    useEffect(() => {
+        dispatch(getUserProfile(token))
+        .then(() => setLoading(false))
+        .catch(() => setLoading(false));
+    }, [token])
 
     useEffect(() => {
         // Update form values when userData changes
@@ -40,7 +42,7 @@ const ProfileComponent: React.FC = () => {
                 age: userData?.age || '',
             });
         }
-    }, [dispatch]);
+    }, [dispatch, token]);
 
     // for update a user profile
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +50,6 @@ const ProfileComponent: React.FC = () => {
         const fieldValue: undefined | string | File = e.target.type === 'file' ? e.target.files?.[0] : e.target.value;
     
         formik.setFieldValue(fieldName, fieldValue); // Set formik field value
-    
         if (fieldName === 'profile_image') {
             formik.setFieldValue('profile_image', fieldValue); // Set profile_image field value
         }
@@ -71,25 +72,19 @@ const ProfileComponent: React.FC = () => {
         const response = await dispatch(updateUserProfile({ userToken: token, updatedata: formData }));
         dispatch(setUserData(response.payload));
         setLoading(false);
-      } catch (error) {
+      } catch (error: any) {
         throw error;
       }
     }
 
     const [updateContact, setUpdateContact] = useState(false)
 
-    const handleContactUpdate = () => {
-        setUpdateContact(true);
-    }
-
     const handlePhoneSubmit = async (values: any) => {
         try {
             setLoading(true);
             values.phone_number = "+91" + values.phone_number
-            console.log("<<<" , values.phone_number)
             // startTimer();
             const response = await dispatch(phoneVerify(values))
-            console.log(response.payload);
             setLoading(false);
             
             if (response.payload.session_token) {
@@ -98,7 +93,6 @@ const ProfileComponent: React.FC = () => {
         }
         catch (error) {
             setLoading(false)
-            console.log("<<<", error)
             // ToastError(error)
             throw error
         }
@@ -158,7 +152,6 @@ const ProfileComponent: React.FC = () => {
         validationSchema: updateUser,
         onSubmit: handleSubmit,
     })
-
 
     return (
       <div className="p-16">
@@ -444,77 +437,90 @@ const ProfileComponent: React.FC = () => {
                 </button>
               </div>
 
-                {/* form for the update Contact */}
+              {/* form for the update Contact */}
             </form>
             {updateContact && (
               <div className="mt-8">
-              <form
-                method="POST"
-                onSubmit={phoneFormik.handleSubmit}
-              >
-                <div className="flex items-end justify-center">
-                  <div className="w-3/4 flex flex-col">
-                    <label htmlFor="phone_number" className="block text-sm font-medium text-gray-900">
-                      Phone No
-                    </label>
-                    <div className="mt-1 flex">
-                      <input
-                        id="phone_number"
-                        name="phone_number"
-                        value={phoneFormik.values.phone_number}
-                        onChange={phoneFormik.handleChange}
-                        className="flex-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:ring-stone-500 focus:border-stone-500 sm:text-sm"
-                        type="tel"
-                        placeholder="Enter your phone number"
-                      />
+                <form method="POST" onSubmit={phoneFormik.handleSubmit}>
+                  <div className="flex items-end justify-center">
+                    <div className="w-3/4 flex flex-col">
+                      <label
+                        htmlFor="phone_number"
+                        className="block text-sm font-medium text-gray-900"
+                      >
+                        Phone No
+                      </label>
+                      <div className="mt-1 flex">
+                        <input
+                          id="phone_number"
+                          name="phone_number"
+                          value={phoneFormik.values.phone_number}
+                          onChange={phoneFormik.handleChange}
+                          className="flex-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:ring-stone-500 focus:border-stone-500 sm:text-sm"
+                          type="tel"
+                          placeholder="Enter your phone number"
+                        />
+                      </div>
+                      {phoneFormik.touched.phone_number &&
+                        phoneFormik.errors.phone_number && (
+                          <p className="mt-2 text-sm text-red-600">
+                            {phoneFormik.errors.phone_number}
+                          </p>
+                        )}
                     </div>
-                    {phoneFormik.touched.phone_number && phoneFormik.errors.phone_number && (
-                      <p className="mt-2 text-sm text-red-600">{phoneFormik.errors.phone_number}</p>
-                    )}
-                  </div>
-                  <div className="w-1/4 ml-4">
-                    <button
-                      type="submit"
-                      className="inline-block w-full h-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-stone-700 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500"
-                    >
-                      Send OTP
-                    </button>
-                  </div>
-                </div>
-              </form>
-          
-              <form method="POST" onSubmit={otpFormik.handleSubmit} className="mt-4">
-                <div className="flex items-end justify-between">
-                  <div className="w-3/4 flex flex-col">
-                    <label htmlFor="security_code" className="block text-sm font-medium text-gray-900">
-                      Verify OTP
-                    </label>
-                    <div className="mt-1 flex">
-                      <input
-                        id="security_code"
-                        name="security_code"
-                        value={otpFormik.values.security_code}
-                        onChange={otpFormik.handleChange}
-                        className="flex-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:ring-stone-500 focus:border-stone-500 sm:text-sm"
-                        type="number"
-                        placeholder="Enter OTP"
-                      />
+                    <div className="w-1/4 ml-4">
+                      <button
+                        type="submit"
+                        className="inline-block w-full h-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-stone-700 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500"
+                      >
+                        Send OTP
+                      </button>
                     </div>
-                    {otpFormik.touched.security_code && otpFormik.errors.security_code && (
-                      <p className="mt-2 text-sm text-red-600">{otpFormik.errors.security_code}</p>
-                    )}
                   </div>
-                  <div className="w-1/4 ml-4">
-                    <button
-                      type="submit"
-                      className="inline-block w-full h-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-stone-700 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500"
-                    >
-                      Verify
-                    </button>
+                </form>
+
+                <form
+                  method="POST"
+                  onSubmit={otpFormik.handleSubmit}
+                  className="mt-4"
+                >
+                  <div className="flex items-end justify-between">
+                    <div className="w-3/4 flex flex-col">
+                      <label
+                        htmlFor="security_code"
+                        className="block text-sm font-medium text-gray-900"
+                      >
+                        Verify OTP
+                      </label>
+                      <div className="mt-1 flex">
+                        <input
+                          id="security_code"
+                          name="security_code"
+                          value={otpFormik.values.security_code}
+                          onChange={otpFormik.handleChange}
+                          className="flex-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:ring-stone-500 focus:border-stone-500 sm:text-sm"
+                          type="number"
+                          placeholder="Enter OTP"
+                        />
+                      </div>
+                      {otpFormik.touched.security_code &&
+                        otpFormik.errors.security_code && (
+                          <p className="mt-2 text-sm text-red-600">
+                            {otpFormik.errors.security_code}
+                          </p>
+                        )}
+                    </div>
+                    <div className="w-1/4 ml-4">
+                      <button
+                        type="submit"
+                        className="inline-block w-full h-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-stone-700 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500"
+                      >
+                        Verify
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </form>
-            </div>
+                </form>
+              </div>
             )}
           </div>
         )}

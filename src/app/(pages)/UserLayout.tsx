@@ -21,7 +21,6 @@ export default function UserLayout({
       <div className="flex flex-col min-h-screen">
         <Navbar />
         {children}
-        <Footer />
       </div>
     </>
   );

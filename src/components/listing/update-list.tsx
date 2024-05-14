@@ -53,22 +53,43 @@ const highlightsData = [
   { id: "gym_nearby", value: "1" },
 ];
 
+interface FormDataState {
+  property_type: string;
+  lease_term: string;
+  approx_rent: string;
+  pet_policy: string;
+  smoking_policy: string;
+  occupancy: string;
+  looking_for: string;
+  max_vacancy: string;
+  amenities: string[];
+  highlights: string[];
+  description: string;
+  images: string[];
+}
+
+type FormDataStateWithoutAmenitiesAndHighlights = Omit<FormDataState, "amenities" | "highlights">;
+
+interface Coordinates {
+  lat: number | null;
+  lng: number | null;
+}
+
 const UpdateList = () => {
 
     const dispatch = useDispatch()
-    const state = useSelector((state: any) => state.list)
     const token = getCookie('token')
-    const [loading, setLoading] = useState(false);
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [address, setAddress] = useState("");
-    const [coordinates, setCoordinates] = useState({
+    const [loading, setLoading] = useState<boolean>(false);
+    const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
+    const [address, setAddress] = useState<string>("");
+    const [coordinates, setCoordinates] = useState<Coordinates>({
         lat: null,
         lng: null
     });
 
     const router = useRouter();
 
-    const [amenitiesChecked, setAmenitiesChecked] = useState({
+    const [amenitiesChecked, setAmenitiesChecked] = useState<{ [key: string]: boolean }>({
       tv: false,
       power_backup: false,
       fridge: false,
@@ -80,7 +101,7 @@ const UpdateList = () => {
       ac: false,
     });
 
-    const [highlightsChecked, setHighlightsChecked] = useState({
+    const [highlightsChecked, setHighlightsChecked] = useState<{ [key: string]: boolean }>({
       gated_society: false,
       park_nearby: false,
       market_nearby: false,
@@ -94,12 +115,12 @@ const UpdateList = () => {
       gym_nearby: false,
     });
     
-    const [newAmenity, setNewAmenity] = useState([]);
-    const [newHighlight, setNewHighlight] = useState([]);
+    const [newAmenity, setNewAmenity] = useState<string[]>([]);
+    const [newHighlight, setNewHighlight] = useState<string[]>([]);
 
     
     // updated code for fetching data
-    const [formDataState, setFormDataState] = useState({
+    const [formDataState, setFormDataState] = useState<FormDataState>({
       property_type: "",
       lease_term: "",
       approx_rent: "",
@@ -128,7 +149,7 @@ const UpdateList = () => {
 
           // Update amenitiesChecked based on data from the backend
           const updatedAmenitiesChecked = { ...amenitiesChecked };
-          data.payload.amenities.forEach((amenity) => {
+          data.payload.amenities.forEach((amenity: string) => {
             if (updatedAmenitiesChecked.hasOwnProperty(amenity)) {
               updatedAmenitiesChecked[amenity] = true;
             }
@@ -137,7 +158,7 @@ const UpdateList = () => {
 
           // Update highlightsChecked based on data from the backend
           const updatedHighlightsChecked = { ...highlightsChecked };
-          data.payload.highlights.forEach((highlight) => {
+          data.payload.highlights.forEach((highlight: string) => {
             if (updatedHighlightsChecked.hasOwnProperty(highlight)) {
               updatedHighlightsChecked[highlight] = true;
             }
@@ -161,7 +182,7 @@ const UpdateList = () => {
 
 
     
-    const initialValues = {
+    const initialValues: FormDataState = {
         property_type: formDataState ? formDataState.property_type : "",
         lease_term: formDataState ? formDataState.lease_term : "",
         approx_rent: formDataState ? formDataState.approx_rent : "",
@@ -169,13 +190,15 @@ const UpdateList = () => {
         pet_policy: formDataState ? formDataState.pet_policy : "",
         smoking_policy: formDataState ? formDataState.smoking_policy : "",
         images: [] as any,
+        amenities: [], // Add this line to match FormDataState
+        highlights: [],
         occupancy: formDataState ? formDataState.occupancy : "",
         looking_for: formDataState ? formDataState.looking_for : "",
         description: formDataState ? formDataState.description : "",
     };
     
     
-    const handleSubmit = async (val: any) => {
+    const handleSubmit = async (val: FormDataState) => {
 
         // console.log("<<<",val);
         
@@ -202,8 +225,10 @@ const UpdateList = () => {
         formData.append("amenities", JSON.stringify(newAmenity.map(Number)));
         formData.append("highlights", JSON.stringify(newHighlight.map(Number)));
         formData.append("location", address);
-        formData.append("latitude", coordinates.lat);
-        formData.append("longitude", coordinates.lng);
+        if (coordinates.lat && coordinates.lng) {
+          formData.append("latitude", coordinates.lat.toString());
+          formData.append("longitude", coordinates.lng.toString());
+        }
 
         // formData.append("availability_date", "2024-04-30");
 
@@ -239,7 +264,7 @@ const UpdateList = () => {
 
     // Function to update newAmenity based on amenitiesChecked
     const updateNewAmenity = () => {
-      const updatedNewAmenity = [];
+      const updatedNewAmenity: string[] = [];
       Object.entries(amenitiesChecked).forEach(([key, value]) => {
         if (value) {
           const amenityObj = amenitiesData.find(
@@ -258,7 +283,7 @@ const UpdateList = () => {
     }, [amenitiesChecked]);
 
     const updateNewHighlight = () => {
-      const updatedNewHighlight = [];
+      const updatedNewHighlight: string[] = [];
       Object.entries(highlightsChecked).forEach(([key, value]) => {
         if (value) {
           const highlightObj = highlightsData.find(
@@ -301,14 +326,17 @@ const UpdateList = () => {
       }
   };
 
-  const handleFileChange = (event) => {
-    const files = Array.from(event.currentTarget.files);
-    const mergedFiles = [...selectedFiles, ...files];
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event?.currentTarget?.files;
+    if (!files) return;
+
+    const fileList = Array.from(files);
+    const mergedFiles = [...selectedFiles, ...fileList];
     setSelectedFiles(mergedFiles);
     // setSelectedFiles(files);
   };
 
-  const handleRemoveImage = (indexToRemove) => {
+  const handleRemoveImage = (indexToRemove: number) => {
     setSelectedFiles((prevFiles) =>
       prevFiles.filter((file, index) => index !== indexToRemove)
     );
@@ -400,7 +428,7 @@ const UpdateList = () => {
                                 getSuggestionItemProps,
                                 loading,
                               }) => (
-                                <div>
+                                <div className='relative'>
                                   <input
                                     {...getInputProps({
                                       placeholder: "Type address",
@@ -408,20 +436,22 @@ const UpdateList = () => {
                                         "py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
                                     })}
                                   />
-                                  {loading ? <div>...loading</div> : null}
-                                  {suggestions.map((suggestion, index) => (
-                                    <div
-                                      key={index}
-                                      {...getSuggestionItemProps(suggestion, {
-                                        className:
-                                          "cursor-pointer p-2 hover:bg-gray-100",
-                                      })}
-                                    >
-                                      <span className="block text-sm text-gray-800">
-                                        {suggestion.description}
-                                      </span>
-                                    </div>
-                                  ))}
+                                  <div className="absolute z-10 left-0 bg-white mt-1 border border-gray-300 rounded-md shadow-md">
+                                    {loading ? <div>...loading</div> : null}
+                                    {suggestions.map((suggestion, index) => (
+                                      <div
+                                        {...getSuggestionItemProps(suggestion, {
+                                          className:
+                                            "cursor-pointer p-2 hover:bg-gray-100",
+                                          key: index,
+                                        })}
+                                      >
+                                        <span className="block text-sm text-gray-800">
+                                          {suggestion.description}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               )}
                             </PlacesAutocomplete>
@@ -658,7 +688,6 @@ const UpdateList = () => {
                                 {Object.keys(amenitiesChecked).map(
                                   (amenity: string) => (
                                     <AmenitiesInputField
-                                      type="checkbox"
                                       key={amenity}
                                       id={amenity}
                                       name={amenity}
@@ -683,7 +712,6 @@ const UpdateList = () => {
                                 {Object.keys(highlightsChecked).map(
                                   (highlight: string) => (
                                     <HighlightsInputField
-                                      type="checkbox"
                                       key={highlight}
                                       id={highlight}
                                       name={highlight}
@@ -737,14 +765,14 @@ const UpdateList = () => {
                             className="w-full text-black text-sm bg-white border file:cursor-pointer cursor-pointer file:border-0 file:py-2.5 file:px-4 file:bg-gray-100 file:hover:bg-gray-200 file:text-black rounded"
                           />
                           <p className="text-xs text-gray-400 mt-2">
-                            PNG, JPG SVG, WEBP, and GIF are Allowed.
+                            PNG, JPG are Allowed.
                           </p>
                         </div>
                       </div>
 
                       <div className="mt-2 flex">{renderImagePreviews()}</div>
 
-                      <p className="mt-1 font-semibold text-sm text-red-600 dark:text-red-500">
+                      <p className="mt-1 font-semibold text-sm text-orange-600">
                         {selectedFiles.length < 2 &&
                           "Minimum 2 Images to be uploaded"}
                         {selectedFiles.length > 5 && "Maximum 5 Images allowed"}

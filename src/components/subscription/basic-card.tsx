@@ -17,12 +17,8 @@ const BasicCard: React.FC<subscriptionCardProps> = ({subscriptionData, remaining
   return (
     <div className="lex flex-col items-center my-10 bg-gradient-to-br from-blue-100 via-gray-100 to-purple-100 p-8 rounded-lg shadow-lg relative border-8 border-blue-200 max-w-sm">
       <div>
-        <h2 className="font-extrabold text-3xl text-center mb-2">Basic</h2>
+        <h2 className="font-extrabold text-3xl text-center mb-2">You have Basic plan</h2>
         <p className="opacity-60 text-center">For the interim.</p>
-        <div className="flex flex-col items-center my-2">
-          <p className="font-extrabold text-4xl">&#8377;200</p>
-          <p className="text-sm opacity-60">/month</p>
-        </div>
       </div>
       <div className="flex flex-col gap-2 rounded-lg shadow-md p-4">
         <p className="text-lg font-bold">Subscription Benefits:</p>

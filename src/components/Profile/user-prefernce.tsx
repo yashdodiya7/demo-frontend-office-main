@@ -53,6 +53,7 @@ const UserChoice = () => {
     wanderer: false,
   });
 
+  const [selectedCount, setSelectedCount] = useState<number>(0);
   const userState = useSelector((state: any) => state.user);
   const dispatch = useDispatch();
 
@@ -67,6 +68,12 @@ const UserChoice = () => {
     };
     fetchData();
   }, [dispatch]);
+
+  useEffect(() => {
+    // Calculate the count of selected preferences
+    const count = Object.values(preferences).filter((value) => value).length;
+    setSelectedCount(count);
+  }, [preferences]);
 
   const handleSubmit = async () => {
     // Extract user_name and preferences from form values
@@ -121,6 +128,11 @@ const UserChoice = () => {
                 <p className="mt-1 text-sm leading-6 text-gray-600 text-center">
                   It will show others what kind of flatmate you prefer.
                 </p>
+                {selectedCount < 4 && (
+                  <p className="text-red-500 text-center mt-4">
+                    Please select at least four preferences.
+                  </p>
+                )}
 
                 {/* <hr className="my-10" /> */}
 
@@ -170,8 +182,12 @@ const UserChoice = () => {
                           id={preference}
                           name={preference}
                           value={preference}
-                          checked={preferences[preference as keyof userPreferences]}
-                          onChange={() => handleChange(preference as keyof userPreferences)}
+                          checked={
+                            preferences[preference as keyof userPreferences]
+                          }
+                          onChange={() =>
+                            handleChange(preference as keyof userPreferences)
+                          }
                         />
                       ))}
                     </div>
@@ -183,7 +199,13 @@ const UserChoice = () => {
             <div className="mt-6 flex items-center justify-center gap-x-6">
               <button
                 type="submit"
-                className="rounded-md bg-stone-700 px-16 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800"
+                disabled={selectedCount < 4}
+                className={`rounded-md px-16 py-2 text-sm font-semibold text-white shadow-sm 
+                  ${
+                    selectedCount < 4
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-stone-600 hover:bg-stone-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600"
+                  }`}
               >
                 UPDATE
               </button>

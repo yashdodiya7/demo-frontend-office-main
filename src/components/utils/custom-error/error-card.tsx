@@ -2,7 +2,7 @@
 
 import React from "react";
 
-const ErrorCard = ({ message }) => {
+const ErrorCard = ({ message }: {message: string}) => {
   return (
     <div className="flex items-center justify-center w-full h-full bg-gray-900 bg-opacity-50">
       <div className="bg-white shadow-lg rounded-lg w-1/2 h-1/2">

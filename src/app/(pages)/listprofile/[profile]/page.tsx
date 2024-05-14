@@ -9,15 +9,32 @@ import { getCookie } from 'cookies-next';
 import axios from 'axios';
 import { ToastContainer } from 'react-toastify';
 import { ToastError, ToastSuccess } from '@/components/utils/custom-error/toast';
+import Link from 'next/link';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
+interface UserProfile {
+  name: string;
+  phone_no: string;
+  profile_image: string;
+  email: string;
+  gender: 'male' | 'female' | 'other'; // You might want to restrict to specific values
+  occupation: string;
+  bio: string;
+  age: number; // Assuming age is a number
+  is_host: boolean;
+  is_verified: boolean;
+  confirmed_deal: boolean;
+  is_paid: boolean;
+  interested: boolean;
+}
+
 const ListProfile = ({ params }: { params: any }) => {
 
-    const [data, setData] = useState({});
-    const [loading, setLoading] = useState(true)
-    const [buttonLoading, setButtonLoading] = useState(false);
-    const [buttonClick, setButtonClick] = useState(false);
+    const [data, setData] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState<boolean>(true)
+    const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+    const [buttonClick, setButtonClick] = useState<boolean>(false);
     const userStateData = useSelector((state: any) => state.user.userProfile)
     const dispatch = useDispatch();
     const token = getCookie("token");
@@ -34,7 +51,7 @@ const ListProfile = ({ params }: { params: any }) => {
               id: params["profile"],
             })
           );
-          setData({ ...res.payload });
+          setData(res.payload);
           setLoading(false);
         } catch (error) {
           setLoading(false);
@@ -43,7 +60,7 @@ const ListProfile = ({ params }: { params: any }) => {
       };
       // Call the asynchronous function
       fetchData();
-    }, [dispatch, buttonClick]);
+    }, [dispatch, buttonClick, params, token]);
 
 
     const handleInterestedClick = async () => {
@@ -54,15 +71,13 @@ const ListProfile = ({ params }: { params: any }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("<<<",res.data)
         if(res.status == 201){
           ToastSuccess("Successfully Interested")
         }
         setButtonLoading(true);
         // If API call is successful, you can add further actions here if needed
-      } catch (error) {
-        console.log("<<<",error);
-        ToastError(error.response?.data?.error)
+      } catch (error: any) {
+        ToastError(error?.response?.data?.error)
         setButtonLoading(false);
         console.error('Error marking as interested:', error);
       } finally {
@@ -74,72 +89,120 @@ const ListProfile = ({ params }: { params: any }) => {
     
   return (
     <UserLayout>
-      <ToastContainer/>
+      <ToastContainer />
       {loading ? ( // Show loader if loading is true
         <div className="flex items-center justify-center h-screen">
           <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
         </div>
       ) : (
-        <div className="flex justify-center items-center p-12 bg-gray-100">
-          <div className="max-w-2xl p-8 bg-white shadow-xl rounded-lg flex flex-wrap gap-14">
-            <div className="flex flex-col items-center justify-center">
-              <Image
-                src={data.profile_image}
-                width={1000}
-                height={1000}
-                alt="Profile"
-                className="w-48 h-48 object-cover rounded-lg"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">
-                Name:
-              </label>
-              <p className="text-gray-900">{data.name}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">
-                Email:
-              </label>
-              <p className="text-gray-900">{data.email}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">
-                Contact No:
-              </label>
-              <p className="text-gray-900">{data.phone_no}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">
-                Gender:
-              </label>
-              <p className="text-gray-900 capitalize">{data.gender}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">
-                Occupation:
-              </label>
-              <p className="text-gray-900">{data.occupation}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Age:</label>
-              <p className="text-gray-900">{data.age}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Bio:</label>
-              <p className="text-gray-900">{data.bio}</p>
-            </div>
-            <button
-              onClick={handleInterestedClick}
-              className={`px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800 ${
-                buttonLoading || data.interested || userStateData.is_host || userStateData.confirmed_deal ? 'opacity-50 pointer-events-none' : ''
-              }`}
-              disabled={buttonLoading || data.interested || userStateData.is_host || userStateData.confirmed_deal}
+        <>
+          <div className="flex justify-center gap-16 items-center p-12 bg-gray-100 h-[90vh]">
+            <Link
+              href={`/listdetails/${params['profile']}`}
+              className="self-start flex items-center px-4 py-2 mb-4 rounded-md bg-stone-500 text-white shadow-sm hover:bg-stone-600"
             >
-              {buttonLoading ? 'Loading...' : 'Interested'}
-            </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9.293 15.707a1 1 0 001.414-1.414L7.414 10l3.293-3.293a1 1 0 00-1.414-1.414l-4 4a1 1 0 000 1.414l4 4a1 1 0 00.707.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Back
+            </Link>
+            <div className="flex flex-col items-center justify-center bg-white p-8 shadow-xl rounded-xl h-96">
+              <Image
+                src={data?.profile_image || ""}
+                width={200}
+                height={200}
+                alt="Profile"
+                className="object-cover rounded-full"
+              />
+              <button
+                onClick={handleInterestedClick}
+                className={`px-12 mt-8 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800 ${
+                  buttonLoading ||
+                  data?.interested ||
+                  userStateData?.is_host ||
+                  userStateData?.confirmed_deal
+                    ? "opacity-50 pointer-events-none"
+                    : ""
+                }`}
+                disabled={
+                  buttonLoading ||
+                  data?.interested ||
+                  userStateData?.is_host ||
+                  userStateData?.confirmed_deal
+                }
+              >
+                {buttonLoading ? "Loading..." : "Interested"}
+              </button>
+            </div>
+            <div className="w-[50%] p-8 bg-white shadow-xl rounded-lg flex flex-col items-center gap-6">
+              <div className="border-t border-gray-200 w-full">
+                <dl>
+                  <div className="bg-stone-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Full name
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {data?.name}
+                    </dd>
+                  </div>
+                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Contact No
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {data?.phone_no}
+                    </dd>
+                  </div>
+                  <div className="bg-stone-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Email address
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {data?.email}
+                    </dd>
+                  </div>
+                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">Age</dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {data?.age}
+                    </dd>
+                  </div>
+                  <div className="bg-stone-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Occupation
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {data?.occupation}
+                    </dd>
+                  </div>
+                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Gender
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {data?.gender}
+                    </dd>
+                  </div>
+                  <div className="bg-stone-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">About</dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {data?.bio}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </UserLayout>
   );

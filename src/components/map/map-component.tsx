@@ -5,10 +5,22 @@ import { GoogleMap, Marker } from '@react-google-maps/api';
 import axios from 'axios';
 import CustomMarker from './custom-marker';
 
+interface Listing {
+  id: number;
+  latitude: number;
+  longitude: number;
+  user_name: string;
+  profile_image: string;
+}
+
+interface MapComponentProps {
+  id: number | undefined;
+}
+
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
-const MapComponent = ({ id }) => {
-  const [data, setData] = useState(null);
+const MapComponent: React.FC<MapComponentProps> = ({ id }) => {
+  const [data, setData] = useState<{ current_post: any, nearby_posts: Listing[] } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,9 +55,9 @@ const MapComponent = ({ id }) => {
     width: '100%',
   };
 
-  const defaultCenter = {
-    lat: current_post.latitude,
-    lng: current_post.longitude,
+  const defaultCenter: any = {
+    lat: current_post?.latitude,
+    lng: current_post?.longitude,
   };
 
   return (

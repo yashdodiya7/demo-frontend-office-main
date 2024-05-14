@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import axios from "axios";
-import { getCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 import UserLayout from "../UserLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserProfile } from "@/store/slice/authSlice";
@@ -32,9 +32,9 @@ const Payment: React.FC = () => {
     dispatch(getUserProfile(userToken))
       .then(() => setLoading(false))
       .catch(() => setLoading(false));
-  }, [dispatch]);
+  }, [dispatch, userToken]);
 
-  const userPaid = useSelector((state: any) => state.user.userProfile.is_paid);
+  const userPaid = useSelector((state: any) => state.user?.userProfile?.is_paid);
 
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -57,6 +57,7 @@ const Payment: React.FC = () => {
         const differenceInTime = endDate.getTime() - currentDate.getTime();
         const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
         setRemainingDays(differenceInDays);
+        setCookie('is_paid', true)
       } catch (error) {
         console.error("Error fetching subscription data:", error);
       }
@@ -65,7 +66,7 @@ const Payment: React.FC = () => {
     if (userPaid) {
       fetchSubscriptionData();
     }
-  }, [userPaid]);
+  }, [userPaid, userToken]);
 
 
   const handlePayment = async (planType: string) => {
@@ -105,7 +106,7 @@ const Payment: React.FC = () => {
   if (userPaid){
     return (
       <UserLayout>
-        <div className="flex justify-center">
+        <div className="flex justify-center my-auto">
           {subscriptionData?.amount === 349 ? (
             <PremiumCard subscriptionData={subscriptionData} remainingDays={remainingDays} />
           ) : subscriptionData?.amount === 200 ? (

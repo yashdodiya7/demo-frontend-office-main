@@ -39,7 +39,7 @@ const UserMenu = () => {
               </div>
             ) : (
               <div className="md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
-                <Link href={data?.is_verified ? "/createlist" : "/verify"}>Make a Post</Link>
+                <Link href={data?.is_verified ? "/create-listing" : "/verify"}>Make a Post</Link>
               </div>
             )
           ) : (
@@ -51,19 +51,19 @@ const UserMenu = () => {
             className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition"
           >
             <AiOutlineMenu />
-            <div className="hidden md:block">
-              <Avatar src="/images/placeholder.jpg" />
+            <div className="hidden md:flex items-center">
+              <Avatar />
             </div>
           </div>
         </div>
         {isOpen && (
           <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[80%] bg-white overflow-hidden right-0 top-12 text-sm">
             <div>
-              {!token && <MenuItem to="/auth/phone-no" label="Sign Up" />}
+              {!token && <MenuItem to="/auth/phone-no-verify" label="Sign Up" />}
               {!token && <MenuItem to="/auth/login" label="Login" />}
               {token && <MenuItem to="/prefernce" label="User Prefernces" />}
               {token && !data?.is_host && <MenuItem to="/myinterests" label="My Interests" />}
-              {token && data?.is_host && <MenuItem to="/interestedusers" label="Interested Users" />}
+              {token && data?.is_host && <MenuItem to="/interested-users" label="Interested Users" />}
               {token && data?.confirmed_deal && !data?.is_host && <MenuItem to="/mydeal" label="My Deal" />}
               {token && <MenuItem to="/subscription" label="Subscription" />}
               {token && <MenuItem to="/" label="Logout" />}

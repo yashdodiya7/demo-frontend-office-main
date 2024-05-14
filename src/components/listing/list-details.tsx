@@ -1,4 +1,4 @@
-import { Check, IndianRupee, MapPin } from "lucide-react";
+import { Check, MapPin } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
@@ -12,6 +12,7 @@ function ListingDetails() {
             {/* Profile image */}
             <div className="mx-auto">
               <Image
+                alt="image"
                 className="object-cover w-20 h-20 bg-gray-200 rounded-full mb-4"
                 src="https://images.pexels.com/photos/3763152/pexels-photo-3763152.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                 width={1000}

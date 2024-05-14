@@ -43,8 +43,6 @@ const phoneVerifySchema = yup.object().shape({
 const otpVerifySchema = yup.object().shape({
 	security_code: yup.string()
     .required('OTP is required')
-    .length(6, 'OTP must be 6 digits long')
-    .matches(/^\d+$/, 'OTP must contain only digits'),
 })
 
 const updateUser = yup.object().shape({
@@ -64,4 +62,17 @@ const updateUser = yup.object().shape({
         .integer('Age must be an integer'),
 })
 
-export { registerSchema, loginValidation, updateUser, phoneVerifySchema, otpVerifySchema }
+
+const ContactFormSchema = yup.object().shape({
+  first_name: yup.string().required("First Name is required"),
+  last_name: yup.string().required("Last Name is required"),
+  email: yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  phone_no: yup.string()
+    .required('Phone number is required')
+    .matches(/^\d{10}$/, 'Phone number should be in 6353355512 format'),
+  message: yup.string().required("Message is required"),
+});
+
+export { registerSchema, loginValidation, updateUser, phoneVerifySchema, otpVerifySchema, ContactFormSchema }
