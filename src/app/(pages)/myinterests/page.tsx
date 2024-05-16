@@ -36,6 +36,7 @@ interface ListingInterest {
   deposit_paid: boolean;
   created_at: string;
   listing: number;
+  is_available: boolean;
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -49,6 +50,7 @@ const MyInterests = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
   const [isRequestPending, setIsRequestPending] = useState<boolean>(false);
   const [confirmationSuccess, setConfirmationSuccess] = useState<boolean>(false);
+  const [buttonLoadingId, setButtonLoadingId] = useState<number | null>(null);
   const dispatch = useDispatch();
   const userState = useSelector((state: RootState) => state?.user.userProfile);
 
@@ -74,7 +76,8 @@ const MyInterests = () => {
 
   const handlePay = async (listingId: number) => {
     try {
-      setIsRequestPending(true)
+      setButtonLoadingId(listingId);
+      // setIsRequestPending(true)
       const response = await axios.post<{ sessionId: string }>(
         `${BASE_URL}/payment/wallet-add/`,
         { listing_id: listingId },
@@ -98,14 +101,14 @@ const MyInterests = () => {
     } catch (error) {
       setIsRequestPending(false)
       console.error("Error fetching session ID:", error);
+    } finally {
+      setButtonLoadingId(null); // Reset button loading state after completion
     }
   };
 
   const handleConfirmDeal = async (listingId: number) => {
     try {
-      // Disable the button to prevent multiple clicks
-      setIsButtonDisabled(true);
-      setIsRequestPending(true);
+      setButtonLoadingId(listingId);
 
       // Make the API request to confirm the deal
       const response = await axios.post(
@@ -126,9 +129,10 @@ const MyInterests = () => {
       // Handle error
       ToastError(error?.response?.data?.error);
       // If there's an error, enable the button again to allow retry
-      setIsButtonDisabled(false);
+      // setIsButtonDisabled(false);
     } finally {
-      setIsRequestPending(false);
+      // setIsRequestPending(false);
+      setButtonLoadingId(null);
     }
   };
 
@@ -141,10 +145,10 @@ const MyInterests = () => {
         </div>
       ) : (
         <div className="flex flex-col mb-12 mt-8 mx-12">
-          <h3 className="text-center text-m=lg font-bold uppercase text-stone-800 mb-4">
+          <h3 className="text-center text-m=lg font-bold uppercase text-stone-800">
             My Interests
           </h3>
-          <h3 className="text-center text-sm font-semibold uppercase text-orange-700 my-4">
+          <h3 className="text-center text-sm font-semibold uppercase text-orange-700 mt-2 mb-8">
             You Have to Pay Deposit First for the deal confirmation
           </h3>
           {interestedUsers.length === 0 ? ( // Conditional rendering for no interested users
@@ -208,9 +212,9 @@ const MyInterests = () => {
                         <tr
                           key={user?.id}
                           className={`${
-                            userState?.confirmed_deal
+                            userState?.confirmed_deal || !user?.is_available
                               ? "bg-gray-100"
-                              : undefined
+                              : ""
                           }`}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
@@ -238,24 +242,22 @@ const MyInterests = () => {
                           </td>
 
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            {user?.make_deal && !user?.confirm_deal && !userState?.confirmed_deal && (
+                            {user?.make_deal && !user?.confirm_deal && !userState?.confirmed_deal && user?.is_available && (
                               <button
                                 type="button"
                                 onClick={() => handlePay(user?.listing)} // Pass the listingId to the function
-                                disabled={
-                                  isButtonDisabled ||
-                                  isRequestPending ||
-                                  userState?.confirmed_deal
-                                }
+                                disabled=
+                                  {buttonLoadingId === user?.listing}
+                                  // isButtonDisabled ||
+                                  // isRequestPending ||
+                                  // userState?.confirmed_deal
                                 className={`mr-2 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 ${
-                                  isButtonDisabled ||
-                                  isRequestPending ||
-                                  userState?.confirmed_deal
+                                  buttonLoadingId === user?.listing
                                     ? "opacity-50 pointer-events-none"
                                     : ""
                                 }`}
                               >
-                                {isRequestPending ? (
+                                {buttonLoadingId === user?.listing ? (
                                   <svg
                                     className="animate-spin h-5 w-5 mr-3 text-blue-600"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -284,24 +286,18 @@ const MyInterests = () => {
                           </td>
 
                           <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                            {user?.make_deal && !user?.confirm_deal && !userState?.confirmed_deal && (
+                            {user?.make_deal && !user?.confirm_deal && !userState?.confirmed_deal && user?.is_available && (
                               <button
                                 type="button"
                                 onClick={() => handleConfirmDeal(user?.listing)}
-                                disabled={
-                                  isButtonDisabled ||
-                                  isRequestPending ||
-                                  userState?.confirmed_deal
-                                }
+                                disabled={buttonLoadingId === user?.listing}
                                 className={`mr-2 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 ${
-                                  isButtonDisabled ||
-                                  isRequestPending ||
-                                  userState?.confirmed_deal
+                                  buttonLoadingId === user?.listing
                                     ? "opacity-50 pointer-events-none"
                                     : ""
                                 }`}
                               >
-                                {isRequestPending ? (
+                                {buttonLoadingId === user?.listing ? (
                                   <svg
                                     className="animate-spin h-5 w-5 mr-3 text-blue-600"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -337,18 +333,18 @@ const MyInterests = () => {
                                 className="inline-block w-32 h-12 mr-6"
                               />
                             )}
-                            <Link
+                            {user?.is_available && <Link
                               href={`/listdetails/${user?.listing}`}
                               className="mr-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
                               View Listing
-                            </Link>
-                            <button
+                            </Link>}
+                            {/* <button
                               type="button"
                               className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
                               Delete
-                            </button>
+                            </button> */}
                           </td>
                         </tr>
                       ))}

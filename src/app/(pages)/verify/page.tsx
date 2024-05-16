@@ -67,7 +67,9 @@ const Verify = () => {
       const imageUrl = URL.createObjectURL(selectedFiles);
       return (
         <div className="relative inline-block mb-4 mr-4">
-          <img
+          <Image
+            width={500}
+            height={500}
             src={imageUrl}
             alt="Preview Image"
             className="w-32 h-32 object-cover rounded-lg shadow-md"
@@ -81,12 +83,13 @@ const Verify = () => {
 
   return (
     <UserLayout>
-      <div className="flex justify-center items-center p-8 bg-gray-100 h-[90vh]">
+      <div className="flex justify-center items-center p-8 bg-gray-100 h-[89vh]">
         <ToastContainer />
         <div className="max-w-2xl p-8 bg-white shadow-xl rounded-lg flex flex-wrap gap-2 justify-between">
           <h2 className="text-2xl font-semibold mb-4">
             Please Upload Aadhar Card for Verification
           </h2>
+          <p className="text-blue-700 font-semibold">We won't store your aadhar card it is only for the verification</p>
           <p className="text-gray-700">
             To complete the verification process, please follow these
             guidelines:
@@ -103,7 +106,8 @@ const Verify = () => {
               name and surname on the Aadhar card.
             </li>
           </ol>
-          <p className="text-gray-700">Thank you for your cooperation.</p>
+          <p className="text-red-600 font-semibold -mt-5">With this verification you are agree to provide your <span>contact No.</span> for the communication between users</p>
+          <p className="text-gray-700 mt-4">Thank you for your cooperation.</p>
 
           <Formik initialValues={{ aadhar: [] }} onSubmit={handleSubmit}>
             {({ isSubmitting }) => (
@@ -116,18 +120,18 @@ const Verify = () => {
                   name="aadhar"
                   onChange={handleFileChange}
                   className="block w-full border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-stone-700 focus:ring-stone-700 disabled:opacity-50 disabled:pointer-events-none file:bg-gray-50 file:border-0 file:py-3 file:px-4"
-                  />
+                />
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-4 py-2 bg-stone-700 text-white rounded-lg font-semibold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-700 focus:ring-opacity-50 disabled:opacity-50 disabled:pointer-events-none"
-                  >
+                >
                   {isSubmitting ? "Submitting..." : "Submit"}
                 </button>
               </Form>
             )}
           </Formik>
-            {renderImagePreviews()}
+          {renderImagePreviews()}
         </div>
       </div>
     </UserLayout>

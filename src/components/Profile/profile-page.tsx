@@ -26,8 +26,9 @@ const ProfileComponent: React.FC = () => {
         dispatch(getUserProfile(token))
         .then(() => setLoading(false))
         .catch(() => setLoading(false));
-    }, [token])
-
+    }, [token, dispatch])
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         // Update form values when userData changes
         if (userData) {
@@ -161,7 +162,7 @@ const ProfileComponent: React.FC = () => {
             <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
           </div>
         ) : (
-          <div className="p-8 bg-stone-100 sm:w-[70%] mx-auto rounded-3xl shadow mt-24 relative">
+          <div className="p-4 sm:p-8 bg-stone-100 sm:w-[70%] mx-auto rounded-3xl shadow mt-24 relative">
             <div className="felx felx-col items-center justify-center">
               <div className="flex flex-col items-center justify-center">
                 <Image
@@ -173,17 +174,17 @@ const ProfileComponent: React.FC = () => {
                   width={1000}
                   height={1000}
                   alt="Profile"
-                  className="w-48 h-48 bg-indigo-100 mx-auto rounded-full shadow-2xl absolute inset-x-0 top-0 -mt-24 flex items-center justify-center text-indigo-500 object-cover"
+                  className="w-24 sm:w-48 h-24 sm:h-48 bg-indigo-100 mx-auto rounded-full shadow-2xl absolute inset-x-0 top-0 -mt-12 sm:-mt-24 flex items-center justify-center text-indigo-500 object-cover"
                 />
               </div>
             </div>
 
             <form
-              className="mt-20"
+              className="mt-12 sm:mt-20"
               method="POST"
               onSubmit={formik.handleSubmit}
             >
-              <div className="flex flex-col gap-1 mt-24 items-center justify-center text-center border-b pb-12">
+              <div className="flex flex-col gap-2 mt-12 sm:mt-24 items-center justify-center text-center border-b pb-6 sm:pb-12">
                 <div className="bg-stone-700 cursor-pointer text-white rounded-xl shadow-lg shadow-stone-400 font-semibold px-8 py-4 hover:bg-stone-800">
                   <label
                     htmlFor="profile-image-upload"
@@ -201,7 +202,7 @@ const ProfileComponent: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <h1 className="text-4xl mt-8 font-medium text-gray-700">
+                <h1 className="text-2xl sm:text-4xl mt-4 sm:mt-8 font-medium text-gray-700">
                   {userData?.name},{" "}
                   <span className="font-light text-gray-500">
                     {userData?.age}
@@ -211,8 +212,8 @@ const ProfileComponent: React.FC = () => {
                 {/* <p className="mt-2 text-gray-500">University of Computer Science</p> */}
               </div>
 
-              <div className="mb-8 mt-4 flex flex-col justify-center">
-                <p className="text-gray-600 text-center font-light lg:px-16">
+              <div className="mb-4 sm:mb-8 mt-4 flex flex-col justify-center">
+                <p className="text-gray-600 text-center font-light sm:px-16">
                   {userData?.bio}
                 </p>
 
@@ -225,16 +226,16 @@ const ProfileComponent: React.FC = () => {
 
               {/* user profile updation form */}
 
-              <div className="space-y-12">
-                <div className="border-b border-gray-900/10 pb-12">
-                  <h2 className="text-base font-semibold leading-7 text-gray-900">
+              <div className="space-y-6 sm:space-y-12">
+                <div className="border-b border-gray-900/10 pb-6 sm:pb-12">
+                  <h2 className="text-lg sm:text-base font-semibold leading-7 text-gray-900">
                     Personal Information
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-gray-600">
                     Update your profile here
                   </p>
 
-                  <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                  <div className="mt-10 grid grid-cols-1 gap-y-6 sm:gap-x-6 sm:gap-y-8 sm:grid-cols-6">
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="name"
@@ -421,17 +422,17 @@ const ProfileComponent: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center justify-start gap-x-6">
+              <div className="mt-6 md:mt-12 flex flex-col md:flex-row items-center justify-center md:justify-start gap-2 md:gap-x-6">
                 <button
                   type="submit"
-                  className="rounded-md shadow-lg shadow-stone-400 bg-stone-700 px-28 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="rounded-md shadow-stone-400 bg-stone-700 px-16 md:px-28 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={() => setUpdateContact((prev) => !updateContact)}
-                  className="rounded-md shadow-lg shadow-stone-400 bg-gray-700 px-24 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  className="rounded-md shadow-stone-400 bg-gray-700 px-12 md:px-24 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                 >
                   {updateContact ? "Cancel" : "Update Contact"}
                 </button>

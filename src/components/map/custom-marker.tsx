@@ -1,5 +1,6 @@
-import React from 'react';
-import { OverlayView } from '@react-google-maps/api';
+import React from "react";
+import { OverlayView } from "@react-google-maps/api";
+import Image from "next/image";
 
 interface CustomMarkerProps {
   position: any;
@@ -8,7 +9,12 @@ interface CustomMarkerProps {
   onClick?: () => void;
 }
 
-const CustomMarker: React.FC<CustomMarkerProps> = ({ position, user_name, profile_image, onClick }) => (
+const CustomMarker: React.FC<CustomMarkerProps> = ({
+  position,
+  user_name,
+  profile_image,
+  onClick,
+}) => (
   <OverlayView
     position={position}
     mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
@@ -18,14 +24,17 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ position, user_name, profil
     })}
   >
     <div
-      style={{
-        background: 'white',
-        cursor: 'pointer',
-      }}
+      className="bg-white cursor-pointer"
       onClick={onClick}
     >
-      <img src={profile_image} style={{ width: '35px', height: '35px', borderRadius: '50%' }} className='border-2 border-stone-800'/>
-      <div className='font-bold'>{user_name}</div>
+      <Image
+        alt="image"
+        width={100}
+        height={100}
+        src={profile_image}
+        className="border-2 border-stone-800 w-9 h-9 rounded-xl"
+      />
+      <div className="font-bold">{user_name}</div>
     </div>
   </OverlayView>
 );

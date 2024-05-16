@@ -117,7 +117,7 @@ const UserChoice = () => {
   return (
     <Formik initialValues={preferences} onSubmit={handleSubmit}>
       {({ handleSubmit }) => (
-        <div className="mx-28 my-8">
+        <div className="mx-auto px-4 my-8 sm:px-6 lg:px-8 md:my-8">
           <ToastContainer />
           <form action="#" method="POST" onSubmit={handleSubmit}>
             <div className="space-y-12">
@@ -170,12 +170,9 @@ const UserChoice = () => {
 
                 {/* <hr className="my-10" /> */}
 
-                <div className="mt-12">
-                  {/* <h3 className="text-md font-semibold mb-6">
-                    Update Preferences
-                  </h3> */}
+                <div className="mt-12 mx-auto">
                   <div className="flex items-baseline justify-center">
-                    <div className="grid grid-cols-6 gap-4">
+                    <div className="grid grid-cols-3 gap-2 md:gap-4 md:grid-cols-6">
                       {Object.keys(preferences).map((preference) => (
                         <FormikInputField
                           key={preference}

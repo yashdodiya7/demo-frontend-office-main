@@ -57,7 +57,9 @@ const FormikInputField: React.FC<FormikInputFieldProps> = ({
               className="w-16 h-16 object-contain"
             />
           </div>
-          <span className="text-black text-sm capitalize p-4">
+          <span className={`text-black text-sm capitalize p-4 ${
+              checked ? "font-semibold" : "font-normal"
+            }`}>
             {formattedValue}
           </span>
         </label>

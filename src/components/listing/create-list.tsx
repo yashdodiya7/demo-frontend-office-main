@@ -354,7 +354,7 @@ const CreateList = () => {
                               getSuggestionItemProps,
                               loading,
                             }) => (
-                              <div>
+                              <div className="relative">
                                 <input
                                   {...getInputProps({
                                     placeholder: "Type address",
@@ -362,20 +362,21 @@ const CreateList = () => {
                                       "py-2 block w-full px-2 rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
                                   })}
                                 />
-                                {loading ? <div>...loading</div> : null}
-                                {suggestions.map((suggestion, index) => (
-                                  <div
-                                    {...getSuggestionItemProps(suggestion, {
-                                      className:
-                                        "cursor-pointer p-2 hover:bg-gray-100",
-                                      key: index,
-                                    })}
-                                  >
-                                    <span className="block text-sm text-gray-800">
-                                      {suggestion.description}
-                                    </span>
-                                  </div>
-                                ))}
+                                <div className="absolute z-10 left-0 bg-white mt-1 border border-gray-300 rounded-md shadow-md">
+                                  {loading ? <div>...loading</div> : null}
+                                  {suggestions.map((suggestion, index) => (
+                                    <div
+                                      {...getSuggestionItemProps(suggestion, {
+                                        className: "cursor-pointer p-2 hover:bg-gray-100",
+                                        key: suggestion,
+                                      })}
+                                    >
+                                      <span className="block text-sm text-gray-800">
+                                        {suggestion.description}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             )}
                           </PlacesAutocomplete>
