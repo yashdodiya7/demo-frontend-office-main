@@ -25,7 +25,7 @@ function DetailCard({listing}:{listing: any}) {
       <div className="md:w-[200px] md:h-[200px] w-full mb-4 md:mb-0">
         <Image src={listing?.user_profile_image} width={1000} height={1000}
           alt="Image"
-          className="h-full w-full rounded-l-md object-cover"
+          className="h-64 sm:h-full w-full rounded-l-md object-cover"
         />
       </div>
         <div className="p-4 w-full">

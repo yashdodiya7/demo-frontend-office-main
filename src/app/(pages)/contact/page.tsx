@@ -204,7 +204,7 @@ export default function ContactPageOne() {
               height={500}
               alt="Contact us"
               className="hidden max-h-full w-full rounded-lg object-cover lg:block"
-              src="https://res.cloudinary.com/dxwxpfxgi/image/upload/v1715511089/jmjjtdn28dw15oqbexzx.jpg"
+              src={"https://res.cloudinary.com/dxwxpfxgi/image/upload/v1715511089/jmjjtdn28dw15oqbexzx.jpg" || ""}
             />
           </div>
         </div>

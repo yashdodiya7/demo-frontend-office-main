@@ -70,7 +70,7 @@ const Verify = () => {
           <Image
             width={500}
             height={500}
-            src={imageUrl}
+            src={imageUrl || ""}
             alt="Preview Image"
             className="w-32 h-32 object-cover rounded-lg shadow-md"
           />
@@ -89,7 +89,7 @@ const Verify = () => {
           <h2 className="text-2xl font-semibold mb-4">
             Please Upload Aadhar Card for Verification
           </h2>
-          <p className="text-blue-700 font-semibold">We won't store your aadhar card it is only for the verification</p>
+          <p className="text-blue-700 font-semibold">We won&apos;t store your aadhar card it is only for the verification</p>
           <p className="text-gray-700">
             To complete the verification process, please follow these
             guidelines:

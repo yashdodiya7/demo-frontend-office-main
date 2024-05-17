@@ -67,9 +67,6 @@ export const userRegister = createAsyncThunk(
 export const userPreference = createAsyncThunk(
   "userPreference",
   async ({ userToken, val }: any) => {
-    // console.log("userToken", userToken);
-    // console.log("val", val);
-
     try {
       const createUserPreference = await axios.post(
         `${BASE_URL}/user/userchoice`,
@@ -81,12 +78,9 @@ export const userPreference = createAsyncThunk(
         }
       );
       console.log(createUserPreference.data);
-
-      // ToastSuccess(createUser.data.message)
       return createUserPreference.data;
     } catch (error: any) {
       console.log(error.response);
-      // ToastError(error.response.data.message)
       throw error.response;
     }
   }
@@ -108,7 +102,6 @@ export const updateUserPreference = createAsyncThunk(
       ToastSuccess(updateUserPreference.data.message);
       return updateUserPreference.data;
     } catch (error: any) {
-      // console.log(error.response);
       ToastError(error.response.data.message);
       throw error.response;
     }
@@ -119,12 +112,9 @@ export const userLogin = createAsyncThunk("userLogin", async (val: object) => {
   try {
     const existingUser = await axios.post(`${BASE_URL}/user/login`, val);
     const data = await existingUser.data;
-    // ToastSuccess(data.message)
     return data;
   } catch (error: any) {
     console.log(error.response.data.errors);
-
-    // ToastError(error.response.data.message)
     throw error.response.data.errors;
   }
 });
@@ -138,12 +128,10 @@ export const getUserProfile = createAsyncThunk(
           Authorization: `Bearer ${userToken}`,
         },
       });
-      // localStorage.setItem('userData', JSON.stringify(existingUser.data.data))
       const data = await existingUser.data;
 
       return data;
     } catch (error: any) {
-      // ToastError(error.response.data.message)
       throw error?.response?.data;
     }
   }

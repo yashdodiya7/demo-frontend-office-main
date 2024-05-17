@@ -156,7 +156,7 @@ const MyInterests = () => {
               <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
                 <Image
                   src={
-                    "https://res.cloudinary.com/dxwxpfxgi/image/upload/v1715514165/tnbdbmrvt2mfmwtpvr1g.png"
+                    "https://res.cloudinary.com/dxwxpfxgi/image/upload/v1715514165/tnbdbmrvt2mfmwtpvr1g.png" || ""
                   }
                   width={1000}
                   height={1000}
@@ -224,7 +224,7 @@ const MyInterests = () => {
                                   width={1000}
                                   height={1000}
                                   className="h-10 w-10 rounded-full"
-                                  src={user?.user?.profile_image} // Replace 'profile_image' with the actual field name
+                                  src={user?.user?.profile_image || ""} // Replace 'profile_image' with the actual field name
                                   alt={user?.user?.name}
                                 />
                               </div>
@@ -327,7 +327,7 @@ const MyInterests = () => {
 
                             {user?.confirm_deal && userState?.confirmed_deal && (
                               <Image
-                                src="/images/dealstamp.png" // Replace with the path to your deal stamp image
+                                src={"/images/dealstamp.png" || ""} // Replace with the path to your deal stamp image
                                 alt="Deal Stamp"
                                 width={500}
                                 height={500}
@@ -340,12 +340,6 @@ const MyInterests = () => {
                             >
                               View Listing
                             </Link>}
-                            {/* <button
-                              type="button"
-                              className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                            >
-                              Delete
-                            </button> */}
                           </td>
                         </tr>
                       ))}

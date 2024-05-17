@@ -96,7 +96,7 @@ const InterestedUsers = () => {
             <div className="flex items-center justify-center">
             <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
               <Image
-              src={"https://res.cloudinary.com/dxwxpfxgi/image/upload/v1715514165/tnbdbmrvt2mfmwtpvr1g.png"}
+              src={"https://res.cloudinary.com/dxwxpfxgi/image/upload/v1715514165/tnbdbmrvt2mfmwtpvr1g.png" || ""}
               width={1000}
               height={1000}
               alt='no Data'
@@ -148,7 +148,7 @@ const InterestedUsers = () => {
                                   width={1000}
                                   height={1000}
                                   className="h-10 w-10 rounded-full"
-                                  src={user.user.profile_image} // Replace 'profile_image' with the actual field name
+                                  src={user?.user?.profile_image || ""} // Replace 'profile_image' with the actual field name
                                   alt={user.user.name}
                                 />
                               </div>

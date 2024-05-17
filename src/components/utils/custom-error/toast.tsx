@@ -8,7 +8,7 @@ export const ToastError = (error: string) => {
   return (
     <>
         {toast.error(error, {
-            position: "top-center",
+            position: "top-right",
             autoClose: 1000,
             hideProgressBar: false,
             closeOnClick: true,
@@ -27,7 +27,7 @@ export const ToastSuccess = (message: string) => {
     return (
       <>
           {toast.success(message, {
-              position: "top-center",
+              position: "top-right",
               autoClose: 1000,
               hideProgressBar: false,
               closeOnClick: true,

@@ -73,6 +73,7 @@ function HomePage() {
     getUserLocation();
   }, [dispatch, stateUser, token, currentPage]);
 
+  
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -92,6 +93,13 @@ function HomePage() {
 
   const handleSearch = async () => {
     const fetchListingsWithLocation = async (lat: number, lan: number) => {
+      let headers;
+      if (token) {
+        headers = {
+          Authorization: `Bearer ${token}`,
+        };
+      }
+
       if (searchQuery.trim() !== "") {
         setLoading(true); // Set loading state to true while fetching data
         try {
@@ -102,9 +110,7 @@ function HomePage() {
               user_latitude: lat, // Assuming you have latitude and longitude in your user state
               user_longitude: lan,
             },
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: headers,
           });
           dispatch(setSearchData(response.data)); // Update state with search results
           setTotalPages(response.data.total_pages);
@@ -122,9 +128,7 @@ function HomePage() {
               female: selectedGender === "female",
               page: currentPage, // Include selected gender in the API call
             },
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: headers,
           });
           setTotalPages(response.data?.total_pages);
           dispatch(setSearchData(response.data)); // Update state with search results

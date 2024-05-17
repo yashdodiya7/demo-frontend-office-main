@@ -1,11 +1,6 @@
 import { getCookie } from 'cookies-next'
 import { NextRequest, NextResponse } from 'next/server'
 
-// admin route
-// const isAdminRoute = (pathname: string) => {
-// 	return pathname.startsWith('/admin')
-// }
-
 const protectedRoutesNotLoggedIn = [
     '/auth/choice',
     '/create-listing',
@@ -34,10 +29,6 @@ const protectedRoutesConfirmedDeal = [
 
 const allProtectedRoutes = [...protectedRoutesNotLoggedIn, ...protectedRoutesNotPaid, ...protectedRoutesConfirmedDeal]
 
-// user route
-const isUserProfileRoute = (pathname: string) => {
-	return pathname.startsWith('/profile')
-}
 
 //apply middleware
 export async function middleware(req: NextRequest) {
@@ -55,11 +46,11 @@ export async function middleware(req: NextRequest) {
     }
 
 	if (!isPaidUser && protectedRoutesNotPaid.some(route => pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL('/subscription', req.url)) // Redirect to login page
+        return NextResponse.redirect(new URL('/subscription', req.url)) // Redirect to subscription page
     }
 
 	if (confirmedDeal && protectedRoutesConfirmedDeal.some(route => pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL('/', req.url)) // Redirect to login page
+        return NextResponse.redirect(new URL('/', req.url)) // Redirect to home page
     }
 
 	return NextResponse.next()

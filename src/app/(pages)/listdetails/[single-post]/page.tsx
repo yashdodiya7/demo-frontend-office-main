@@ -259,7 +259,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                         (imageUrl: string, index: number) => (
                           <div key={index} className="h-60">
                             <Image
-                              src={imageUrl}
+                              src={imageUrl || ""}
                               alt={`image-${index}`}
                               width={500}
                               height={500}
@@ -273,7 +273,7 @@ const SingleDetails = ({ params }: { params: any }) => {
                     <div className="h-60">
                       {data?.image_urls && data?.image_urls?.length > 0 ? (
                         <Image
-                          src={data.image_urls[0]} // Use index 0 to access the first image URL
+                          src={data?.image_urls[0] || ""} // Use index 0 to access the first image URL
                           alt={`image`}
                           width={500}
                           height={500}

@@ -57,7 +57,7 @@ const MyDeal = () => {
           {/* User 1 Card */}
           <div className="flex flex-col items-center justify-center border border-gray-300 p-4 rounded-lg">
             <Image
-              src={dealData?.logged_in_user_profile?.profile_image}
+              src={dealData?.logged_in_user_profile?.profile_image || ""}
               width={100}
               height={100}
               alt="Profile 1"
