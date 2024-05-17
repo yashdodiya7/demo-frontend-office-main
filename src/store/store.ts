@@ -23,12 +23,6 @@ const persistConfig = {
   whitelist: ["userProfile", "phone_no", "otp_session_id"],
 };
 
-// Combine all your reducers into a root reducer
-// const rootReducer = combineReducers({
-//   user: authSlice,
-//   list: listingSlice
-// });
-
 const persistedReducer = persistReducer(persistConfig, authSlice);
 
 const store = configureStore({

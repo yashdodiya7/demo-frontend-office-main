@@ -60,8 +60,6 @@ const ProfileChoice = () => {
       console.log(response.payload);
 
       if (response.payload) {
-        // Redirect the user to the home page
-        // setSuccess(true)
         router.push("/");
       }
     } catch (error) {
@@ -130,9 +128,6 @@ const ProfileChoice = () => {
             </div>
 
             <div className="mt-6 flex items-center justify-center gap-x-6">
-              {/* <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
-                        Cancel
-                    </button> */}
               <button
                 type="submit"
                 disabled={selectedCount < 4}

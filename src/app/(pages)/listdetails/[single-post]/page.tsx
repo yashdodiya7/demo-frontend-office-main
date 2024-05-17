@@ -81,7 +81,7 @@ const SingleDetails = ({ params }: { params: any }) => {
         setLoading(false);
         setData(res.payload);
       } catch (error) {
-        console.error("<<<Error fetching single listing:", error);
+        console.error("Error fetching single listing:", error);
       }
     };
     // Call the asynchronous function
@@ -165,8 +165,6 @@ const SingleDetails = ({ params }: { params: any }) => {
           {/* Right side - Product details */}
           <div className="w-full sm:w-2/3">
             <div className="bg-white shadow rounded-lg p-8">
-              {/* Product image */}
-              {/* <div className="w-64 h-64 bg-gray-200 rounded-lg mb-8"></div> */}
               {/* Product details */}
               <div className="flex flex-col items-start justify-start md:flex-row md:justify-between">
                 <div>

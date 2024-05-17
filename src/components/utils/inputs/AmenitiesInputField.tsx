@@ -1,4 +1,6 @@
-import { ErrorMessage, Field, FieldArray } from "formik";
+"use client"
+
+import Image from "next/image";
 import React, { useState } from "react";
 
 interface FormikInputFieldProps {
@@ -57,7 +59,9 @@ const AmenitiesInputField: React.FC<AmenitiesInputFieldProps> = ({
               checked ? "border-green-500" : "border-gray-300"
             }`}
           >
-            <img
+            <Image
+              width={500}
+              height={500}
               src={checkboxIcons[id]}
               alt={formattedValue}
               className="w-16 h-16 object-contain"

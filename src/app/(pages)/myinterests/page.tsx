@@ -242,7 +242,7 @@ const MyInterests = () => {
                           </td>
 
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            {user?.make_deal && !user?.confirm_deal && !userState?.confirmed_deal && user?.is_available && (
+                            {user?.make_deal && !user?.confirm_deal && !userState?.confirmed_deal && user?.is_available && !user?.deposit_paid && (
                               <button
                                 type="button"
                                 onClick={() => handlePay(user?.listing)} // Pass the listingId to the function
@@ -283,6 +283,7 @@ const MyInterests = () => {
                                 )}
                               </button>
                             )}
+                            {user?.deposit_paid && <p className="mr-2 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-stone-600">Deposit paid</p>}
                           </td>
 
                           <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">

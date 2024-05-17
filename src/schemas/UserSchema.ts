@@ -37,7 +37,7 @@ const loginValidation = yup.object().shape({
 const phoneVerifySchema = yup.object().shape({
 	phone_number: yup.string()
     .required('Phone number is required')
-    .matches(/^\d{10}$/, 'Phone number should be in 6353355512 format'),
+    .matches(/^\d{10}$/, 'Phone number should be of 10 digit'),
 })
 
 const otpVerifySchema = yup.object().shape({

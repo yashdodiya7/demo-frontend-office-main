@@ -121,7 +121,7 @@ const ListProfile = ({ params }: { params: any }) => {
                 width={200}
                 height={200}
                 alt="Profile"
-                className="object-cover rounded-full"
+                className="object-cover rounded-full w-52 h-52"
               />
               <button
                 onClick={handleInterestedClick}

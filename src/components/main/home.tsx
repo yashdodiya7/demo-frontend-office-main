@@ -6,39 +6,47 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchListing, setSearchData } from "@/store/slice/listingSlice";
 import { getCookie } from "cookies-next";
 import Link from "next/link";
-import ErrorCard from "../utils/custom-error/error-card";
 import axios from "axios";
 import { Footer } from "../footer";
 
-const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-
+const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 function HomePage() {
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.list);
   const stateUser = useSelector((state: any) => state.user);
-  // const stateUser = useSelector((state: any) => state.user)
   const token: string | undefined = getCookie("token");
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [searchCurrentPage, setSearchCurrentPage] = useState<number>(1)
+  const [searchCurrentPage, setSearchCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [selectedGender, setSelectedGender] = useState<string>("");
 
   useEffect(() => {
     // Function to fetch listings with user's location
-    const fetchListingsWithLocation = async (latitude: number, longitude: number) => {
+    const fetchListingsWithLocation = async (
+      latitude: number,
+      longitude: number
+    ) => {
       try {
         // Dispatch action to fetch listings with user's location
-        
-        const locationCoords = {"user_latitude": latitude, "user_longitude": longitude};
-        const response = await dispatch(fetchListing({userToken: token, locationCoords: locationCoords, page: currentPage }));
-        // console.log("<<<",response.payload.total_pages)
-        setTotalPages(response?.payload?.total_pages)
+        const locationCoords = {
+          user_latitude: latitude,
+          user_longitude: longitude,
+        };
+
+        const response = await dispatch(
+          fetchListing({
+            userToken: token,
+            locationCoords: locationCoords,
+            page: currentPage,
+          })
+        );
+        setTotalPages(response?.payload?.total_pages);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching listings:', error);
+        console.error("Error fetching listings:", error);
         setLoading(false);
       }
     };
@@ -52,9 +60,9 @@ function HomePage() {
           fetchListingsWithLocation(latitude, longitude);
         },
         (error) => {
-          console.error('Error getting user location:', error);
+          console.error("Error getting user location:", error);
           // If unable to get user's location, fetch listings without location
-          dispatch(fetchListing({userToken: token}))
+          dispatch(fetchListing({ userToken: token }))
             .then(() => setLoading(false))
             .catch(() => setLoading(false));
         }
@@ -72,21 +80,9 @@ function HomePage() {
     }
   };
 
-  const handleSearchNextPage = () => {
-    if (searchCurrentPage < totalPages) {
-      setSearchCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
-
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
-
-  const handleSearchPrevPage = () => {
-    if (searchCurrentPage > 1) {
-      setSearchCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
@@ -94,65 +90,49 @@ function HomePage() {
     setCurrentPage(pageNumber);
   };
 
-  const handleSearchPageClick = (pageNumber: number) => {
-    setSearchCurrentPage(pageNumber);
-  };
-
   const handleSearch = async () => {
-
     const fetchListingsWithLocation = async (lat: number, lan: number) => {
-
-      if (searchQuery.trim() !== '') {
+      if (searchQuery.trim() !== "") {
         setLoading(true); // Set loading state to true while fetching data
         try {
-          const response = await axios.get(`${BASE_URL}/listing/listsearch`,
-            {
-              params: {
-                location: searchQuery,
-                male: selectedGender === 'male',
-                female: selectedGender === 'female',
-                page: currentPage,
-                user_latitude: lat, // Assuming you have latitude and longitude in your user state
-                user_longitude: lan,
-              },
-
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          console.log("<<<", response.data);
+          const response = await axios.get(`${BASE_URL}/listing/listsearch`, {
+            params: {
+              location: searchQuery,
+              page: currentPage,
+              user_latitude: lat, // Assuming you have latitude and longitude in your user state
+              user_longitude: lan,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           dispatch(setSearchData(response.data)); // Update state with search results
           setTotalPages(response.data.total_pages);
         } catch (error) {
-          console.error('Error fetching search results:', error);
+          console.error("Error fetching search results:", error);
         }
         setLoading(false); // Set loading state back to false after fetching data
-      }
-      else {
+      } else {
         try {
-          const response = await axios.get(`${BASE_URL}/listing/listsearch`,
-            {
-              params: {
-                user_latitude: lat, // Assuming you have latitude and longitude in your user state
-                user_longitude: lan,
-                male: selectedGender === 'male',
-                female: selectedGender === 'female',
-                page: currentPage, // Include selected gender in the API call
-              },
-
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const response = await axios.get(`${BASE_URL}/listing/listsearch`, {
+            params: {
+              user_latitude: lat, // Assuming you have latitude and longitude in your user state
+              user_longitude: lan,
+              male: selectedGender === "male",
+              female: selectedGender === "female",
+              page: currentPage, // Include selected gender in the API call
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           setTotalPages(response.data?.total_pages);
           dispatch(setSearchData(response.data)); // Update state with search results
         } catch (error) {
-          console.error('Error fetching search results:', error);
+          console.error("Error fetching search results:", error);
         }
       }
-    }
+    };
 
     const getUserLocation = () => {
       navigator.geolocation.getCurrentPosition(
@@ -162,22 +142,21 @@ function HomePage() {
           fetchListingsWithLocation(latitude, longitude);
         },
         (error) => {
-          console.error('Error getting user location:', error);
+          console.error("Error getting user location:", error);
           // If unable to get user's location, fetch listings without location
-          dispatch(fetchListing({userToken: token}))
+          dispatch(fetchListing({ userToken: token }))
             .then(() => setLoading(false))
             .catch(() => setLoading(false));
         }
       );
     };
-
     // Call function to get user's location
     getUserLocation();
   };
 
   useEffect(() => {
-    handleSearch();
-  }, [searchCurrentPage, selectedGender]);
+    handleSearch()
+  }, [selectedGender])
 
   return (
     <div className="w-full">
@@ -229,7 +208,7 @@ function HomePage() {
               <select
                 value={selectedGender}
                 onChange={(e) => {
-                  setSelectedGender(prev => e.target.value);
+                  setSelectedGender((prev) => e.target.value);
                 }}
                 className="p-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-stone-500 focus:border-stone-500"
               >

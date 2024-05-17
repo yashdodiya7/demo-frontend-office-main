@@ -17,14 +17,6 @@ const UserMenu = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const data = useSelector((state: RootState) => state.user.userProfile);
 
-  // useEffect(() => {
-  //   if (data.userProfile) {
-  //     setIsVerify(data.userProfile.is_verified);
-  //     setIsHost(data.userProfile.is_host);
-  //   }
-  // }, [data]);
-  
-
   const toggleOpen = useCallback(() => {
     setIsOpen((prevState) => !prevState);
   }, []);
@@ -62,10 +54,12 @@ const UserMenu = () => {
               {!token && <MenuItem to="/auth/phone-no-verify" label="Sign Up" />}
               {!token && <MenuItem to="/auth/login" label="Login" />}
               {token && <MenuItem to="/prefernce" label="User Prefernces" />}
+              {token && <div className="block sm:hidden"><MenuItem to="/profile" label="Profile" /></div>}
               {token && !data?.is_host && <MenuItem to="/myinterests" label="My Interests" />}
               {token && data?.is_host && <MenuItem to="/interested-users" label="Interested Users" />}
               {token && data?.confirmed_deal && !data?.is_host && <MenuItem to="/mydeal" label="My Deal" />}
               {token && <MenuItem to="/subscription" label="Subscription" />}
+              <div className="block sm:hidden"><MenuItem to="/contact" label="Contact us" /></div>
               {token && <MenuItem to="/" label="Logout" />}
             </div>
           </div>

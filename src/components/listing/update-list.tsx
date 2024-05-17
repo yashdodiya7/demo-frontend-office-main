@@ -659,24 +659,6 @@ const UpdateList = () => {
                         </div>
                       </div>
 
-                      {/* <div className="sm:col-span-4">
-                        <div className="flex items-center">
-                          <Field
-                            type="checkbox"
-                            value="True"
-                            name="mobile_visible"
-                            id="mobile_visible"
-                            className="w-6 h-4 mr-3"
-                          />
-                          <label
-                            htmlFor="mobile_visible"
-                            className="text-black text-sm"
-                          >
-                            Mobile No Visible to Others ?
-                          </label>
-                        </div>
-                      </div> */}
-
                       <div className="sm:col-span-6 flex gap-2 flex-col md:flex-col md:gap-2">
                         <div>
                           <h3 className="text-md font-semibold mb-6">

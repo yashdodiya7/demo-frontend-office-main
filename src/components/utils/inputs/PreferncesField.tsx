@@ -1,3 +1,6 @@
+"use client"
+
+import Image from "next/image";
 import React from "react";
 
 const prefrencesIcons: Record<string, string> = {
@@ -23,7 +26,9 @@ const PreferncesField: React.FC<{ name: string }> = ({ name }) => {
         <div
             className={`w-24 h-24 flex items-center justify-center border-2 rounded-full border-stone-500 bg-stone-100`}
         >
-            <img
+            <Image
+            width={500}
+            height={500}
             src={prefrencesIcons[name]}
             alt={name}
             className="w-16 h-16 object-contain"

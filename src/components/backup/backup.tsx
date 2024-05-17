@@ -93,6 +93,15 @@ const backup = () => {
           className="mt-4 text-sm text-red-600 dark:text-red-500"
         />
       </div>*/}
+
+      {/* <Link
+        href="#"
+        title=""
+        className="text-sm font-semibold text-black hover:underline"
+      >
+        {" "}
+        Forgot password?{" "}
+      </Link> */}
     </div>
   );
 };

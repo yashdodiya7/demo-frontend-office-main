@@ -6,6 +6,7 @@ import Navbar from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Provider } from "react-redux";
 import storeObj from "@/store/store";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 

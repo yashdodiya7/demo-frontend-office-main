@@ -71,7 +71,6 @@ const InterestedUsers = () => {
                   },
               }
           );
-          // console.log("<<<",response.data);
           setRefreshData(prev => !prev);
           ToastSuccess(response.data.success);
           // Handle success, e.g., show a success message

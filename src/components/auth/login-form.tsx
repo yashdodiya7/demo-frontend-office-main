@@ -19,20 +19,13 @@ interface formValue {
 
 function LoginForm() {
   const { error } = useSelector((state: any) => state.user);
-  // console.log(error?.message);
-
-  // const [serror, setError] = useState<string | undefined>()
-  // const [success, setSuccess] = useState<string | undefined>()
-  // const [isPending, startTransition] = useTransition()
+  const [loading, setLoading] = useState<boolean>(false)
   const dispatch = useDispatch();
   const router = useRouter();
 
-  // status message
-  // let state = useSelector((state: any) => state.user)
-
   const handleSubmit = async (val: formValue) => {
     try {
-      console.log(val);
+      setLoading(true);
       const response = await dispatch(userLogin(val));
       const userToken = response.payload.tokens.access;
       // console.log(userToken);
@@ -43,14 +36,12 @@ function LoginForm() {
         router.push("/");
       }
     } catch (error) {
+      setLoading(false);
       throw error;
     } finally {
-      formik.resetForm();
+      setLoading(true);
     }
-    // console.log(status);
   };
-
-  // console.log(state.status);
 
   const formik = useFormik({
     initialValues: {
@@ -63,6 +54,11 @@ function LoginForm() {
 
   return (
     <section>
+      {loading ? ( // Show loader if loading is true
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
+        </div>
+      ) : (
       <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
         <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
           <div className="grid place-items-center mb-6">
@@ -74,7 +70,7 @@ function LoginForm() {
           <p className="mt-2 text-center text-sm text-gray-600 ">
             Don&apos;t have an account?{" "}
             <Link
-              href="/auth/phone-no"
+              href="/auth/phone-no-verify"
               className="font-semibold text-black transition-all duration-200 hover:underline"
             >
               Create a free account
@@ -115,14 +111,7 @@ function LoginForm() {
                     {" "}
                     Password{" "}
                   </label>
-                  <Link
-                    href="#"
-                    title=""
-                    className="text-sm font-semibold text-black hover:underline"
-                  >
-                    {" "}
-                    Forgot password?{" "}
-                  </Link>
+                  
                 </div>
                 <div className="mt-2">
                   <input
@@ -155,6 +144,7 @@ function LoginForm() {
           </form>
         </div>
       </div>
+      )}
     </section>
   );
 }

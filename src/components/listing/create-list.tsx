@@ -20,6 +20,7 @@ import TextNumberInputField from "../utils/inputs/TextNumberInputField";
 import SelectInputField from "../utils/inputs/SelectInputField";
 import Image from "next/image";
 import { ToastError } from "../utils/custom-error/toast";
+import Logo from "../navbar/Logo";
 
 interface Amenity {
   id: string;
@@ -30,7 +31,6 @@ interface Highlight {
   id: string;
   value: string;
 }
-
 
 interface Coordinates {
   lat: number | null;
@@ -69,7 +69,6 @@ const highlightsData: Highlight[] = [
   { id: "gym_nearby", value: "1" },
 ];
 
-
 interface FormDataValue {
   property_type: string;
   lease_term: string;
@@ -88,7 +87,7 @@ interface FormDataValue {
 const CreateList = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [address, setAddress] = useState<string>("");
@@ -96,7 +95,6 @@ const CreateList = () => {
     lat: null,
     lng: null,
   });
-  // const [isSelected, setIsSelected] = useState()
 
   const [amenitiesChecked, setAmenitiesChecked] = useState<{
     [key: string]: boolean;
@@ -130,7 +128,7 @@ const CreateList = () => {
   });
   const [newHighlight, setNewHighlight] = useState<string[]>([]);
 
-  const initialValues:FormDataValue = {
+  const initialValues: FormDataValue = {
     property_type: "apartment",
     lease_term: "",
     approx_rent: "",
@@ -145,24 +143,6 @@ const CreateList = () => {
     description: "",
   };
 
-  const getUserLocation = () => {
-    return new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            resolve({ latitude, longitude });
-          },
-          (error) => {
-            reject(error);
-          }
-        );
-      } else {
-        reject("Geolocation is not supported by this browser.");
-      }
-    });
-  };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.currentTarget.files || []);
     setSelectedFiles(files);
@@ -172,33 +152,18 @@ const CreateList = () => {
 
   const handleSubmit = async (val: FormDataValue) => {
     try {
-      // Retrieve user's current location
-      // let userLocation: any;
-      // try {
-      //   userLocation = await getUserLocation();
-      // } catch (error) {
-      //   ToastError("Please allow location access");
-      //   return; // Stop further execution
-      // }
-
       const formData = new FormData();
-
-      // formData.append("userLatitude", userLocation.latitude.toString());
-      // formData.append("userLongitude", userLocation.longitude.toString());
 
       Object.entries(val).forEach(([key, value]) => {
         if (
           key !== "amenities" &&
           key !== "highlights" &&
-          // key !== "mobile_visible" &&
           key !== "images"
         ) {
           formData.append(key, value);
         }
       });
-      // if (val.mobile_visible?.length > 0) {
       formData.append("mobile_visible", "true");
-      // }
       selectedFiles.forEach((file) => {
         formData.append("images", file);
       });
@@ -231,7 +196,6 @@ const CreateList = () => {
       // Handle error as needed
     }
   };
-  
 
   const handleAmenitiesChange = (amenity: any) => {
     setAmenitiesChecked({
@@ -289,10 +253,8 @@ const CreateList = () => {
     console.log(latLng);
     setAddress(results[0].formatted_address);
 
-    // console.log(results[0].formatted_address);
     setCoordinates(latLng);
   };
-
 
   const renderImagePreviews = () => {
     return selectedFiles.map((file, index) => {
@@ -325,8 +287,13 @@ const CreateList = () => {
           validationSchema={PostCreationSchema}
         >
           {({ handleSubmit }) => (
-            <div className="mx-28 my-8 mb-24">
-              <form action="#" method="POST" onSubmit={handleSubmit}>
+            <div className="mx-4 md:mx-28 my-8 mb-24">
+              <div className="grid place-items-center mb-4">
+                <Logo />
+              </div>
+              <form
+                onSubmit={handleSubmit}
+              >
                 <div className="space-y-12">
                   <div className="border-b border-gray-900/10 pb-12">
                     <h2 className="text-base font-semibold leading-7 text-gray-900">
@@ -367,7 +334,8 @@ const CreateList = () => {
                                   {suggestions.map((suggestion, index) => (
                                     <div
                                       {...getSuggestionItemProps(suggestion, {
-                                        className: "cursor-pointer p-2 hover:bg-gray-100",
+                                        className:
+                                          "cursor-pointer p-2 hover:bg-gray-100",
                                         key: suggestion,
                                       })}
                                     >
@@ -584,31 +552,13 @@ const CreateList = () => {
                         </div>
                       </div>
 
-                      {/* <div className="sm:col-span-4">
-                      <div className="flex items-center">
-                        <Field
-                          type="checkbox"
-                          value="True"
-                          name="mobile_visible"
-                          id="mobile_visible"
-                          className="w-6 h-4 mr-3"
-                        />
-                        <label
-                          htmlFor="mobile_visible"
-                          className="text-black text-sm"
-                        >
-                          Mobile No Visible to Others ?
-                        </label>
-                      </div>
-                    </div> */}
-
                       <div className="sm:col-span-6 flex gap-2 flex-col md:flex-col md:gap-2">
                         <div>
                           <h3 className="text-md font-semibold mb-6">
                             Amenities
                           </h3>
                           <div className="flex flex-wrap items-baseline justify-center">
-                            <div className="grid grid-cols-6 gap-4">
+                            <div className="grid grid-cols-3 sm:grid-cols-6 sm:gap-4">
                               {Object.keys(amenitiesChecked).map(
                                 (amenity: string) => (
                                   <AmenitiesInputField
@@ -632,7 +582,7 @@ const CreateList = () => {
                             Highlights
                           </h3>
                           <div className="flex flex-wrap items-center justify-center">
-                            <div className="grid grid-cols-6 gap-4">
+                            <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
                               {Object.keys(highlightsChecked).map(
                                 (highlight: string) => (
                                   <HighlightsInputField

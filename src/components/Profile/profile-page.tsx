@@ -7,8 +7,6 @@ import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
-import { ToastError, ToastSuccess } from '../utils/custom-error/toast'
-import { URL } from 'url'
 
 
 const ProfileComponent: React.FC = () => {
@@ -20,7 +18,7 @@ const ProfileComponent: React.FC = () => {
     // const [previewImage, setPreviewImage] = useState();
     const state = useSelector((state: any) => state.user)
     const userData = state.userProfile
-    const [imagePreview, setPreviewImage] = useState<any>();
+    const [imagePreview, setPreviewImage] = useState<any>(null);
 
     useEffect(() => {
         dispatch(getUserProfile(token))
@@ -51,7 +49,12 @@ const ProfileComponent: React.FC = () => {
         const fieldValue: undefined | string | File = e.target.type === 'file' ? e.target.files?.[0] : e.target.value;
     
         formik.setFieldValue(fieldName, fieldValue); // Set formik field value
-        if (fieldName === 'profile_image') {
+        if (fieldName === 'profile_image' && fieldValue instanceof File) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setPreviewImage(reader.result as string);
+            };
+            reader.readAsDataURL(fieldValue);
             formik.setFieldValue('profile_image', fieldValue); // Set profile_image field value
         }
     };
@@ -99,9 +102,8 @@ const ProfileComponent: React.FC = () => {
         }
       };
 
-
+    
     const handleOtpSubmit = async ( val: any) => {
-        // val.phone_no = state.phone_no
         val.session_token = state.otp_session_id
         val.phone_number = state.phone_no
 
@@ -110,7 +112,7 @@ const ProfileComponent: React.FC = () => {
             const response = await dispatch(otpVerify(val))
             // console.log(response.payload);
             
-            if (response.payload.security_code) {
+            if (response.payload?.security_code) {
                 setUpdateContact(false)
                 // console.log(response.payload, "In if condition");
                 dispatch(setPhoneNumber({ phone_no: val.phone_number }));
@@ -142,7 +144,7 @@ const ProfileComponent: React.FC = () => {
     const formik = useFormik({
         initialValues: {
             name: `${userData?.name}`,
-            phone_no: `${userData?.phone_no}`,
+            phone_no: `${state.phone_no}`,
             email: `${userData?.email}`,
             bio: `${userData?.bio}`,
             profile_image: null,
@@ -202,6 +204,15 @@ const ProfileComponent: React.FC = () => {
                     onChange={handleChange}
                   />
                 </div>
+                {imagePreview && (
+                  <div>
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-16 h-16"
+                    />
+                  </div>
+                )}
                 <h1 className="text-2xl sm:text-4xl mt-4 sm:mt-8 font-medium text-gray-700">
                   {userData?.name},{" "}
                   <span className="font-light text-gray-500">
