@@ -1,11 +1,12 @@
 "use client"
 
 import { logout } from "@/store/slice/authSlice";
+import { logoutInterest } from "@/store/slice/interestSlice";
 // import  storeObj  from "@/store/store";
 import { deleteCookie } from "cookies-next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 interface MenuItemProps {
     label: string;
@@ -21,6 +22,7 @@ const MenuItem = ({ label, to }: MenuItemProps) => {
 
     const handleLogout = () => {
         deleteCookie('token')
+        dispatch(logoutInterest())
         dispatch(logout())
         router.push('/')
     }

@@ -89,7 +89,9 @@ const Verify = () => {
           <h2 className="text-2xl font-semibold mb-4">
             Please Upload Aadhar Card for Verification
           </h2>
-          <p className="text-blue-700 font-semibold">We won&apos;t store your aadhar card it is only for the verification</p>
+          <p className="text-blue-700 font-semibold">
+            We won&apos;t store your aadhar card it is only for the verification
+          </p>
           <p className="text-gray-700">
             To complete the verification process, please follow these
             guidelines:
@@ -106,7 +108,10 @@ const Verify = () => {
               name and surname on the Aadhar card.
             </li>
           </ol>
-          <p className="text-red-600 font-semibold -mt-5">With this verification you are agree to provide your <span>contact No.</span> for the communication between users</p>
+          <p className="text-red-600 font-semibold -mt-5">
+            With this verification you are agree to provide your{" "}
+            <span>contact No.</span> for the communication between users
+          </p>
           <p className="text-gray-700 mt-4">Thank you for your cooperation.</p>
 
           <Formik initialValues={{ aadhar: [] }} onSubmit={handleSubmit}>

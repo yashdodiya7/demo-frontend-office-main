@@ -16,6 +16,7 @@ import { ToastContainer } from "react-toastify";
 import Link from "next/link";
 import Logo from "../navbar/Logo";
 import Loader from "../ui-component/loader";
+import ButtonLoader from "../ui-component/button-loader";
 
 const PhoneNumberField = () => {
   const router = useRouter();
@@ -140,9 +141,10 @@ const PhoneNumberField = () => {
                 <div>
                   <button
                     type="submit"
+                    disabled={loading}
                     className="inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-gray-800"
                   >
-                    Send Otp
+                    {!loading ? "Send Otp" : <ButtonLoader/>}
                   </button>
                 </div>
               </div>

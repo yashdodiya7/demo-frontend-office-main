@@ -70,10 +70,16 @@ const InterestedUsers = () => {
   return (
     <UserLayout>
       <ToastContainer />
-      {loading ? <Loader/> : (
+      {loading ? (
+        <Loader />
+      ) : (
         <div className="flex flex-col mb-12 mt-8 mx-12">
           <h3 className="text-center text-m=lg font-bold uppercase text-stone-800 mb-4">
             Interested users
+          </h3>
+          <h3 className="text-center text-sm font-semibold uppercase text-blue-700 mt-2 mb-8">
+            After Deal Confirmation Concent agreement Sent to the respective
+            mail address
           </h3>
           {interestedUsers.length === 0 ? ( // Conditional rendering for no interested users
             <div className="flex items-center justify-center">
@@ -154,35 +160,21 @@ const InterestedUsers = () => {
                           </td>
 
                           <td className="px-6 flex justify-end items-center py-4 whitespace-nowrap text-end text-sm font-medium">
-                            <button
-                              type="button"
-                              disabled={user.make_deal}
-                              onClick={() =>
-                                handleMakeDeal(user.listing, user.user.id)
-                              }
-                              className="mr-2 inline-flex items-center text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                            >
-                              {user.confirm_deal ? (
-                                // Render a "Deal Done" button icon if confirm_deal is true
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-6 w-6 text-green-800"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              ) : (
-                                // Render a "Make a Deal" button if confirm_deal is false
+                            {user.confirm_deal ? (
+                              // Render a "Deal Done" button icon if confirm_deal is true
+                              <p className="mr-4 font-semibold text-stone-700">Deal Confirmed</p>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled={user.make_deal}
+                                onClick={() =>
+                                  handleMakeDeal(user.listing, user.user.id)
+                                }
+                                className="mr-2 inline-flex items-center text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+                              >
                                 "Make a Deal"
-                              )}
-                            </button>
+                              </button>
+                            )}
 
                             <Link
                               href={`/interested-user-profile/${user.user.id}`}

@@ -20,38 +20,47 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
+import Loader from "../ui-component/loader";
 
 const ProfileComponent: React.FC = () => {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const token: string | undefined = getCookie("token");
   const state = useSelector((state: any) => state.user);
   const userData = state.userProfile;
   const [imagePreview, setPreviewImage] = useState<any>(null);
+  const [updateContact, setUpdateContact] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
-    dispatch(getUserProfile(token))
-      .then(() => setLoading(false))
-      .catch(() => setLoading(false));
+    const fetchUserProfile = async () => {
+      try {
+        await dispatch(getUserProfile(token));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserProfile();
   }, [token, dispatch]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    // Update form values when userData changes
-    if (userData) {
-      formik.setValues({
-        name: userData?.name || "",
-        phone_no: userData?.phone_no || "",
-        email: userData?.email || "",
-        profile_image: userData?.profile_image || null,
-        bio: userData?.bio || "",
-        gender: userData?.gender || "",
-        occupation: userData?.occupation || "",
-        age: userData?.age || "",
-      });
-    }
-  }, [dispatch, token]);
+  // useEffect(() => {
+  //   // Update form values when userData changes
+  //   if (userData) {
+  //     formik.setValues({
+  //       name: userData?.name || "",
+  //       phone_no: userData?.phone_no || "",
+  //       email: userData?.email || "",
+  //       profile_image: userData?.profile_image || null,
+  //       bio: userData?.bio || "",
+  //       gender: userData?.gender || "",
+  //       occupation: userData?.occupation || "",
+  //       age: userData?.age || "",
+  //     });
+  //   }
+  // }, [dispatch, token]);
 
   // for update a user profile
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,13 +97,28 @@ const ProfileComponent: React.FC = () => {
         updateUserProfile({ userToken: token, updatedata: formData })
       );
       dispatch(setUserData(response.payload));
-      setLoading(false);
     } catch (error: any) {
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const [updateContact, setUpdateContact] = useState(false);
+  const formik = useFormik({
+    initialValues: {
+      name: `${userData?.name}`,
+      phone_no: `${state.phone_no}`,
+      email: `${userData?.email}`,
+      bio: `${userData?.bio}`,
+      profile_image: `${userData?.profile_image || ""}`,
+      gender: `${userData?.gender}`,
+      occupation: `${userData?.occupation}`,
+      age: `${userData?.age}`,
+    },
+    enableReinitialize: true,
+    validationSchema: updateUser,
+    onSubmit: handleSubmit,
+  });
 
   const handlePhoneSubmit = async (values: any) => {
     try {
@@ -147,29 +171,10 @@ const ProfileComponent: React.FC = () => {
     onSubmit: handleOtpSubmit,
   });
 
-  const formik = useFormik({
-    initialValues: {
-      name: `${userData?.name}`,
-      phone_no: `${state.phone_no}`,
-      email: `${userData?.email}`,
-      bio: `${userData?.bio}`,
-      profile_image: null,
-      gender: `${userData?.gender}`,
-      occupation: `${userData?.occupation}`,
-      age: `${userData?.age}`,
-    },
-    validationSchema: updateUser,
-    onSubmit: handleSubmit,
-  });
-
   return (
     <div className="p-16">
       <ToastContainer />
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
-      ) : (
+      {loading ? <Loader/> : (
         <div className="p-4 sm:p-8 bg-stone-100 sm:w-[70%] mx-auto rounded-3xl shadow mt-24 relative">
           <div className="felx felx-col items-center justify-center">
             <div className="flex flex-col items-center justify-center">

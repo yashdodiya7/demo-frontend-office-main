@@ -156,7 +156,7 @@ const CreateList = () => {
   };
 
   // handle submit for the create listing
-  const handleSubmit = async (val: FormDataValue) => {
+  const handleSubmit = async (val: FormDataValue, formikHelpers: any) => {
     try {
       const formData = new FormData();
 
@@ -183,6 +183,7 @@ const CreateList = () => {
       }
 
       formData.append("availability_date", "2024-04-30");
+
       setLoading(true);
       const res = await dispatch(
         createPost({ userToken: token, updatedata: formData })
@@ -195,10 +196,14 @@ const CreateList = () => {
           setLoading(false);
         }, 1000);
       }
-      setLoading(false);
+      
     } catch (error) {
-      console.error("An error occurred:", error);
-      // Handle error as needed
+      console.error("<<<An error occurred:", error);
+      setLoading(false);
+      formikHelpers.setSubmitting(false);
+    } finally {
+      setLoading(false);
+      formikHelpers.setSubmitting(false);
     }
   };
 
@@ -288,10 +293,10 @@ const CreateList = () => {
       {loading ? <Loader/> : (
         <Formik
           initialValues={initialValues}
-          onSubmit={handleSubmit}
+          onSubmit={(values, formikHelpers) => handleSubmit(values, formikHelpers)}
           validationSchema={PostCreationSchema}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, isSubmitting }) => (
             <div className="mx-4 md:mx-28 my-8 mb-24">
               <div className="grid place-items-center mb-4">
                 <Logo />
@@ -656,7 +661,7 @@ const CreateList = () => {
                   <button
                     type="submit"
                     disabled={
-                      selectedFiles.length < 2 || selectedFiles.length > 5
+                      isSubmitting || selectedFiles.length < 2 || selectedFiles.length > 5
                     }
                     className="px-16 mb-8 rounded-md bg-stone-600 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-700"
                   >

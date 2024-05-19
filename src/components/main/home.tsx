@@ -19,7 +19,6 @@ function HomePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [searchCurrentPage, setSearchCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [selectedGender, setSelectedGender] = useState<string>("");
 
@@ -35,7 +34,6 @@ function HomePage() {
           user_latitude: latitude,
           user_longitude: longitude,
         };
-
         const response = await dispatch(
           fetchListing({
             userToken: token,
@@ -52,21 +50,27 @@ function HomePage() {
     };
 
     // Get user's location
-    const getUserLocation = () => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          // Fetch listings with user's location
-          fetchListingsWithLocation(latitude, longitude);
-        },
-        (error) => {
-          console.error("Error getting user location:", error);
-          // If unable to get user's location, fetch listings without location
-          dispatch(fetchListing({ userToken: token }))
-            .then(() => setLoading(false))
-            .catch(() => setLoading(false));
+    const getUserLocation = async () => {
+      try {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+    
+        const { latitude, longitude } = position.coords;
+        // Fetch listings with user's location
+        await fetchListingsWithLocation(latitude, longitude);
+      } catch (error) {
+        console.error("Error getting user location:", error);
+        // If unable to get user's location, fetch listings without location
+        try {
+          const res = await dispatch(fetchListing({ userToken: token, page: currentPage }));
+          setTotalPages(res.payload?.total_pages);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching listings:", error);
+          setLoading(false);
         }
-      );
+      }
     };
 
     // Call function to get user's location
@@ -138,29 +142,51 @@ function HomePage() {
       }
     };
 
-    const getUserLocation = () => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          // Fetch listings with user's location
-          fetchListingsWithLocation(latitude, longitude);
-        },
-        (error) => {
-          console.error("Error getting user location:", error);
-          // If unable to get user's location, fetch listings without location
-          dispatch(fetchListing({ userToken: token }))
-            .then(() => setLoading(false))
-            .catch(() => setLoading(false));
+    const getUserLocation = async () => {
+      try {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+    
+        const { latitude, longitude } = position.coords;
+        // Fetch listings with user's location
+        await fetchListingsWithLocation(latitude, longitude);
+      } catch (error) {
+        console.error("Error getting user location:", error);
+        // If unable to get user's location, fetch listings without location
+        try {
+          const res = await dispatch(fetchListing({ userToken: token, page: currentPage }));
+          setTotalPages(res.data?.total_pages);
+          console.log("<<<", res.payload);
+          dispatch(setSearchData(res.data));
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching listings:", error);
+          setLoading(false);
         }
-      );
+      }
     };
+    
     // Call function to get user's location
     getUserLocation();
   };
 
+  const fetchInitialListings = async (page = 1) => {
+    try {
+      const response = await dispatch(fetchListing({ userToken: token, page }));
+      setTotalPages(response?.payload?.total_pages);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching listings:", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    handleSearch()
-  }, [selectedGender])
+    if (selectedGender != "") {
+      handleSearch()
+    }
+  }, [selectedGender])  
 
   return (
     <div className="w-full">

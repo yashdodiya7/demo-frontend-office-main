@@ -13,6 +13,7 @@ import { RootState } from "@/types/user";
 import { ToastContainer } from "react-toastify";
 import Logo from "../navbar/Logo";
 import Loader from "../ui-component/loader";
+import ButtonLoader from "../ui-component/button-loader";
 
 interface RegisterFormValues {
   email: string;
@@ -73,7 +74,7 @@ const RegisterForm: React.FC = () => {
   return (
     <section>
       <ToastContainer />
-      {loading ? <Loader/> : (
+      {/* {loading ? <Loader/> : ( */}
         <div className="flex items-center justify-center px-4 py-6 sm:px-6 sm:pb-16 lg:px-8 lg:pb-24">
           <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
             <div className="grid place-items-center mb-4">
@@ -266,16 +267,17 @@ const RegisterForm: React.FC = () => {
                 <div>
                   <button
                     type="submit"
+                    disabled={loading}
                     className={`inline-flex w-full items-center justify-center rounded-md bg-black px-3.5 py-2.5 font-semibold leading-7 text-white hover:bg-black/80`}
                   >
-                    Create Account <ArrowRight className="ml-2" size={16} />
+                    {loading ? <ButtonLoader/> : <>Create Account <ArrowRight className="ml-2" size={16} /></>}
                   </button>
                 </div>
               </div>
             </form>
           </div>
         </div>
-      )}
+      {/* // )} */}
     </section>
   );
 };

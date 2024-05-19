@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { setUserData } from "@/store/slice/authSlice";
 import { RootState } from "@/types/user";
+import { fetchMyInterestedListings, handlePaymentInterestedListing } from "@/store/slice/interestSlice";
 
 interface UserProfile {
   id: number;
@@ -47,8 +48,8 @@ const MyInterests = () => {
 
   const [interestedUsers, setInterestedUsers] = useState<ListingInterest[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-  const [isRequestPending, setIsRequestPending] = useState<boolean>(false);
+  // const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+  // const [isRequestPending, setIsRequestPending] = useState<boolean>(false);
   const [confirmationSuccess, setConfirmationSuccess] = useState<boolean>(false);
   const [buttonLoadingId, setButtonLoadingId] = useState<number | null>(null);
   const dispatch = useDispatch();
@@ -57,13 +58,8 @@ const MyInterests = () => {
   useEffect(() => {
     const fetchInterestedUsers = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/listing/interested`, {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
-        console.log(response.data);
-        setInterestedUsers(response.data);
+        const response = await dispatch(fetchMyInterestedListings());
+        setInterestedUsers(response?.payload);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching interested users:", error);
@@ -78,28 +74,20 @@ const MyInterests = () => {
     try {
       setButtonLoadingId(listingId);
       // setIsRequestPending(true)
-      const response = await axios.post<{ sessionId: string }>(
-        `${BASE_URL}/payment/wallet-add/`,
-        { listing_id: listingId },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
-      const sessionId: string = response.data.sessionId;
+      const response = await dispatch(handlePaymentInterestedListing(listingId));
+      const sessionId: string = response.payload?.sessionId;
 
       const stripe: Stripe | null = await loadStripe(publicKey);
 
       if (stripe) {
         const result = await stripe.redirectToCheckout({ sessionId });
-        setIsRequestPending(false)
+        // setIsRequestPending(false)
         if (result.error) {
           console.error("Error redirecting to checkout:", result.error);
         }
       }
     } catch (error) {
-      setIsRequestPending(false)
+      // setIsRequestPending(false)
       console.error("Error fetching session ID:", error);
     } finally {
       setButtonLoadingId(null); // Reset button loading state after completion
@@ -148,8 +136,11 @@ const MyInterests = () => {
           <h3 className="text-center text-m=lg font-bold uppercase text-stone-800">
             My Interests
           </h3>
-          <h3 className="text-center text-sm font-semibold uppercase text-orange-700 mt-2 mb-8">
+          <h3 className="text-center text-sm font-semibold uppercase text-orange-700 mt-2">
             You Have to Pay Deposit First for the deal confirmation
+          </h3>
+          <h3 className="text-center text-sm font-semibold uppercase text-blue-700 mt-2 mb-8">
+            After Deal Confirmation Concent agreement Sent to the respective mail address
           </h3>
           {interestedUsers.length === 0 ? ( // Conditional rendering for no interested users
             <div className="flex items-center justify-center">

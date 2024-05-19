@@ -1,24 +1,29 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import UserLayout from '../../UserLayout'
-import Image from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchSingleListingUserProfile } from '@/store/slice/listingSlice';
-import { getCookie } from 'cookies-next';
-import axios from 'axios';
-import { ToastContainer } from 'react-toastify';
-import { ToastError, ToastSuccess } from '@/components/utils/custom-error/toast';
-import Link from 'next/link';
+import React, { useEffect, useState } from "react";
+import UserLayout from "../../UserLayout";
+import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSingleListingUserProfile } from "@/store/slice/listingSlice";
+import { getCookie } from "cookies-next";
+import axios from "axios";
+import { ToastContainer } from "react-toastify";
+import {
+  ToastError,
+  ToastSuccess,
+} from "@/components/utils/custom-error/toast";
+import Link from "next/link";
+import Loader from "@/components/ui-component/loader";
+import { handleInterestedButton } from "@/store/slice/interestSlice";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 interface UserProfile {
   name: string;
   phone_no: string;
   profile_image: string;
   email: string;
-  gender: 'male' | 'female' | 'other'; // You might want to restrict to specific values
+  gender: "male" | "female" | "other"; // You might want to restrict to specific values
   occupation: string;
   bio: string;
   age: number; // Assuming age is a number
@@ -30,75 +35,65 @@ interface UserProfile {
 }
 
 const ListProfile = ({ params }: { params: any }) => {
+  const [data, setData] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+  const [buttonClick, setButtonClick] = useState<boolean>(false);
+  const userStateData = useSelector((state: any) => state.user.userProfile);
+  const dispatch = useDispatch();
+  const token = getCookie("token");
 
-    const [data, setData] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState<boolean>(true)
-    const [buttonLoading, setButtonLoading] = useState<boolean>(false);
-    const [buttonClick, setButtonClick] = useState<boolean>(false);
-    const userStateData = useSelector((state: any) => state.user.userProfile)
-    const dispatch = useDispatch();
-    const token = getCookie("token");
-
-
-    useEffect(() => {
-      // Define an asynchronous function inside the useEffect
-      const fetchData = async () => {
-        try {
-          // Fetch listings when the component mounts
-          const res = await dispatch(
-            fetchSingleListingUserProfile({
-              userToken: token,
-              id: params["profile"],
-            })
-          );
-          setData(res.payload);
-          setLoading(false);
-        } catch (error) {
-          setLoading(false);
-          console.error("Error fetching single listing:", error);
-        }
-      };
-      // Call the asynchronous function
-      fetchData();
-    }, [dispatch, buttonClick, params, token]);
-
-
-    const handleInterestedClick = async () => {
+  useEffect(() => {
+    // Define an asynchronous function inside the useEffect
+    const fetchData = async () => {
       try {
-        setButtonLoading(true);
-        const res = await axios.post(`${BASE_URL}/listing/listings/${params['profile']}/interested`, null, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if(res.status == 201){
-          ToastSuccess("Successfully Interested")
-        }
-        setButtonLoading(true);
-        // If API call is successful, you can add further actions here if needed
-      } catch (error: any) {
-        ToastError(error?.response?.data?.error)
-        setButtonLoading(false);
-        console.error('Error marking as interested:', error);
-      } finally {
-        setButtonLoading(false);
-        setButtonClick(prevState => !prevState);
+        // Fetch listings when the component mounts
+        const res = await dispatch(
+          fetchSingleListingUserProfile({
+            userToken: token,
+            id: params["profile"],
+          })
+        );
+        setData(res.payload);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.error("Error fetching single listing:", error);
       }
     };
-    
-    
+    // Call the asynchronous function
+    fetchData();
+  }, [dispatch, buttonClick, params, token]);
+
+  const handleInterestedClick = async () => {
+    try {
+      setButtonLoading(true);
+      const res = await dispatch(handleInterestedButton(Number(params['profile'])))
+      // if (res.status == 201) {
+      //   ToastSuccess("Successfully Interested");
+      // }
+      setButtonLoading(true);
+      // If API call is successful, you can add further actions here if needed
+    } catch (error: any) {
+      // ToastError(error?.response?.data?.error);
+      setButtonLoading(false);
+      console.error("Error marking as interested:", error);
+    } finally {
+      setButtonLoading(false);
+      setButtonClick((prevState) => !prevState);
+    }
+  };
+
   return (
     <UserLayout>
       <ToastContainer />
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
+      {loading ? (
+        <Loader />
       ) : (
         <>
           <div className="flex flex-col sm:flex-row justify-center gap-16 items-center p-8 bg-gray-100 sm:h-[90vh]">
             <Link
-              href={`/listdetails/${params['profile']}`}
+              href={`/listdetails/${params["profile"]}`}
               className="self-start flex items-center px-4 py-2 mb-4 rounded-md bg-stone-500 text-white shadow-sm hover:bg-stone-600"
             >
               <svg
@@ -206,6 +201,6 @@ const ListProfile = ({ params }: { params: any }) => {
       )}
     </UserLayout>
   );
-}
+};
 
-export default ListProfile
+export default ListProfile;

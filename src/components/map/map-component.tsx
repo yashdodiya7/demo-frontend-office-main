@@ -22,18 +22,28 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 const MapComponent: React.FC<MapComponentProps> = ({ id }) => {
   const [data, setData] = useState<{ current_post: any, nearby_posts: Listing[] } | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/listing/nearbypost/${id}`);
-        setData(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+  const [isIdReceived, setIsIdReceived] = useState(false);
 
-    fetchData();
-  }, [id]); // Fetch data whenever the id prop changes
+  useEffect(() => {
+    if (id) {
+      setIsIdReceived(true);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (isIdReceived) {
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(`${BASE_URL}/listing/nearbypost/${id}`);
+          setData(response.data);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [isIdReceived, id]);
 
   const handleMarkerClick = (listingId: number) => {
     // Redirect to the listing details page when a marker is clicked
