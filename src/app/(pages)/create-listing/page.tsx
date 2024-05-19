@@ -1,6 +1,5 @@
 import CreateList from "@/components/listing/create-list";
 import React from "react";
-import UserLayout from "../UserLayout";
 
 const CreateListPage = () => {
   return (

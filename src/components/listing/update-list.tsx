@@ -76,254 +76,235 @@ interface Coordinates {
 }
 
 const UpdateList = () => {
+  const dispatch = useDispatch();
+  const token = getCookie("token");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
+  const [address, setAddress] = useState<string>("");
+  const [coordinates, setCoordinates] = useState<Coordinates>({
+    lat: null,
+    lng: null,
+  });
 
-    const dispatch = useDispatch()
-    const token = getCookie('token')
-    const [loading, setLoading] = useState<boolean>(false);
-    const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
-    const [address, setAddress] = useState<string>("");
-    const [coordinates, setCoordinates] = useState<Coordinates>({
-        lat: null,
-        lng: null
-    });
+  const router = useRouter();
 
-    const router = useRouter();
+  const [amenitiesChecked, setAmenitiesChecked] = useState<{
+    [key: string]: boolean;
+  }>({
+    tv: false,
+    power_backup: false,
+    fridge: false,
+    cook: false,
+    kitchen: false,
+    parking: false,
+    wifi: false,
+    washing_machine: false,
+    ac: false,
+  });
 
-    const [amenitiesChecked, setAmenitiesChecked] = useState<{ [key: string]: boolean }>({
-      tv: false,
-      power_backup: false,
-      fridge: false,
-      cook: false,
-      kitchen: false,
-      parking: false,
-      wifi: false,
-      washing_machine: false,
-      ac: false,
-    });
+  const [highlightsChecked, setHighlightsChecked] = useState<{
+    [key: string]: boolean;
+  }>({
+    gated_society: false,
+    park_nearby: false,
+    market_nearby: false,
+    no_restriction: false,
+    attached_balcony: false,
+    close_to_metro_station: false,
+    newly_built: false,
+    separate_washrooms: false,
+    house_keeping: false,
+    public_transport_nearby: false,
+    gym_nearby: false,
+  });
 
-    const [highlightsChecked, setHighlightsChecked] = useState<{ [key: string]: boolean }>({
-      gated_society: false,
-      park_nearby: false,
-      market_nearby: false,
-      no_restriction: false,
-      attached_balcony: false,
-      close_to_metro_station: false,
-      newly_built: false,
-      separate_washrooms: false,
-      house_keeping: false,
-      public_transport_nearby: false,
-      gym_nearby: false,
-    });
-    
-    const [newAmenity, setNewAmenity] = useState<string[]>([]);
-    const [newHighlight, setNewHighlight] = useState<string[]>([]);
+  const [newAmenity, setNewAmenity] = useState<string[]>([]);
+  const [newHighlight, setNewHighlight] = useState<string[]>([]);
 
-    
-    // updated code for fetching data
-    const [formDataState, setFormDataState] = useState<FormDataState>({
-      property_type: "",
-      lease_term: "",
-      approx_rent: "",
-      pet_policy: "",
-      smoking_policy: "",
-      occupancy: "",
-      looking_for: "", 
-      max_vacancy: "",
-      amenities: [],
-      highlights: [],
-      description: "",
-      images: [],
-    });
+  // updated code for fetching data
+  const [formDataState, setFormDataState] = useState<FormDataState>({
+    property_type: "",
+    lease_term: "",
+    approx_rent: "",
+    pet_policy: "",
+    smoking_policy: "",
+    occupancy: "",
+    looking_for: "",
+    max_vacancy: "",
+    amenities: [],
+    highlights: [],
+    description: "",
+    images: [],
+  });
 
-    useEffect(() => {
-      const fetchUpdateData = async () => {
-        try {
-          setLoading(true)
-          const data = await dispatch(fetchUpdateListingData(token));
-          const latLng = {
-            lat: data.payload.latitude,
-            lng: data.payload.longitude,
-          };
-          setCoordinates(latLng);
-          setAddress(data.payload.location);
-
-          // Update amenitiesChecked based on data from the backend
-          const updatedAmenitiesChecked = { ...amenitiesChecked };
-          data.payload.amenities.forEach((amenity: string) => {
-            if (updatedAmenitiesChecked.hasOwnProperty(amenity)) {
-              updatedAmenitiesChecked[amenity] = true;
-            }
-          });
-          setAmenitiesChecked(updatedAmenitiesChecked);
-
-          // Update highlightsChecked based on data from the backend
-          const updatedHighlightsChecked = { ...highlightsChecked };
-          data.payload.highlights.forEach((highlight: string) => {
-            if (updatedHighlightsChecked.hasOwnProperty(highlight)) {
-              updatedHighlightsChecked[highlight] = true;
-            }
-          });
-          setHighlightsChecked(updatedHighlightsChecked);
-
-          setSelectedFiles(data.payload.image_urls);
-
-          setFormDataState(data.payload);
-
-          setLoading(false)
-        } catch (error) {
-          setLoading(false)
-          console.error("Error fetching data:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchUpdateData();
-    }, [dispatch]);
-
-
-    
-    const initialValues: FormDataState = {
-        property_type: formDataState ? formDataState.property_type : "",
-        lease_term: formDataState ? formDataState.lease_term : "",
-        approx_rent: formDataState ? formDataState.approx_rent : "",
-        max_vacancy: formDataState ? formDataState.max_vacancy: "",
-        pet_policy: formDataState ? formDataState.pet_policy : "",
-        smoking_policy: formDataState ? formDataState.smoking_policy : "",
-        images: [] as any,
-        amenities: [], // Add this line to match FormDataState
-        highlights: [],
-        occupancy: formDataState ? formDataState.occupancy : "",
-        looking_for: formDataState ? formDataState.looking_for : "",
-        description: formDataState ? formDataState.description : "",
-    };
-    
-    
-    const handleSubmit = async (val: FormDataState) => {
-
-        // console.log("<<<",val);
-        
-        const formData = new FormData();
-
-        Object.entries(val).forEach(([key, value]) => {
-          if (
-            key !== "amenities" &&
-            key !== "highlights" &&
-            key !== "images"
-          ) {
-            formData.append(key, value);
-          }
-        });
-
-        // if (val.mobile_visible.length > 0) {
-        //   formData.append("mobile_visible", true);
-        // }
-
-        selectedFiles.forEach((file) => {
-          formData.append("images", file);
-        });
-
-        formData.append("amenities", JSON.stringify(newAmenity.map(Number)));
-        formData.append("highlights", JSON.stringify(newHighlight.map(Number)));
-        formData.append("location", address);
-        if (coordinates.lat && coordinates.lng) {
-          formData.append("latitude", coordinates.lat.toString());
-          formData.append("longitude", coordinates.lng.toString());
-        }
-
-        // formData.append("availability_date", "2024-04-30");
-
-        // for (const [name, value] of formData.entries()) {
-        //   console.log(`<<< ${name}: ${value}`);
-        // }
-        setLoading(true)
-        const res = await dispatch(updatePost({userToken: token , updatedata: formData}))
-        setLoading(false)
-        // console.log("<<<Response: ",res.data);
-    }
-        
-    const handleSelect = async (value: any) => {
-      const results = await geocodeByAddress(value);
-      const latLng = await getLatLng(results[0]);
-      setAddress(results[0].formatted_address);
-      setCoordinates(latLng);
-    };
-    
-    const handleAmenitiesChange = (amenity: any) => {
-        setAmenitiesChecked({
-            ...amenitiesChecked,
-            [amenity]: !amenitiesChecked[amenity]
-        });
-    };
-
-    const handleHighlightsChange = (highlight: any) => {
-      setHighlightsChecked({
-        ...highlightsChecked,
-        [highlight]: !highlightsChecked[highlight],
-      });
-    };
-
-    // Function to update newAmenity based on amenitiesChecked
-    const updateNewAmenity = () => {
-      const updatedNewAmenity: string[] = [];
-      Object.entries(amenitiesChecked).forEach(([key, value]) => {
-        if (value) {
-          const amenityObj = amenitiesData.find(
-            (amenity) => amenity.id === key
-          );
-          if (amenityObj) {
-            updatedNewAmenity.push(amenityObj.value);
-          }
-        }
-      });
-      setNewAmenity(updatedNewAmenity);
-    };
-
-    useEffect(() => {
-      updateNewAmenity();
-    }, [amenitiesChecked]);
-
-    const updateNewHighlight = () => {
-      const updatedNewHighlight: string[] = [];
-      Object.entries(highlightsChecked).forEach(([key, value]) => {
-        if (value) {
-          const highlightObj = highlightsData.find(
-            (highlight) => highlight.id === key
-          );
-          if (highlightObj) {
-            updatedNewHighlight.push(highlightObj.value);
-          }
-        }
-      });
-      setNewHighlight(updatedNewHighlight);
-    };
-
-    useEffect(() => {
-      updateNewHighlight();
-    }, [highlightsChecked]);
-
-    const handleDelete = async () => {
+  useEffect(() => {
+    const fetchUpdateData = async () => {
       try {
-        const response = await axios.delete(`${BASE_URL}/listing/delete`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          },
+        setLoading(true);
+        const data = await dispatch(fetchUpdateListingData(token));
+        const latLng = {
+          lat: data.payload.latitude,
+          lng: data.payload.longitude,
+        };
+        setCoordinates(latLng);
+        setAddress(data.payload.location);
+
+        // Update amenitiesChecked based on data from the backend
+        const updatedAmenitiesChecked = { ...amenitiesChecked };
+        data.payload.amenities.forEach((amenity: string) => {
+          if (updatedAmenitiesChecked.hasOwnProperty(amenity)) {
+            updatedAmenitiesChecked[amenity] = true;
+          }
         });
-        
-        if (response.status === 204) {
-          ToastSuccess("Listing deleted successfully")
-          dispatch(setUserData({is_host: false}))
-          setLoading(true)
-          setTimeout(() => {
-            setLoading(false);
-            router.push('/'); // Redirect to the home page
-          }, 2000)
-        } else {
-          console.error('Failed to delete listing');
-        }
+        setAmenitiesChecked(updatedAmenitiesChecked);
+
+        // Update highlightsChecked based on data from the backend
+        const updatedHighlightsChecked = { ...highlightsChecked };
+        data.payload.highlights.forEach((highlight: string) => {
+          if (updatedHighlightsChecked.hasOwnProperty(highlight)) {
+            updatedHighlightsChecked[highlight] = true;
+          }
+        });
+        setHighlightsChecked(updatedHighlightsChecked);
+
+        setSelectedFiles(data.payload.image_urls);
+
+        setFormDataState(data.payload);
+
+        setLoading(false);
       } catch (error) {
-        console.error('Error occurred:', error);
+        setLoading(false);
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchUpdateData();
+  }, [dispatch]);
+
+  const initialValues: FormDataState = {
+    property_type: formDataState ? formDataState.property_type : "",
+    lease_term: formDataState ? formDataState.lease_term : "",
+    approx_rent: formDataState ? formDataState.approx_rent : "",
+    max_vacancy: formDataState ? formDataState.max_vacancy : "",
+    pet_policy: formDataState ? formDataState.pet_policy : "",
+    smoking_policy: formDataState ? formDataState.smoking_policy : "",
+    images: [] as any,
+    amenities: [], // Add this line to match FormDataState
+    highlights: [],
+    occupancy: formDataState ? formDataState.occupancy : "",
+    looking_for: formDataState ? formDataState.looking_for : "",
+    description: formDataState ? formDataState.description : "",
+  };
+
+  const handleSubmit = async (val: FormDataState) => {
+    const formData = new FormData();
+
+    Object.entries(val).forEach(([key, value]) => {
+      if (key !== "amenities" && key !== "highlights" && key !== "images") {
+        formData.append(key, value);
+      }
+    });
+
+    selectedFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    formData.append("amenities", JSON.stringify(newAmenity.map(Number)));
+    formData.append("highlights", JSON.stringify(newHighlight.map(Number)));
+    formData.append("location", address);
+    if (coordinates.lat && coordinates.lng) {
+      formData.append("latitude", coordinates.lat.toString());
+      formData.append("longitude", coordinates.lng.toString());
+    }
+    setLoading(true);
+    const res = await dispatch(
+      updatePost({ userToken: token, updatedata: formData })
+    );
+    setLoading(false);
+  };
+
+  const handleSelect = async (value: any) => {
+    const results = await geocodeByAddress(value);
+    const latLng = await getLatLng(results[0]);
+    setAddress(results[0].formatted_address);
+    setCoordinates(latLng);
+  };
+
+  const handleAmenitiesChange = (amenity: any) => {
+    setAmenitiesChecked({
+      ...amenitiesChecked,
+      [amenity]: !amenitiesChecked[amenity],
+    });
+  };
+
+  const handleHighlightsChange = (highlight: any) => {
+    setHighlightsChecked({
+      ...highlightsChecked,
+      [highlight]: !highlightsChecked[highlight],
+    });
+  };
+
+  // Function to update newAmenity based on amenitiesChecked
+  const updateNewAmenity = () => {
+    const updatedNewAmenity: string[] = [];
+    Object.entries(amenitiesChecked).forEach(([key, value]) => {
+      if (value) {
+        const amenityObj = amenitiesData.find((amenity) => amenity.id === key);
+        if (amenityObj) {
+          updatedNewAmenity.push(amenityObj.value);
+        }
+      }
+    });
+    setNewAmenity(updatedNewAmenity);
+  };
+
+  useEffect(() => {
+    updateNewAmenity();
+  }, [amenitiesChecked]);
+
+  const updateNewHighlight = () => {
+    const updatedNewHighlight: string[] = [];
+    Object.entries(highlightsChecked).forEach(([key, value]) => {
+      if (value) {
+        const highlightObj = highlightsData.find(
+          (highlight) => highlight.id === key
+        );
+        if (highlightObj) {
+          updatedNewHighlight.push(highlightObj.value);
+        }
+      }
+    });
+    setNewHighlight(updatedNewHighlight);
+  };
+
+  useEffect(() => {
+    updateNewHighlight();
+  }, [highlightsChecked]);
+
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/listing/delete`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.status === 204) {
+        ToastSuccess("Listing deleted successfully");
+        dispatch(setUserData({ is_host: false }));
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+          router.push("/"); // Redirect to the home page
+        }, 2000);
+      } else {
+        console.error("Failed to delete listing");
+      }
+    } catch (error) {
+      console.error("Error occurred:", error);
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -431,7 +412,7 @@ const UpdateList = () => {
                               getSuggestionItemProps,
                               loading,
                             }) => (
-                              <div className='relative'>
+                              <div className="relative">
                                 <input
                                   {...getInputProps({
                                     placeholder: "Type address",
@@ -475,7 +456,6 @@ const UpdateList = () => {
                             name="property_type"
                             className="px-2 block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                           >
-                            
                             <option value="apartment">Apartment</option>
                             <option value="house">House</option>
                             <option value="room">Room</option>
@@ -787,6 +767,6 @@ const UpdateList = () => {
       )}
     </div>
   );
-}
+};
 
 export default UpdateList

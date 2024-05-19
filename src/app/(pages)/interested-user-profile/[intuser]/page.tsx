@@ -6,6 +6,9 @@ import Image from 'next/image';
 import { getCookie } from 'cookies-next';
 import axios from 'axios';
 import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
+import { interestedUserProfile } from '@/store/slice/interestSlice';
+import Loader from '@/components/ui-component/loader';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -26,39 +29,26 @@ interface UserProfile {
 
 const ListProfile = ({ params }: { params: any }) => {
 
-    const [data, setData] = useState<UserProfile | null>(null);
+    const dispatch = useDispatch()
+    const data = useSelector((state: any) => state.interest?.interestedUserProfile)
     const [loading, setLoading] = useState<boolean>(true);
-    const token = getCookie("token");
 
     useEffect(() => {
-      const fetchInterestedUserProfile = async () => {
+      const fetchUserData = async () => {
         try {
-          const response = await axios.get(
-            `${BASE_URL}/listing/interesteduserprofile/${params["intuser"]}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setData(response.data);
-          setLoading(false);
+          await dispatch(interestedUserProfile(params["intuser"]))
+          setLoading(false)
         } catch (error) {
-          setLoading(false);
-          console.error("Error fetching single listing:", error);
+          setLoading(false)
+          console.log("<<<", error);
         }
-      };
-      fetchInterestedUserProfile();
-    });
-    
+      }
+      fetchUserData();
+    }, []);
     
   return (
     <UserLayout>
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
-      ) : (
+      {loading ? <Loader/> : (
         <>
           <div className="flex flex-col sm:flex-row justify-center gap-16 items-center p-8 bg-gray-100 sm:h-[90vh]">
             <Link

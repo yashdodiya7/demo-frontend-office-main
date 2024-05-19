@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { RootState } from "@/types/user";
 import { ToastContainer } from "react-toastify";
 import Logo from "../navbar/Logo";
+import Loader from "../ui-component/loader";
 
 interface RegisterFormValues {
   email: string;
@@ -34,6 +35,7 @@ const RegisterForm: React.FC = () => {
   const state = useSelector((state: RootState) => state.user);
   const router = useRouter();
 
+  // Handle submit for the register form
   const handleSubmit = async (val: RegisterFormValues) => {
     try {
       setLoading(true)
@@ -41,6 +43,7 @@ const RegisterForm: React.FC = () => {
       const response = await dispatch(userRegister(val));
       if (response.payload.message === "registration successfull") {
         // Redirect the user to the home page
+        setLoading(true)
         setSuccess(true);
         router.push("/auth/choice");
       }
@@ -52,6 +55,7 @@ const RegisterForm: React.FC = () => {
     }
   };
 
+  // Formik for the form submission
   const formik = useFormik<RegisterFormValues>({
     initialValues: {
       email: "",
@@ -69,11 +73,7 @@ const RegisterForm: React.FC = () => {
   return (
     <section>
       <ToastContainer />
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
-      ) : (
+      {loading ? <Loader/> : (
         <div className="flex items-center justify-center px-4 py-6 sm:px-6 sm:pb-16 lg:px-8 lg:pb-24">
           <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
             <div className="grid place-items-center mb-4">
@@ -251,7 +251,7 @@ const RegisterForm: React.FC = () => {
                       name="password2"
                       type="password"
                       placeholder="*****"
-                      id="password"
+                      id="password2"
                       className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
                     ></input>
                     {formik.touched.password2 && formik.errors.password2 && (
@@ -263,15 +263,6 @@ const RegisterForm: React.FC = () => {
                     )}
                   </div>
                 </div>
-                {/* {success && <FormMessage serror={false}/>}
-                            {error && <FormMessage serror={error} />} */}
-                {/* <div className="font-[sans-serif] max-w-md mx-auto">
-                                <label className="text-sm text-black mb-2 block">Upload a profile</label>
-                                <input type="file"
-                                    name='profile_image'
-                                    className="w-full text-black text-sm bg-white border file:cursor-pointer cursor-pointer file:border-0 file:py-2.5 file:px-4 file:bg-gray-100 file:hover:bg-gray-200 file:text-black rounded" />
-                                <p className="text-xs text-gray-400 mt-2">PNG, JPG SVG, WEBP are Allowed.</p>
-                            </div> */}
                 <div>
                   <button
                     type="submit"
@@ -282,40 +273,6 @@ const RegisterForm: React.FC = () => {
                 </div>
               </div>
             </form>
-            {/* <div className="mt-3 space-y-3">
-                        <button
-                            type="button"
-                            className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-400 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none"
-                        >
-                            <span className="mr-2 inline-block">
-                                <svg
-                                    className="h-6 w-6 text-rose-500"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                >
-                                    <path d="M20.283 10.356h-8.327v3.451h4.792c-.446 2.193-2.313 3.453-4.792 3.453a5.27 5.27 0 0 1-5.279-5.28 5.27 5.27 0 0 1 5.279-5.279c1.259 0 2.397.447 3.29 1.178l2.6-2.599c-1.584-1.381-3.615-2.233-5.89-2.233a8.908 8.908 0 0 0-8.934 8.934 8.907 8.907 0 0 0 8.934 8.934c4.467 0 8.529-3.249 8.529-8.934 0-.528-.081-1.097-.202-1.625z"></path>
-                                </svg>
-                            </span>
-                            Sign up with Google
-                        </button>
-                        <button
-                            type="button"
-                            className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-400 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none"
-                        >
-                            <span className="mr-2 inline-block">
-                                <svg
-                                    className="h-6 w-6 text-[#2563EB]"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                >
-                                    <path d="M13.397 20.997v-8.196h2.765l.411-3.209h-3.176V7.548c0-.926.258-1.56 1.587-1.56h1.684V3.127A22.336 22.336 0 0 0 14.201 3c-2.444 0-4.122 1.492-4.122 4.231v2.355H7.332v3.209h2.753v8.202h3.312z"></path>
-                                </svg>
-                            </span>
-                            Sign up with Facebook
-                        </button>
-                    </div> */}
           </div>
         </div>
       )}

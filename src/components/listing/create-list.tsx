@@ -19,8 +19,8 @@ import { PostCreationSchema } from "@/schemas/ListingSchema";
 import TextNumberInputField from "../utils/inputs/TextNumberInputField";
 import SelectInputField from "../utils/inputs/SelectInputField";
 import Image from "next/image";
-import { ToastError } from "../utils/custom-error/toast";
 import Logo from "../navbar/Logo";
+import Loader from "../ui-component/loader";
 
 interface Amenity {
   id: string;
@@ -95,7 +95,10 @@ const CreateList = () => {
     lat: null,
     lng: null,
   });
+  // get token from the cookie
+  const token = getCookie("token");
 
+  // amenities checked for the icon management
   const [amenitiesChecked, setAmenitiesChecked] = useState<{
     [key: string]: boolean;
   }>({
@@ -109,8 +112,10 @@ const CreateList = () => {
     washing_machine: false,
     ac: false,
   });
+  // forming a array of the amenities which is selected
   const [newAmenity, setNewAmenity] = useState<string[]>([]);
 
+  // highlights checked for the icon management
   const [highlightsChecked, setHighlightsChecked] = useState<{
     [key: string]: boolean;
   }>({
@@ -126,6 +131,7 @@ const CreateList = () => {
     public_transport_nearby: false,
     gym_nearby: false,
   });
+  // forming a array of the highlights which is selected
   const [newHighlight, setNewHighlight] = useState<string[]>([]);
 
   const initialValues: FormDataValue = {
@@ -143,13 +149,13 @@ const CreateList = () => {
     description: "",
   };
 
+  // for selecting image files
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.currentTarget.files || []);
     setSelectedFiles(files);
   };
 
-  const token = getCookie("token");
-
+  // handle submit for the create listing
   const handleSubmit = async (val: FormDataValue) => {
     try {
       const formData = new FormData();
@@ -168,7 +174,6 @@ const CreateList = () => {
         formData.append("images", file);
       });
 
-      // formData.append("amenities", JSON.stringify(val.amenities.map(Number)));
       formData.append("amenities", JSON.stringify(newAmenity.map(Number)));
       formData.append("highlights", JSON.stringify(newHighlight.map(Number)));
       formData.append("location", address);
@@ -211,6 +216,7 @@ const CreateList = () => {
     });
   };
 
+  // push amenities which is selected to updatedNewAmenity
   const updateNewAmenity = () => {
     const updatedNewAmenity: string[] = [];
     Object.entries(amenitiesChecked).forEach(([key, value]) => {
@@ -228,6 +234,7 @@ const CreateList = () => {
     updateNewAmenity();
   }, [amenitiesChecked]);
 
+  // push amenities which is selected to updatedNewHighlight
   const updateNewHighlight = () => {
     const updatedNewHighlight: string[] = [];
     Object.entries(highlightsChecked).forEach(([key, value]) => {
@@ -247,6 +254,7 @@ const CreateList = () => {
     updateNewHighlight();
   }, [highlightsChecked]);
 
+  // Handle select for the getting location
   const handleSelect = async (value: any) => {
     const results = await geocodeByAddress(value);
     const latLng = await getLatLng(results[0]);
@@ -256,6 +264,7 @@ const CreateList = () => {
     setCoordinates(latLng);
   };
 
+  // Rendering a images for the preview
   const renderImagePreviews = () => {
     return selectedFiles.map((file, index) => {
       // Render newly selected file with remove button
@@ -276,11 +285,7 @@ const CreateList = () => {
   return (
     <div>
       <ToastContainer />
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
-      ) : (
+      {loading ? <Loader/> : (
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
@@ -299,8 +304,6 @@ const CreateList = () => {
                     <h2 className="text-base font-semibold leading-7 text-gray-900">
                       Add a POST
                     </h2>
-                    {/* <p className="mt-1 text-sm leading-6 text-gray-600">Add Choices based on your Preferences</p> */}
-
                     <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                       <div className="sm:col-span-2">
                         <label

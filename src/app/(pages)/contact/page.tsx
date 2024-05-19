@@ -36,7 +36,6 @@ export default function ContactPageOne() {
     } finally {
       formik.resetForm();
     }
-    // console.log(status);
   };
 
   const formik = useFormik({

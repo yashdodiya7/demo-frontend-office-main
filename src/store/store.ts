@@ -16,6 +16,7 @@ import {
 } from "redux-persist";
   
 import storage from "redux-persist/lib/storage";
+import interestSlice from "./slice/interestSlice";
 
 const persistConfig = {
   key: "root",
@@ -29,6 +30,7 @@ const store = configureStore({
   reducer: {
     user: persistedReducer,
     list: listingSlice,
+    interest: interestSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

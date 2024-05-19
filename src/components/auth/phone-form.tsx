@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 import Link from "next/link";
 import Logo from "../navbar/Logo";
-import { ToastError } from "../utils/custom-error/toast";
+import Loader from "../ui-component/loader";
 
 const PhoneNumberField = () => {
   const router = useRouter();
@@ -23,13 +23,12 @@ const PhoneNumberField = () => {
   const state = useSelector((state: any) => state.user);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Handler for phone number submission
   const handlePhoneSubmit = async (val: any) => {
     setLoading(true);
     try {
       val.phone_number = "+91" + val.phone_number;
       const response = await dispatch(phoneVerify(val));
-      console.log(response.payload);
-
       if (response.payload.session_token) {
         setLoading(false);
         await dispatch(setPhoneNumber({ phone_no: val.phone_number }));
@@ -42,6 +41,7 @@ const PhoneNumberField = () => {
     }
   };
 
+  // Handler for OTP submission
   const handleOtpSubmit = async (val: any) => {
     setLoading(true);
     val.session_token = state.otp_session_id;
@@ -49,7 +49,6 @@ const PhoneNumberField = () => {
 
     try {
       const response = await dispatch(otpVerify(val));
-
       if (response.payload.security_code) {
         setLoading(false);
         dispatch(setOtpSessionId());
@@ -63,6 +62,7 @@ const PhoneNumberField = () => {
     }
   };
 
+  // Formik setup for phone number form
   const phoneFormik = useFormik({
     initialValues: {
       phone_number: "",
@@ -71,6 +71,7 @@ const PhoneNumberField = () => {
     onSubmit: handlePhoneSubmit,
   });
 
+  // Formik setup for OTP form
   const otpFormik = useFormik({
     initialValues: {
       security_code: "",
@@ -82,10 +83,8 @@ const PhoneNumberField = () => {
   return (
     <section>
       <ToastContainer />
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
+      {loading ? (
+        <Loader />
       ) : (
         <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
           <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
@@ -169,7 +168,7 @@ const PhoneNumberField = () => {
                       value={otpFormik.values.security_code}
                       onChange={otpFormik.handleChange}
                       className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                      type="number"
+                      type="text"
                       placeholder="123456"
                     ></input>
                     {otpFormik.touched.security_code &&

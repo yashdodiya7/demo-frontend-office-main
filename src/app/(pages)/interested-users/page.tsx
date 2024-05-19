@@ -1,13 +1,16 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import UserLayout from '../UserLayout'
-import axios from 'axios';
-import { getCookie } from 'cookies-next';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ToastSuccess } from '@/components/utils/custom-error/toast';
-import { ToastContainer } from 'react-toastify';
+import React, { useEffect, useState } from "react";
+import UserLayout from "../UserLayout";
+import axios from "axios";
+import { getCookie } from "cookies-next";
+import Image from "next/image";
+import Link from "next/link";
+import { ToastSuccess } from "@/components/utils/custom-error/toast";
+import { ToastContainer } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchInterestedUsers, makeDeal } from "@/store/slice/interestSlice";
+import Loader from "@/components/ui-component/loader";
 
 interface InterestedUser {
   id: number;
@@ -30,81 +33,66 @@ interface User {
   profile_image: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const InterestedUsers = () => {
+  const dispatch = useDispatch();
+  const userToken = getCookie("token");
 
-    const userToken = getCookie('token')
+  const interestedUsers = useSelector((state: any) => state.interest?.interstedUsers)
+  const [loading, setLoading] = useState(true);
+  const [refreshData, setRefreshData] = useState(false);
 
-    const [interestedUsers, setInterestedUsers] = useState<InterestedUser[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [refreshData, setRefreshData] = useState(false);
-
-    useEffect(() => {
-      const fetchInterestedUsers = async () => {
-        try {
-          const response = await axios.get(`${BASE_URL}/listing/interestedusers`, {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          });
-          console.log(response.data)
-          setInterestedUsers(response.data);
-          setLoading(false);
-        } catch (error) {
-          console.error("Error fetching interested users:", error);
-          setLoading(false);
-        }
-      };
-
-      fetchInterestedUsers();
-    }, [refreshData, userToken]);
-
-    const handleMakeDeal = async (listingId: number, userId: number) => {
+  useEffect(() => {
+    const getInterestedUsers = async () => {
       try {
-          const response = await axios.post(
-              `${BASE_URL}/listing/make-deal`,
-              { listingId, userId },
-              {
-                  headers: {
-                      Authorization: `Bearer ${userToken}`,
-                  },
-              }
-          );
-          setRefreshData(prev => !prev);
-          ToastSuccess(response.data.success);
-          // Handle success, e.g., show a success message
+        await dispatch(fetchInterestedUsers())
+        setLoading(false);
       } catch (error) {
-          console.error("<<<Error making deal:", error);
-          // Handle error, e.g., show an error message
+        console.error("Error fetching interested users:", error);
+        setLoading(false);
       }
     };
+    getInterestedUsers();
+  }, [refreshData]);
+
+  const handleMakeDeal = async (listingId: number, userId: number) => {
+    try {
+      const response = await dispatch(makeDeal({ listingId, userId }));
+      setRefreshData((prev) => !prev);
+      ToastSuccess(response?.payload?.success);
+    } catch (error) {
+      console.error("Error making deal:", error);
+      // Handle error, e.g., show an error message
+    }
+  };
 
   return (
     <UserLayout>
       <ToastContainer />
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
-      ) : (
+      {loading ? <Loader/> : (
         <div className="flex flex-col mb-12 mt-8 mx-12">
           <h3 className="text-center text-m=lg font-bold uppercase text-stone-800 mb-4">
             Interested users
           </h3>
           {interestedUsers.length === 0 ? ( // Conditional rendering for no interested users
             <div className="flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
-              <Image
-              src={"https://res.cloudinary.com/dxwxpfxgi/image/upload/v1715514165/tnbdbmrvt2mfmwtpvr1g.png" || ""}
-              width={1000}
-              height={1000}
-              alt='no Data'
-              className='object-cover w-full h-full'
-              />
-              <p className="text-lg text-gray-800 mt-4 font-mono font-bold">No one is interested at the moment.</p>
+              <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
+                <Image
+                  src={
+                    "https://res.cloudinary.com/dxwxpfxgi/image/upload/v1715514165/tnbdbmrvt2mfmwtpvr1g.png" ||
+                    ""
+                  }
+                  width={1000}
+                  height={1000}
+                  alt="no Data"
+                  className="object-cover w-full h-full"
+                />
+                <p className="text-lg text-gray-800 mt-4 font-mono font-bold">
+                  No one is interested at the moment.
+                </p>
+              </div>
             </div>
-          </div>
           ) : (
             <div className="-m-1.5 overflow-x-auto">
               <div className="p-1.5 min-w-full inline-block align-middle">
@@ -139,7 +127,7 @@ const InterestedUsers = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {interestedUsers.map((user) => (
+                      {interestedUsers.map((user: any) => (
                         <tr key={user.id}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                             <div className="flex items-center">
@@ -222,6 +210,6 @@ const InterestedUsers = () => {
       )}
     </UserLayout>
   );
-}
+};
 
-export default InterestedUsers
+export default InterestedUsers;

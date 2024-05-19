@@ -10,7 +10,13 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const createPost = createAsyncThunk(
   "createPost",
-  async ({ userToken, updatedata }: {userToken: string, updatedata: Object}) => {
+  async ({
+    userToken,
+    updatedata,
+  }: {
+    userToken: string;
+    updatedata: Object;
+  }) => {
     try {
       const createPost = await axios.post(
         `${BASE_URL}/listing/create`,
@@ -34,7 +40,13 @@ export const createPost = createAsyncThunk(
 
 export const updatePost = createAsyncThunk(
   "updatePost",
-  async ({ userToken, updatedata }: {userToken: string, updatedata: Object}) => {
+  async ({
+    userToken,
+    updatedata,
+  }: {
+    userToken: string;
+    updatedata: Object;
+  }) => {
     try {
       const updatePost = await axios.patch(
         `${BASE_URL}/listing/update`,

@@ -9,8 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { userLogin, getUserProfile } from "@/store/slice/authSlice";
 import FormMessage from "../ui-component/message";
 import { useRouter } from "next/navigation";
-import { Console } from "console";
 import Logo from "../navbar/Logo";
+import Loader from "../ui-component/loader";
 
 interface formValue {
   email: string;
@@ -23,12 +23,12 @@ function LoginForm() {
   const dispatch = useDispatch();
   const router = useRouter();
 
+  // Handle submit for the login form
   const handleSubmit = async (val: formValue) => {
     try {
       setLoading(true);
       const response = await dispatch(userLogin(val));
-      const userToken = response.payload.tokens.access;
-      // console.log(userToken);
+      const userToken = response?.payload?.tokens?.access;
 
       if (response.payload && response.payload.message === "Login success") {
         // Redirect the user to the home page
@@ -43,6 +43,7 @@ function LoginForm() {
     }
   };
 
+  // login form formik handler instance
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -54,11 +55,7 @@ function LoginForm() {
 
   return (
     <section>
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
-      ) : (
+      {loading ? <Loader/> : (
       <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
         <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
           <div className="grid place-items-center mb-6">

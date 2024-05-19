@@ -101,7 +101,7 @@ function HomePage() {
       }
 
       if (searchQuery.trim() !== "") {
-        setLoading(true); // Set loading state to true while fetching data
+        setLoading(true);
         try {
           const response = await axios.get(`${BASE_URL}/listing/listsearch`, {
             params: {

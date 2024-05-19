@@ -39,13 +39,11 @@ export const otpVerify = createAsyncThunk("otpVerify", async (val: any) => {
   } catch (error: any) {
 
     if (error.response?.data?.non_field_errors) {
-        console.log("<<<", error.response?.data?.non_field_errors[0])
-        ToastError(error.response?.data?.non_field_errors[0]);
+      ToastError(error.response?.data?.non_field_errors[0]);
     } else {
-        console.log("<<<", error.response?.data?.error)
-        ToastError(error.response?.data?.error);
+      ToastError(error.response?.data?.error);
     }
-    
+
     throw error.response;
   }
 });
@@ -77,7 +75,6 @@ export const userPreference = createAsyncThunk(
           },
         }
       );
-      console.log(createUserPreference.data);
       return createUserPreference.data;
     } catch (error: any) {
       console.log(error.response);
