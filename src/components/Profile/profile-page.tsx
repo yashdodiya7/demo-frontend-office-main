@@ -21,6 +21,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Loader from "../ui-component/loader";
+import { ToastSuccess } from "../utils/custom-error/toast";
 
 const ProfileComponent: React.FC = () => {
   const dispatch = useDispatch();
@@ -44,23 +45,6 @@ const ProfileComponent: React.FC = () => {
     };
     fetchUserProfile();
   }, [token, dispatch]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // useEffect(() => {
-  //   // Update form values when userData changes
-  //   if (userData) {
-  //     formik.setValues({
-  //       name: userData?.name || "",
-  //       phone_no: userData?.phone_no || "",
-  //       email: userData?.email || "",
-  //       profile_image: userData?.profile_image || null,
-  //       bio: userData?.bio || "",
-  //       gender: userData?.gender || "",
-  //       occupation: userData?.occupation || "",
-  //       age: userData?.age || "",
-  //     });
-  //   }
-  // }, [dispatch, token]);
 
   // for update a user profile
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,6 +131,7 @@ const ProfileComponent: React.FC = () => {
         setUpdateContact(false);
         dispatch(setPhoneNumber({ phone_no: val.phone_number }));
         dispatch(setUserData({ phone_no: val.phone_number }));
+        ToastSuccess("Phone Number Updated Successfully")
         router.push("/");
         dispatch(setOtpSessionId());
       }

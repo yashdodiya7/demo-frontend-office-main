@@ -8,6 +8,7 @@ import { getCookie } from "cookies-next";
 import Link from "next/link";
 import axios from "axios";
 import { Footer } from "../footer";
+import Loader from "../ui-component/loader";
 
 const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
@@ -76,8 +77,6 @@ function HomePage() {
     // Call function to get user's location
     getUserLocation();
   }, [dispatch, stateUser, token, currentPage]);
-
-  
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -171,19 +170,11 @@ function HomePage() {
     getUserLocation();
   };
 
-  const fetchInitialListings = async (page = 1) => {
-    try {
-      const response = await dispatch(fetchListing({ userToken: token, page }));
-      setTotalPages(response?.payload?.total_pages);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching listings:", error);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (selectedGender != "") {
+    if (selectedGender) {
+      handleSearch()
+    }
+    else if (selectedGender == "all") {
       handleSearch()
     }
   }, [selectedGender])  
@@ -191,11 +182,7 @@ function HomePage() {
   return (
     <div className="w-full" suppressHydrationWarning>
       {/* Features Section */}
-      {loading ? ( // Show loader if loading is true
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-        </div>
-      ) : (
+      {loading ? <Loader/> : (
         <div className="mx-auto my-10 max-w-7xl px-2">
           <div className="flex justify-between items-baseline flex-col sm:flex-row">
             <div className="relative mt-4 w-full sm:w-[30%]">
@@ -242,7 +229,7 @@ function HomePage() {
                 }}
                 className="p-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-stone-500 focus:border-stone-500"
               >
-                <option value="">Looking For</option>
+                <option value="all">Looking For</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>

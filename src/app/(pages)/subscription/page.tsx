@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserProfile } from "@/store/slice/authSlice";
 import PremiumCard from "@/components/subscription/premium-card";
 import BasicCard from "@/components/subscription/basic-card";
+import Loader from "@/components/ui-component/loader";
 
 const BASE_URL: string = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 const publicKey: string = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || "";
@@ -123,11 +124,7 @@ const Payment: React.FC = () => {
   
   return (
     <UserLayout>
-      {loading ? ( // Show loader if loading is true
-          <div className="flex items-center justify-center h-screen">
-              <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-stone-700"></div>
-          </div>
-      ) : (
+      {loading ? <Loader/> : (
       <div className="flex justify-center items-center max-h-screen">
         <div className="grid lg:grid-cols-2 px-8 gap-10 text-stone-800 my-12">
           <div className="flex flex-col items-center bg-slate-100 p-8 rounded-lg shadow-lg max-w-sm overflow-hidden">

@@ -68,8 +68,6 @@ interface FormDataState {
   images: string[];
 }
 
-type FormDataStateWithoutAmenitiesAndHighlights = Omit<FormDataState, "amenities" | "highlights">;
-
 interface Coordinates {
   lat: number | null;
   lng: number | null;

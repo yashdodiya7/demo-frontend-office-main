@@ -17,7 +17,6 @@ const protectedRoutesNotLoggedIn = [
 ]
 
 const protectedRoutesNotPaid = [
-	'/interested-user-profile',
 	'/listprofile',
 	'/mydeal',
 ]
@@ -34,7 +33,7 @@ const allProtectedRoutes = [...protectedRoutesNotLoggedIn, ...protectedRoutesNot
 export async function middleware(req: NextRequest) {
 
 	const res = NextResponse.next()
-	//retrive user token and role
+	//retrive user token and status
 	const isLoginUser = getCookie('token', { req, res })
 	const isPaidUser = getCookie('is_paid', { req, res })
 	const confirmedDeal = getCookie('confirmed_deal', { req, res })

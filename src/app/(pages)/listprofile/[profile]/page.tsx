@@ -6,12 +6,7 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleListingUserProfile } from "@/store/slice/listingSlice";
 import { getCookie } from "cookies-next";
-import axios from "axios";
 import { ToastContainer } from "react-toastify";
-import {
-  ToastError,
-  ToastSuccess,
-} from "@/components/utils/custom-error/toast";
 import Link from "next/link";
 import Loader from "@/components/ui-component/loader";
 import { handleInterestedButton } from "@/store/slice/interestSlice";
@@ -69,13 +64,9 @@ const ListProfile = ({ params }: { params: any }) => {
     try {
       setButtonLoading(true);
       const res = await dispatch(handleInterestedButton(Number(params['profile'])))
-      // if (res.status == 201) {
-      //   ToastSuccess("Successfully Interested");
-      // }
       setButtonLoading(true);
       // If API call is successful, you can add further actions here if needed
     } catch (error: any) {
-      // ToastError(error?.response?.data?.error);
       setButtonLoading(false);
       console.error("Error marking as interested:", error);
     } finally {

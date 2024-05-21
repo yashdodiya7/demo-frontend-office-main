@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import UserLayout from "../UserLayout";
-import axios from "axios";
-import { getCookie } from "cookies-next";
 import Image from "next/image";
 import Link from "next/link";
 import { ToastSuccess } from "@/components/utils/custom-error/toast";
@@ -33,11 +31,8 @@ interface User {
   profile_image: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
 const InterestedUsers = () => {
   const dispatch = useDispatch();
-  const userToken = getCookie("token");
 
   const interestedUsers = useSelector((state: any) => state.interest?.interstedUsers)
   const [loading, setLoading] = useState(true);

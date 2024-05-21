@@ -385,8 +385,6 @@ const CreateList = () => {
                         </div>
                       </div>
 
-                      {/* <SelectInputField initialValue="apartment" name="Property Type" value="property_type" options={["apartment", "house", "room"]}/> */}
-
                       <div className="sm:col-span-2">
                         <label
                           htmlFor="lease_term"
@@ -409,8 +407,6 @@ const CreateList = () => {
                           />
                         </div>
                       </div>
-
-                      {/* <TextNumberInputField name="Lease Term" type="number" value="lease_term" placeholder="11"/> */}
 
                       <div className="sm:col-span-2">
                         <label

@@ -3,14 +3,11 @@
 import React, { useEffect, useState } from 'react'
 import UserLayout from '../../UserLayout'
 import Image from 'next/image';
-import { getCookie } from 'cookies-next';
-import axios from 'axios';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { interestedUserProfile } from '@/store/slice/interestSlice';
 import Loader from '@/components/ui-component/loader';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 interface UserProfile {
   name: string;

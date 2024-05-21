@@ -48,8 +48,6 @@ const MyInterests = () => {
 
   const [interestedUsers, setInterestedUsers] = useState<ListingInterest[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  // const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-  // const [isRequestPending, setIsRequestPending] = useState<boolean>(false);
   const [confirmationSuccess, setConfirmationSuccess] = useState<boolean>(false);
   const [buttonLoadingId, setButtonLoadingId] = useState<number | null>(null);
   const dispatch = useDispatch();
@@ -73,7 +71,6 @@ const MyInterests = () => {
   const handlePay = async (listingId: number) => {
     try {
       setButtonLoadingId(listingId);
-      // setIsRequestPending(true)
       const response = await dispatch(handlePaymentInterestedListing(listingId));
       const sessionId: string = response.payload?.sessionId;
 
@@ -81,13 +78,11 @@ const MyInterests = () => {
 
       if (stripe) {
         const result = await stripe.redirectToCheckout({ sessionId });
-        // setIsRequestPending(false)
         if (result.error) {
           console.error("Error redirecting to checkout:", result.error);
         }
       }
     } catch (error) {
-      // setIsRequestPending(false)
       console.error("Error fetching session ID:", error);
     } finally {
       setButtonLoadingId(null); // Reset button loading state after completion
@@ -116,10 +111,7 @@ const MyInterests = () => {
     } catch (error: any) {
       // Handle error
       ToastError(error?.response?.data?.error);
-      // If there's an error, enable the button again to allow retry
-      // setIsButtonDisabled(false);
     } finally {
-      // setIsRequestPending(false);
       setButtonLoadingId(null);
     }
   };

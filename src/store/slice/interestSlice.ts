@@ -138,8 +138,8 @@ const interestSlice = createSlice({
   initialState,
   reducers: {
     logoutInterest: (state: any) => {
-      state.interestedUserProfile = null
-      state.interstedUsers = null
+      state.interestedUserProfile = {}
+      state.interstedUsers = []
     },
   },
   extraReducers: (builder: any) => {

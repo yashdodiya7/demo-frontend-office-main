@@ -20,9 +20,11 @@ const MenuItem = ({ label, to }: MenuItemProps) => {
     const router = useRouter()
     const dispatch = useDispatch()
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         deleteCookie('token')
-        dispatch(logoutInterest())
+        deleteCookie('is_paid')
+        deleteCookie('confirmed_deal')
+        await dispatch(logoutInterest())
         dispatch(logout())
         router.push('/')
     }

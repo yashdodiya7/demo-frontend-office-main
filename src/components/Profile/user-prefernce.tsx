@@ -29,13 +29,6 @@ interface userPreferences {
   wanderer: boolean;
 }
 
-// const userPreferencesArray = [
-//   {
-//     name: "pet_lover",
-//     value: "Pet Lover",
-//   },
-// ];
-
 const UserChoice = () => {
   const token = getCookie("token");
   const [preferences, setPreferences] = useState<userPreferences>({
@@ -85,9 +78,6 @@ const UserChoice = () => {
       const response = await dispatch(
         updateUserPreference({ userToken: token, val: payload })
       );
-      // if (response.payload) {
-      // Redirect the user to the home page
-      // }
     } catch (error) {
       throw error;
     } finally {
@@ -106,13 +96,6 @@ const UserChoice = () => {
       [preference]: !preferences[preference],
     });
   };
-
-//   const truePreferences = Object?.entries(preferences).filter(
-//     ([key, value]) => value === true
-//   );
-//   const falsePreferences = Object?.entries(preferences).filter(
-//     ([key, value]) => value === false
-//   );
 
   return (
     <Formik initialValues={preferences} onSubmit={handleSubmit}>
@@ -133,42 +116,6 @@ const UserChoice = () => {
                     Please select at least four preferences.
                   </p>
                 )}
-
-                {/* <hr className="my-10" /> */}
-
-                {/* <div className="mx-auto flex items-start justify-center gap-24">
-                  <div className="mb-8">
-                    <h3 className="text-lg font-semibold mb-2">
-                      Selected Preferences
-                    </h3>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      {truePreferences.map(([key]) => (
-                        <p key={key}>
-                          <span className="px-2 py-1 rounded bg-green-500 text-white">
-                            {key.replace(/_/g, " ")}
-                          </span>
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">
-                      Unselected Preferences
-                    </h3>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      {falsePreferences.map(([key]) => (
-                        <p key={key}>
-                          <span className="px-2 py-1 rounded bg-red-500 text-white">
-                            {key.replace(/_/g, " ")}
-                          </span>
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                </div> */}
-
-                {/* <hr className="my-10" /> */}
 
                 <div className="mt-12 mx-auto">
                   <div className="flex items-baseline justify-center">

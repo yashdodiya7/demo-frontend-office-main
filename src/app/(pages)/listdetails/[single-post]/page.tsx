@@ -97,7 +97,6 @@ const SingleDetails = ({ params }: { params: any }) => {
       router.push(`/listprofile/${params["single-post"]}`); // Redirect if user is paid and has token
     }
   };
-  // console.log(data);
 
   return (
     <UserLayout>
@@ -126,7 +125,6 @@ const SingleDetails = ({ params }: { params: any }) => {
               <p className="text-sm text-gray-600 mb-2">
                 {data?.user_occupation}
               </p>
-              {/* <p className="text-sm text-gray-600">{data?.user_gender}</p> */}
                 <button
                     onClick={handleLinkClick}
                     className="px-12 mt-4 rounded-md bg-stone-700 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-800"
