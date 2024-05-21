@@ -19,7 +19,7 @@ const Navbar: React.FC<NavbarProps> = () => {
     }, [userState?.confirm_deal, userState?.is_verified, userState?.is_host, userState?.is_paid])
 
     return (
-        <div className="w-full bg-white shadow-sm sticky top-0 z-50">
+        <div className="w-full bg-white shadow-sm sticky top-0 z-50" suppressHydrationWarning>
             <div className="py-4 border-b-[1px]">
                 <Container>
                     <div className="flex flex-row items-center justify-between">

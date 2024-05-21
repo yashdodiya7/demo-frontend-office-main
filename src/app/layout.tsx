@@ -18,11 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBLeAvWMxpPVw2yRJgz1xN-EkNeGFhxt1E&libraries=places&callback=initMap' async></script>
       </head>
-      <body className={inter.className} suppressHydrationWarning={true}>
+      <body className={inter.className} suppressHydrationWarning>
         <Provider store={store}>
           {children}
         </Provider>

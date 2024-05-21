@@ -107,7 +107,7 @@ const ProfileComponent: React.FC = () => {
   const formik = useFormik({
     initialValues: {
       name: `${userData?.name}`,
-      phone_no: `${state.phone_no}`,
+      phone_no: `${state.phone_no !== null ? state.phone_no : userData?.phone_no}`,
       email: `${userData?.email}`,
       bio: `${userData?.bio}`,
       profile_image: `${userData?.profile_image || ""}`,

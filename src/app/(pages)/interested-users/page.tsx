@@ -172,7 +172,7 @@ const InterestedUsers = () => {
                                 }
                                 className="mr-2 inline-flex items-center text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                               >
-                                "Make a Deal"
+                                Make a Deal
                               </button>
                             )}
 
@@ -182,13 +182,6 @@ const InterestedUsers = () => {
                             >
                               View Profile
                             </Link>
-
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                            >
-                              Delete
-                            </button>
                           </td>
                         </tr>
                       ))}

@@ -39,7 +39,7 @@ function LoginForm() {
       setLoading(false);
       throw error;
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   };
 

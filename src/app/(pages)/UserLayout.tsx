@@ -19,7 +19,7 @@ export default function UserLayout({
 }>) {
   return (
     <>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen" suppressHydrationWarning={true}>
         <Navbar />
         {children}
       </div>

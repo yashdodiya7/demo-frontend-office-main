@@ -189,7 +189,7 @@ function HomePage() {
   }, [selectedGender])  
 
   return (
-    <div className="w-full">
+    <div className="w-full" suppressHydrationWarning>
       {/* Features Section */}
       {loading ? ( // Show loader if loading is true
         <div className="flex items-center justify-center h-screen">
