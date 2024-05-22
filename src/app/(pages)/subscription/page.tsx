@@ -147,7 +147,7 @@ const Payment: React.FC = () => {
               </p>
               <div className="flex justify-center mt-8">
                 <button
-                  className="border px-4 py-2 border-violet-400 border-4 hover:bg-violet-100 rounded-xl"
+                  className="px-4 py-2 border-violet-400 border-4 hover:bg-violet-100 rounded-xl"
                   onClick={handleBasicPlanClick}
                 >
                   Get Started
