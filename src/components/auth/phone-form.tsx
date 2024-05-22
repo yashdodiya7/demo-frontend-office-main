@@ -23,17 +23,22 @@ const PhoneNumberField = () => {
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.user);
   const [loading, setLoading] = useState<boolean>(false);
+  const [phoneState, setPhoneState] = useState<any>({
+    phone_number: "",
+  })
 
   // Handler for phone number submission
   const handlePhoneSubmit = async (val: any) => {
+    setPhoneState(val)
     setLoading(true);
     try {
-      val.phone_number = "+91" + val.phone_number;
+      // val.phone_number = "+91" + val.phone_number;
       const response = await dispatch(phoneVerify(val));
       if (response.payload.session_token) {
         setLoading(false);
         await dispatch(setPhoneNumber({ phone_no: val.phone_number }));
       }
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       throw error;
@@ -65,9 +70,7 @@ const PhoneNumberField = () => {
 
   // Formik setup for phone number form
   const phoneFormik = useFormik({
-    initialValues: {
-      phone_number: "",
-    },
+    initialValues: phoneState,
     validationSchema: phoneVerifySchema,
     onSubmit: handlePhoneSubmit,
   });
@@ -125,14 +128,14 @@ const PhoneNumberField = () => {
                       value={phoneFormik.values.phone_number}
                       onChange={phoneFormik.handleChange}
                       className="flex h-10 w-full rounded-md border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
-                      type="number"
-                      placeholder="6353355965"
+                      type="text"
+                      placeholder="+911234567890"
                     ></input>
                     {phoneFormik.touched.phone_number &&
                       phoneFormik.errors.phone_number && (
                         <p className="mt-2 text-sm text-red-600 dark:text-red-500">
                           <span className="font-medium">
-                            {phoneFormik.errors.phone_number}
+                            {typeof phoneFormik.errors.phone_number === 'string' && phoneFormik.errors.phone_number}
                           </span>
                         </p>
                       )}

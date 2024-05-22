@@ -91,7 +91,7 @@ const ProfileComponent: React.FC = () => {
   const formik = useFormik({
     initialValues: {
       name: `${userData?.name}`,
-      phone_no: `${state.phone_no !== null ? state.phone_no : userData?.phone_no}`,
+      phone_no: `${userData?.phone_no}`,
       email: `${userData?.email}`,
       bio: `${userData?.bio}`,
       profile_image: `${userData?.profile_image || ""}`,
@@ -107,7 +107,7 @@ const ProfileComponent: React.FC = () => {
   const handlePhoneSubmit = async (values: any) => {
     try {
       setLoading(true);
-      values.phone_number = "+91" + values.phone_number;
+      // values.phone_number = "+91" + values.phone_number;
       const response = await dispatch(phoneVerify(values));
       setLoading(false);
 
@@ -132,7 +132,6 @@ const ProfileComponent: React.FC = () => {
         dispatch(setPhoneNumber({ phone_no: val.phone_number }));
         dispatch(setUserData({ phone_no: val.phone_number }));
         ToastSuccess("Phone Number Updated Successfully")
-        router.push("/");
         dispatch(setOtpSessionId());
       }
     } catch (error) {
@@ -225,12 +224,6 @@ const ProfileComponent: React.FC = () => {
               <p className="text-gray-600 text-center font-light sm:px-16">
                 {userData?.bio}
               </p>
-
-              {/* <button
-                        className="text-indigo-500 py-2 px-4  font-medium mt-4"
-                    >
-                        Show more
-                    </button> */}
             </div>
 
             {/* user profile updation form */}
@@ -464,7 +457,7 @@ const ProfileComponent: React.FC = () => {
                         value={phoneFormik.values.phone_number}
                         onChange={phoneFormik.handleChange}
                         className="flex-1 block w-full px-3 py-2 border-gray-300 rounded-md shadow-sm focus:ring-stone-500 focus:border-stone-500 sm:text-sm"
-                        type="tel"
+                        type="text"
                         placeholder="Enter your phone number"
                       />
                     </div>

@@ -6,9 +6,10 @@ import {
 } from "@/components/utils/custom-error/toast";
 import { UserState } from "@/types/user";
 import { RootState } from "@reduxjs/toolkit/query";
-import { deleteCookie, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const token = getCookie('token')
 
 export const phoneVerify = createAsyncThunk(
   "phoneVerify",
@@ -30,9 +31,20 @@ export const phoneVerify = createAsyncThunk(
 
 export const otpVerify = createAsyncThunk("otpVerify", async (val: any) => {
   try {
+    let headers;
+    if (token) {
+      headers = {
+        Authorization: `Bearer ${token}`,
+      }
+    } else {
+      headers = {}
+    }
     const otpVerify = await axios.post(
       `${BASE_URL}/verify/phone/verify_and_register`,
-      val
+      val,
+      {
+        headers: headers,
+      }
     );
     ToastSuccess("OTP Verified");
     return otpVerify.data;
@@ -211,7 +223,6 @@ const authSlice = createSlice({
     },
     setPhoneNumber: (state: any, action: any) => {
       const { phone_no } = action.payload; // Extract phone number from payload
-      console.log
       state.phone_no = phone_no; // Update state with the new phone number
     },
     setOtpSessionId: (state: any) => {

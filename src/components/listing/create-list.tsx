@@ -5,7 +5,7 @@ import { createPost } from "@/store/slice/listingSlice";
 import { getCookie } from "cookies-next";
 import { ErrorMessage, Field, FieldArray, Formik } from "formik";
 import { useRouter } from "next/navigation";
-import React, { FormEventHandler, useEffect, useState } from "react";
+import React, { FormEventHandler, useCallback, useEffect, useMemo, useState } from "react";
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
@@ -133,8 +133,7 @@ const CreateList = () => {
   });
   // forming a array of the highlights which is selected
   const [newHighlight, setNewHighlight] = useState<string[]>([]);
-
-  const initialValues: FormDataValue = {
+  const [intial,setinit] = useState<any>({
     property_type: "apartment",
     lease_term: "",
     approx_rent: "",
@@ -147,7 +146,22 @@ const CreateList = () => {
     amenities: [],
     highlights: [],
     description: "",
-  };
+  })
+
+  const initialValues = useMemo(() => ({
+    property_type: "apartment",
+    lease_term: "",
+    approx_rent: "",
+    pet_policy: "allowed",
+    smoking_policy: "allowed",
+    images: [] as any,
+    occupancy: "single",
+    max_vacancy: "",
+    looking_for: "male",
+    amenities: [],
+    highlights: [],
+    description: "",
+  }), []);
 
   // for selecting image files
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,16 +170,13 @@ const CreateList = () => {
   };
 
   // handle submit for the create listing
-  const handleSubmit = async (val: FormDataValue, formikHelpers: any) => {
+  const handleSubmit = async (val: FormDataValue) => {
     try {
+      setinit(val)
       const formData = new FormData();
 
       Object.entries(val).forEach(([key, value]) => {
-        if (
-          key !== "amenities" &&
-          key !== "highlights" &&
-          key !== "images"
-        ) {
+        if (key !== "amenities" && key !== "highlights" && key !== "images") {
           formData.append(key, value);
         }
       });
@@ -191,38 +202,33 @@ const CreateList = () => {
 
       if (res?.payload?.message === "Post Created") {
         dispatch(setUserData({ is_host: true }));
-        setTimeout(() => {
-          router.push("/");
-          setLoading(false);
-        }, 1000);
+        router.push("/");
       }
       
     } catch (error) {
       console.error("<<<An error occurred:", error);
       setLoading(false);
-      formikHelpers.setSubmitting(false);
     } finally {
       setLoading(false);
-      formikHelpers.setSubmitting(false);
     }
   };
 
-  const handleAmenitiesChange = (amenity: any) => {
-    setAmenitiesChecked({
-      ...amenitiesChecked,
-      [amenity]: !amenitiesChecked[amenity],
-    });
-  };
+  const handleAmenitiesChange = useCallback((amenity: any) => {
+    setAmenitiesChecked((prevState) => ({
+      ...prevState,
+      [amenity]: !prevState[amenity],
+    }));
+  }, []);
 
-  const handleHighlightsChange = (highlight: any) => {
-    setHighlightsChecked({
-      ...highlightsChecked,
-      [highlight]: !highlightsChecked[highlight],
-    });
-  };
+  const handleHighlightsChange = useCallback((highlight: any) => {
+    setHighlightsChecked((prevState) => ({
+      ...prevState,
+      [highlight]: !prevState[highlight],
+    }));
+  }, []);
 
   // push amenities which is selected to updatedNewAmenity
-  const updateNewAmenity = () => {
+  const updateNewAmenity = useCallback(() => {
     const updatedNewAmenity: string[] = [];
     Object.entries(amenitiesChecked).forEach(([key, value]) => {
       if (value) {
@@ -233,31 +239,29 @@ const CreateList = () => {
       }
     });
     setNewAmenity(updatedNewAmenity);
-  };
+  }, [amenitiesChecked]);
 
   useEffect(() => {
     updateNewAmenity();
-  }, [amenitiesChecked]);
+  }, [amenitiesChecked, updateNewAmenity]);
 
   // push amenities which is selected to updatedNewHighlight
-  const updateNewHighlight = () => {
+  const updateNewHighlight = useCallback(() => {
     const updatedNewHighlight: string[] = [];
     Object.entries(highlightsChecked).forEach(([key, value]) => {
       if (value) {
-        const highlightObj = highlightsData.find(
-          (highlight) => highlight.id === key
-        );
+        const highlightObj = highlightsData.find((highlight) => highlight.id === key);
         if (highlightObj) {
           updatedNewHighlight.push(highlightObj.value);
         }
       }
     });
     setNewHighlight(updatedNewHighlight);
-  };
+  }, [highlightsChecked]);
 
   useEffect(() => {
     updateNewHighlight();
-  }, [highlightsChecked]);
+  }, [highlightsChecked, updateNewHighlight]);
 
   // Handle select for the getting location
   const handleSelect = async (value: any) => {
@@ -292,9 +296,10 @@ const CreateList = () => {
       <ToastContainer />
       {loading ? <Loader/> : (
         <Formik
-          initialValues={initialValues}
-          onSubmit={(values, formikHelpers) => handleSubmit(values, formikHelpers)}
+          initialValues={intial}
+          onSubmit={handleSubmit}
           validationSchema={PostCreationSchema}
+          enableReinitialize
         >
           {({ handleSubmit, isSubmitting }) => (
             <div className="mx-4 md:mx-28 my-8 mb-24">
