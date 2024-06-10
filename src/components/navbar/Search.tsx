@@ -2,10 +2,15 @@
 
 import { getCookie } from 'cookies-next';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const Search = () => {
-    const token: string = getCookie('token') || "";
+    
+    const [token, setToken] = useState<string | null>(null);
+    const cookieToken = getCookie('token');
+      useEffect(() => {
+          setToken(cookieToken as string);
+      }, [token, cookieToken]);
     
     return (
         <div className="w-full md:w-auto py-2 transition cursor-pointer">

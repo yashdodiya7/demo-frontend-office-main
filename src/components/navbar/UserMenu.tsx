@@ -13,9 +13,14 @@ import { RootState } from "@/types/user";
 interface UserMenuProps { }
 
 const UserMenu = () => {
-  const token = getCookie("token");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const data = useSelector((state: RootState) => state.user.userProfile);
+
+  const [token, setToken] = useState<string | null>(null);
+  const cookieToken = getCookie('token');
+    useEffect(() => {
+        setToken(cookieToken as string);
+    }, [token, cookieToken]);
 
   const toggleOpen = useCallback(() => {
     setIsOpen((prevState) => !prevState);
