@@ -13,29 +13,36 @@ import { RootState } from "@/types/user";
 interface UserMenuProps { }
 
 const UserMenu = () => {
-  const token = getCookie("token");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const data = useSelector((state: RootState) => state.user.userProfile);
+
+  const [token, setToken] = useState<string | null>(null);
+  const cookieToken = getCookie('token');
+    useEffect(() => {
+        // This code will only run on the client side
+        
+        setToken(cookieToken as string);
+    }, [token, cookieToken]);
 
   const toggleOpen = useCallback(() => {
     setIsOpen((prevState) => !prevState);
   }, []);
 
     return (
-      <div className="relative">
+      <div className="relative" suppressHydrationWarning>
         <div className="flex flex-row items-center gap-3">
           {token && !data?.confirmed_deal ? (
             data?.is_host ? (
-              <div className="md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
+              <div className="md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer" suppressHydrationWarning>
                 <Link href="/updatelisting">Edit a Post</Link>
               </div>
             ) : (
-              <div className="md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
+              <div className="md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer" suppressHydrationWarning>
                 <Link href={data?.is_verified ? "/create-listing" : "/verify"}>Make a Post</Link>
               </div>
             )
           ) : (
-            <div className="w-24 hidden md:block text-sm font-semibold py-3 px-4 rounded-full"></div>
+            <div className="w-24 hidden md:block text-sm font-semibold py-3 px-4 rounded-full" suppressHydrationWarning></div>
           )}
 
           <div
@@ -49,7 +56,7 @@ const UserMenu = () => {
           </div>
         </div>
         {isOpen && (
-          <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[80%] bg-white overflow-hidden right-0 top-12 text-sm">
+          <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[80%] bg-white overflow-hidden right-0 top-12 text-sm" suppressHydrationWarning>
             <div>
               {!token && <MenuItem to="/auth/phone-no-verify" label="Sign Up" />}
               {!token && <MenuItem to="/auth/login" label="Login" />}

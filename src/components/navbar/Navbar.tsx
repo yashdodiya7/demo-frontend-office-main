@@ -20,11 +20,11 @@ const Navbar: React.FC<NavbarProps> = () => {
 
     return (
         <div className="w-full bg-white shadow-sm sticky top-0 z-50" suppressHydrationWarning>
-            <div className="py-4 border-b-[1px]">
+            <div className="py-4 border-b-[1px]" suppressHydrationWarning>
                 <Container>
-                    <div className="flex flex-row items-center justify-between">
+                    <div className="flex flex-row items-center justify-between" suppressHydrationWarning>
                         <Logo />
-                        <div className="sm:block hidden"><Search /></div>
+                        <div className="sm:block hidden" suppressHydrationWarning><Search /></div>
                         <UserMenu />
                     </div>
                 </Container>

@@ -16,7 +16,6 @@ import {
 import { getCookie } from "cookies-next";
 import { useFormik } from "formik";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
@@ -31,7 +30,6 @@ const ProfileComponent: React.FC = () => {
   const userData = state.userProfile;
   const [imagePreview, setPreviewImage] = useState<any>(null);
   const [updateContact, setUpdateContact] = useState<boolean>(false);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
