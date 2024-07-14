@@ -74,6 +74,17 @@ export const userRegister = createAsyncThunk(
   }
 );
 
+export const userLogin = createAsyncThunk("userLogin", async (val: object) => {
+  try {
+    const existingUser = await axios.post(`${BASE_URL}/user/login`, val);
+    const data = await existingUser.data;
+    return data;
+  } catch (error: any) {
+    console.log(error.response.data.errors);
+    throw error.response.data.errors;
+  }
+});
+
 export const userPreference = createAsyncThunk(
   "userPreference",
   async ({ userToken, val }: any) => {
@@ -116,17 +127,6 @@ export const updateUserPreference = createAsyncThunk(
     }
   }
 );
-
-export const userLogin = createAsyncThunk("userLogin", async (val: object) => {
-  try {
-    const existingUser = await axios.post(`${BASE_URL}/user/login`, val);
-    const data = await existingUser.data;
-    return data;
-  } catch (error: any) {
-    console.log(error.response.data.errors);
-    throw error.response.data.errors;
-  }
-});
 
 export const getUserProfile = createAsyncThunk(
   "getUser",
